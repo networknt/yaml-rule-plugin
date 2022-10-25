@@ -123,6 +123,7 @@ You can see that we added an endpoint /v1/pets@get in the endpointRules with a r
 
 Here is the link to the video walkthrough. 
 
+https://www.youtube.com/watch?v=-mpzIOL41ZM
 
 
 ### HeaderReplaceResponseTransformAction
@@ -155,6 +156,83 @@ petstore-response-header-replace:
           value: My-Header
 ```
 
+If you have multiple request paths that need to apply this rule, you can construct your rule like this. Notice that the first joinCode is AND, and all others are OR.  
+
+```
+petstore-response-header-replace:
+  ruleId: petstore-response-header-replace
+  host: lightapi.net
+  ruleType: response-transform
+  visibility: public
+  description: Transform the response to replace one header with the other header.
+  conditions:
+    - conditionId: path-pets
+      propertyPath: requestPath
+      operatorCode: EQ
+      joinCode: AND
+      index: 1
+      conditionValues:
+        - conditionValueId: path
+          conditionValue: /v1/pets
+    - conditionId: path-dogs
+      propertyPath: requestPath
+      operatorCode: EQ
+      joinCode: OR
+      index: 2
+      conditionValues:
+        - conditionValueId: path
+          conditionValue: /v1/dogs
+    - conditionId: path-cats
+      propertyPath: requestPath
+      operatorCode: EQ
+      joinCode: OR
+      index: 3
+      conditionValues:
+        - conditionValueId: path
+          conditionValue: /v1/cats
+
+  actions:
+    - actionId: header-transform
+      actionClassName: com.networknt.rule.HeaderReplaceResponseTransformAction
+      actionValues:
+        - actionValueId: sourceHeader
+          value: X-Test-1
+        - actionValueId: targetHeader
+          value: My-Header
+
+```
+Or you can write your rule this way. Notice that we use IN operator code and give multiple conditionValues objects. 
+
+```
+petstore-response-header-replace-in:
+  ruleId: petstore-response-header-replace-in
+  host: lightapi.net
+  ruleType: response-transform
+  visibility: public
+  description: Transform the response to replace one header with the other header.
+  conditions:
+    - conditionId: path-pets
+      propertyPath: requestPath
+      operatorCode: IN
+      joinCode: AND
+      index: 1
+      conditionValues:
+        - conditionValueId: pets
+          conditionValue: /v1/pets
+        - conditionValueId: dogs
+          conditionValue: /v1/dogs
+        - conditionValueId: cats
+          conditionValue: /v1/cats
+  actions:
+    - actionId: header-transform
+      actionClassName: com.networknt.rule.ValidationAction
+      actionValues:
+        - actionValueId: sourceHeader
+          value: X-Test-1
+        - actionValueId: targetHeader
+          value: My-Header
+
+```
 Compare with the request side of the rule, we only pass the sourceHeader and targetHeader to the rule engine, so the source header won't be removed after the execution.
 
 Make the following update to the values.yml to add the /v1/pets to the appliedPathPrefixes to the response-transformer.appliedPathPrefixes. 
