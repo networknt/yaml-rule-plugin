@@ -1,7 +1,6 @@
-module com.networknt.utility {
-    exports com.networknt.utility;
+module com.networknt.rule {
+    exports com.networknt.rule;
 
     requires org.slf4j;
-    requires org.apache.commons.codec;
 
 }
