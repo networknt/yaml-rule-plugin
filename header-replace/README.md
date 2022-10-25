@@ -233,6 +233,61 @@ petstore-response-header-replace-in:
           value: My-Header
 
 ```
+
+If you have request path with query parameters, you can use pattern matching as the condition. For example. 
+
+```
+petstore-response-header-replace-match:
+  ruleId: petstore-response-header-replace-match
+  host: lightapi.net
+  ruleType: response-transform
+  visibility: public
+  description: Transform the response to replace one header with the other header.
+  conditions:
+    - conditionId: BankingServices
+      propertyPath: requestPath
+      operatorCode: MATCH
+      joinCode: AND
+      index: 1
+      conditionValues:
+        - conditionValueId: path
+          conditionValue: /v3/(.*)/BankingServices/(.*)
+    - conditionId: insight
+      propertyPath: requestPath
+      operatorCode: MATCH
+      joinCode: OR
+      index: 2
+      conditionValues:
+        - conditionValueId: path
+          conditionValue: /v3/(.*)/insight/login/(.*)/attributes/(.*)
+    - conditionId: Investments
+      propertyPath: requestPath
+      operatorCode: MATCH
+      joinCode: OR
+      index: 3
+      conditionValues:
+        - conditionValueId: path
+          conditionValue: /v3/(.*)/Investments
+    - conditionId: attributes
+      propertyPath: requestPath
+      operatorCode: MATCH
+      joinCode: OR
+      index: 4
+      conditionValues:
+        - conditionValueId: path
+          conditionValue: /v3/(.*)/attributes/(.*)
+
+```
+
+The above rule can pass the following paths. 
+
+```
+/v3/{customerId}/BankingServices/Token
+/v3/{customerId}/Investments
+/v3/{customerId}/insight/login/{loginId}/attributes/{requestId}/GetLendingAttributes
+/v3/{customerId}/attributes/library
+```
+
 Compare with the request side of the rule, we only pass the sourceHeader and targetHeader to the rule engine, so the source header won't be removed after the execution.
 
 Make the following update to the values.yml to add the /v1/pets to the appliedPathPrefixes to the response-transformer.appliedPathPrefixes. 
