@@ -4,7 +4,7 @@ The file jar file for the module is about 6.5KB and it can be dropped into the r
 
 The jar file can be built locally or you can download it from the maven central for the released version or sonatype for the snapshot version. 
 
-snapshot: https://oss.sonatype.org/service/local/repositories/snapshots/content/com/networknt/header-replace/2.1.3-SNAPSHOT/header-replace-2.1.3-20221025.001018-1.jar
+snapshot: https://oss.sonatype.org/service/local/repositories/snapshots/content/com/networknt/header-replace/2.1.3-SNAPSHOT/header-replace-2.1.3-20221025.034617-2.jar
 
 release: 
 
