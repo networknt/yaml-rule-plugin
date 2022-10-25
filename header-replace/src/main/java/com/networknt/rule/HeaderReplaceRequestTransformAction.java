@@ -19,9 +19,22 @@ public class HeaderReplaceRequestTransformAction implements IAction {
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         resultMap.put(RuleConstants.RESULT, true);
-        String sourceHeader = (String)objMap.get("sourceHeader");
-        String targetHeader = (String)objMap.get("targetHeader");
-        Boolean removeSourceHeader = (Boolean)objMap.get("removeSourceHeader");
+        String sourceHeader = null;
+        String targetHeader = null;
+        Boolean removeSourceHeader = null;
+        for(RuleActionValue value: actionValues) {
+            if("sourceHeader".equals(value.getActionValueId())) {
+                sourceHeader = value.getValue();
+                continue;
+            }
+            if("targetHeader".equals(value.getActionValueId())) {
+                targetHeader = value.getValue();
+                continue;
+            }
+            if("removeSourceHeader".equals(value.getActionValueId())) {
+                removeSourceHeader = "true".equalsIgnoreCase(value.getValue()) ? Boolean.TRUE : Boolean.FALSE;
+            }
+        }
         if(logger.isDebugEnabled()) logger.debug("source request header = " + sourceHeader + " target request header = " + targetHeader + " removeSourceHeader = " + removeSourceHeader);
         HeaderMap headerMap = (HeaderMap)objMap.get("requestHeaders");
         String sourceValue = null;
