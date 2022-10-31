@@ -1,0 +1,6 @@
+# The username for the CANNEX security. It is in this config file so that we can have different config
+# values based on the environments. If we put it into the rule, then we need to update the rule per evn.
+username: ${cannex.username:username}
+# The password that is used to create password digest for CANNEX API access. The reason we put it into
+# this config file instead of pass it from the rule is that the config file support encryption by default.
+password: ${cannex.password:password}
