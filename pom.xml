@@ -95,6 +95,8 @@
 
     <modules>
         <module>header-replace</module>
+        <module>conquest-token</module>
+        <module>soap-security</module>
     </modules>
 
     <dependencyManagement>
@@ -107,7 +109,22 @@
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
+                <artifactId>conquest-token</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>soap-security</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
                 <artifactId>config</artifactId>
+                <version>${version.light-4j}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>ingress-proxy</artifactId>
                 <version>${version.light-4j}</version>
             </dependency>
 
