@@ -15,7 +15,6 @@ public class ConquestConfig {
     private static final Logger logger = LoggerFactory.getLogger(ConquestConfig.class);
 
     public static final String CONFIG_NAME = "conquest";
-    public static final String ENABLED = "enabled";
     public static final String PATH_PREFIX = "pathPrefix";
     public static final String TOKEN_URL = "tokenUrl";
     public static final String AUTH_ISSUER = "authIssuer";
@@ -28,9 +27,7 @@ public class ConquestConfig {
     public static final String PROXY_PORT = "proxyPort";
     public static final String ENABLE_HTTP2 = "enableHttps";
     public static final String PATH_PREFIX_AUTHS = "pathPrefixAuths";
-    public static final String SERVICE_HOST = "serviceHost";
 
-    boolean enabled;
     String certFilename;
     String certPassword;
     String proxyHost;
@@ -67,14 +64,6 @@ public class ConquestConfig {
         mappedConfig = config.getJsonMapConfigNoCache(CONFIG_NAME);
         setConfigData();
         setConfigList();
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 
     public String getCertFilename() {
@@ -126,11 +115,7 @@ public class ConquestConfig {
     }
 
     private void setConfigData() {
-        Object object = mappedConfig.get(ENABLED);
-        if(object != null && (Boolean) object) {
-            setEnabled(true);
-        }
-        object = mappedConfig.get(CERT_FILENAME);
+        Object object = mappedConfig.get(CERT_FILENAME);
         if(object != null) {
             setCertFilename((String) object);
         }
@@ -180,7 +165,6 @@ public class ConquestConfig {
                     pathPrefixAuth.setAuthIssuer((String)value.get(AUTH_ISSUER));
                     pathPrefixAuth.setAuthSubject((String)value.get(AUTH_SUBJECT));
                     pathPrefixAuth.setAuthAudience((String)value.get(AUTH_AUDIENCE));
-                    pathPrefixAuth.setServiceHost((String)value.get(SERVICE_HOST));
                     pathPrefixAuth.setTokenTtl((Integer)value.get(TOKEN_TTL));
                     pathPrefixAuth.setTokenUrl((String)value.get(TOKEN_URL));
                     pathPrefixAuths.add(pathPrefixAuth);
