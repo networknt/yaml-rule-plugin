@@ -48,7 +48,7 @@ public class SoapSecurityTransformAction implements IAction {
 
     private String transform(String requestBody, String username, String password) {
         // the source input is a string of XML, we will replace the header with security with regex.
-        String output = requestBody.replaceAll("<soap:Header/>", generateSecurity(username, password));
+        String output = requestBody.replaceAll("<soapenv:Header/>", generateSecurity(username, password));
         return output;
     }
 
@@ -70,18 +70,17 @@ public class SoapSecurityTransformAction implements IAction {
 
         // SOAP header security section.
         String security =
-                  "   <soap:Header>\n"
-                + "   <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\"\n"
+                "   <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\"\n"
                 + "               xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"\n"
-                + "               soap:mustUnderstand=\"1\">\n"
+                + "               soapenv:mustUnderstand=\"1\">\n"
                 + "      <wsse:UsernameToken wsu:Id=\"UsernameToken-eab4be46-8374-4492-81c9-502798f4b123\">\n"
                 + "         <wsse:Username>%Username%</wsse:Username>\n"
                 + "         <wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">%PasswordDigest%</wsse:Password>\n"
                 + "         <wsse:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">%Nonce%</wsse:Nonce>\n"
                 + "         <wsu:Created>%Created%</wsu:Created>\n"
                 + "      </wsse:UsernameToken>\n"
-                + "   </wsse:Security>\n"
-                + "   </soap:Header>\\n\";"  ;
+                + "   </wsse:Security>\n";
+
 
         security = security.replaceAll("%Username%", username);
         security = security.replaceAll("%PasswordDigest%", passwordDigest);
