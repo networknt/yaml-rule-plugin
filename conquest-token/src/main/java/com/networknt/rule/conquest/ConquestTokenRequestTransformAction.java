@@ -42,12 +42,11 @@ import java.util.stream.Collectors;
  */
 public class ConquestTokenRequestTransformAction implements IAction {
     private static final Logger logger = LoggerFactory.getLogger(ConquestTokenRequestTransformAction.class);
-    private ConquestConfig config;
-    private HttpClient client;
+    // change the config to static so that it can cache the token retrieved until expiration time.
+    private static ConquestConfig config = ConquestConfig.load();
+    private static HttpClient client;
 
     public ConquestTokenRequestTransformAction() {
-        config = ConquestConfig.load();
-        if(logger.isInfoEnabled()) logger.info("ConquestTokenRequestTransformAction is loaded.");
     }
 
     @Override
@@ -59,6 +58,7 @@ public class ConquestTokenRequestTransformAction implements IAction {
             if(requestPath.startsWith(pathPrefixAuth.getPathPrefix())) {
                 if(logger.isTraceEnabled()) logger.trace("found with requestPath = " + requestPath + " prefix = " + pathPrefixAuth.getPathPrefix());
                 if(System.currentTimeMillis() >= (pathPrefixAuth.getExpiration())) {
+                    if(logger.isTraceEnabled()) logger.trace("Cached token {} is expired with current time {} and expired time {}", pathPrefixAuth.getAccessToken() != null ? pathPrefixAuth.getAccessToken().substring(0, 20) : null, System.currentTimeMillis(), pathPrefixAuth.getExpiration());
                     // get a new access token.
                     String jwt = null;
                     try {
@@ -73,6 +73,7 @@ public class ConquestTokenRequestTransformAction implements IAction {
                         if(tokenResponse != null) {
                             pathPrefixAuth.setExpiration(System.currentTimeMillis() + tokenResponse.getExpiresIn() * 1000 - 60000);
                             pathPrefixAuth.setAccessToken(tokenResponse.getAccessToken());
+                            if(logger.isTraceEnabled()) logger.trace("Got a new token {} and cached it with expiration time {}", pathPrefixAuth.getAccessToken() != null ? pathPrefixAuth.getAccessToken().substring(0, 20) : null, pathPrefixAuth.getExpiration());
                         } else {
                             return;
                         }
@@ -182,7 +183,6 @@ public class ConquestTokenRequestTransformAction implements IAction {
 
             HttpResponse<?> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             // {"access_token":"eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiM0ptbzhUWFJtQTJ2U2hkcFJ6UHpUbC9Xak1zPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJjb25xdWVzdC1wdWJsaWMtdWF0LXN1bmxpZmUtand0LWludGVncmF0aW9uIiwiYXVkaXRUcmFja2luZ0lkIjoiM2UwNjc5ODYtMzRmYy00MzhjLThiYmEtOWJlODhiNGUzZTgxIiwiaXNzIjoiaHR0cHM6Ly9zdW5saWZlLWF1dGgudWF0LmNvbnF1ZXN0LXB1YmxpYy5jb25xdWVzdHBsYW5uaW5nLmNvbTo0NDMvbG9naW4vb2F1dGgyL3JlYWxtcy9yb290L3JlYWxtcy9jb24vcmVhbG1zL3VhdCIsInRva2VuTmFtZSI6ImFjY2Vzc190b2tlbiIsInR5cCI6IkJlYXJlciIsInRva2VuX3R5cGUiOiJCZWFyZXIiLCJhdXRoR3JhbnRJZCI6IjhmODVjOTFkLTQ1NzAtNDA5Ni1iYTdkLWI3Mzk2NDJiZGVhMiIsImF1ZCI6ImNvbnF1ZXN0LXB1YmxpYy11YXQtc3VubGlmZS1qd3QtaW50ZWdyYXRpb24iLCJuYmYiOjE2NjYyOTg1OTksInJlYWxtX2FjY2VzcyI6e30sInNjb3BlIjoiYXBpLmNvbnF1ZXN0cGxhbm5pbmcuY29tIiwiYXV0aF90aW1lIjoxNjY2Mjk4NTk5LCJyZWFsbSI6Ii9jb24vdWF0IiwiZXhwIjoxNjY2MzAwMzk5LCJpYXQiOjE2NjYyOTg1OTksImV4cGlyZXNfaW4iOjE4MDAwMDAsImp0aSI6IjU0ZjMzYzU2LTRhYjktNGI2OC1hYWU2LTAwZGJhZWJiNmVhOSJ9.Fvp2bs2h4pRo9Dcd_w7yMJGwY0Acq4h1fouYbo6b0WVVu8KTTC3Xxrl59kPT7f8Rsd-BjeORM83VypgAVWBvEhZWSOY_PpEIgPL0_EHBDOsOyd9x6Q_78WtVxpQ37Vag3nGT_EZA2b5ECWX1fg4C0qIJ4uUf4wyI6a91fui-95EgVBRsdsNa7TaX4AcsCX4T_96X-sqUY127YGyKV20S9ppKzwpg2kR1Xp43_HxtyBu5i-oSj8ry1EVZd5I0hTl2dzddyYUT8SfCiitS-BrAXC_1MM91td00kn3WlMjFahE5PcC6rg8yVFGpG0OQyIbElvCnfSeqNLjx3FPyVx3rqw","scope":"api.conquestplanning.com","token_type":"Bearer","expires_in":1799}
-            System.out.println(response.statusCode() + " " + response.body().toString());
             if(response.statusCode() == 200) {
                 // construct a token response and return it.
                 Map<String, Object> map = JsonMapper.string2Map(response.body().toString());
