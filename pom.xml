@@ -97,6 +97,7 @@
         <module>header-replace</module>
         <module>conquest-token</module>
         <module>soap-security</module>
+        <module>context-validator</module>
     </modules>
 
     <dependencyManagement>
@@ -115,6 +116,11 @@
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>soap-security</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>context-validator</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
