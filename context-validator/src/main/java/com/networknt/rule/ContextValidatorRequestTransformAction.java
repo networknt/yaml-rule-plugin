@@ -38,11 +38,10 @@ public class ContextValidatorRequestTransformAction implements IAction {
             String contentType = "application/json";
             int statusCode = 401;
             if(logger.isTraceEnabled()) logger.trace("Return values: errorMessage {} contentType {} statusCode", errorMessage, contentType, statusCode);
-            Map<String, Object> map = new HashMap<>();
-            map.put("errorMessage", errorMessage);
-            map.put("contentType", contentType);
-            map.put("statusCode", statusCode);
-            resultMap.put("validationError", map);
+            resultMap.put("errorMessage", errorMessage);
+            resultMap.put("contentType", contentType);
+            resultMap.put("statusCode", statusCode);
+            resultMap.put("validationError", true);
         }
     }
 }
