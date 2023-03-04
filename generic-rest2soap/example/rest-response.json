@@ -1,0 +1,8 @@
+{
+  "DeliverExamOneContentResult": {
+    "TransactionID": "4aef1b48-7342-4f93-9314-ed7b93bfc1ee",
+    "ResponseCode": "1",
+    "ResponseCodeText": "Successfully received message",
+    "ResponseMessage": "Message"
+  }
+}
