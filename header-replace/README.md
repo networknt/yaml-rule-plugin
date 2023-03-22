@@ -13,6 +13,8 @@ release:
 
 To use this action plugin, add the following section into the rules.yml
 
+Note that the activeValues define the sourceHeader as Flink-Token, targetHeader as Authorization and removeSourceHeader as true. This will allow the targetHeader to be updated with the value from the sourceHeader, and the sourceHeader will be removed after the update.
+
 ```
 petstore-request-header-replace:
   ruleId: petstore-request-header-replace
@@ -40,6 +42,18 @@ petstore-request-header-replace:
         - actionValueId: removeSourceHeader
           value: true
 
+```
+There is another use case to replace the targetHeader with a targetValue passed in from the rule action value. Here is the section of the actionValues for this use case. It will update the Authorization header to newToken.
+
+```
+  actions:
+    - actionId: header-transform
+      actionClassName: com.networknt.rule.HeaderReplaceRequestTransformAction
+      actionValues:
+        - actionValueId: targetHeader
+          value: Authorization
+        - actionValueId: targetValue
+          value: newToken
 ```
 
 The above rule will be triggered when the request path is /v1/pets, which is an endpoint for the petstore API in the backend. Once the rule is triggered, it passes sourceHeader name, targetHeader name and removeSourceHeader flag through actionValues parameter to the plugin. The plugin will return requestHeaders object that contains a remove list of string for headers to be removed and a map of header name to header value in the update map. 
@@ -130,6 +144,8 @@ https://www.youtube.com/watch?v=-mpzIOL41ZM
 
 To use this action plugin, add the following section into the rules.yml
 
+Note that the activeValues define the sourceHeader as X-Test-1, targetHeader as My-Header. This will allow the targetHeader to be updated with the value from the sourceHeader, and the sourceHeader will not be removed after the update.
+
 ```
 petstore-response-header-replace:
   ruleId: petstore-response-header-replace
@@ -152,6 +168,16 @@ petstore-response-header-replace:
       actionValues:
         - actionValueId: sourceHeader
           value: X-Test-1
+        - actionValueId: targetHeader
+          value: My-Header
+```
+
+There is another use case to replace the targetHeader with a targetValue passed in from the rule action value. Here is the section of the actionValues for this use case. It will update the My-Header header to newToken.
+
+```
+      actionValues:
+        - actionValueId: targetValue
+          value: newToken
         - actionValueId: targetHeader
           value: My-Header
 ```

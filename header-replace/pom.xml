@@ -21,7 +21,7 @@
     <parent>
         <groupId>com.networknt</groupId>
         <artifactId>yaml-rule-plugin</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -33,6 +33,10 @@
         <dependency>
             <groupId>com.networknt</groupId>
             <artifactId>yaml-rule</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>config</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -51,11 +55,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.networknt</groupId>
-            <artifactId>config</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
