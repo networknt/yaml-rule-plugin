@@ -91,4 +91,42 @@ public class HeaderReplaceRequestTransformActionTest {
         Map<String, Object> updateMap = (Map)requestHeaders.get("update");
         Assert.assertEquals("newToken", updateMap.get("Authorization"));
     }
+
+    /**
+     * The test case is similar to the above one but the targetValue is encrypted. The plugin should decrypt the value
+     * and put into the targetHeader.
+     */
+    @Test
+    public void testEncryptedValue() {
+        HeaderReplaceRequestTransformAction action = new HeaderReplaceRequestTransformAction();
+        Map<String, Object> objMap = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>();
+        List<RuleActionValue> actionValues = new ArrayList<>();
+
+        // set the original oldToken in the Authorization header.
+        HeaderMap headerMap = new HeaderMap();
+        headerMap.add(new HttpString("Authorization"), "oldToken");
+        objMap.put("requestHeaders", headerMap);
+
+        // replace the Authorization header with targetValue newToken
+        RuleActionValue ruleActionValue1 = new RuleActionValue();
+        ruleActionValue1.setActionValueId("targetHeader");
+        ruleActionValue1.setValue("Authorization");
+        actionValues.add(ruleActionValue1);
+        RuleActionValue ruleActionValue2 = new RuleActionValue();
+        ruleActionValue2.setActionValueId("targetValue");
+        ruleActionValue2.setValue("CRYPT:08eXg9TmK604+w06RaBlsPQbplU1F1Ez5pkBO/hNr8w=");
+        actionValues.add(ruleActionValue2);
+
+        action.performAction(objMap, resultMap, actionValues);
+
+        Assert.assertNotNull(resultMap);
+        Map<String, Object> requestHeaders = (Map)resultMap.get("requestHeaders");
+        Assert.assertNotNull(requestHeaders);
+        // there should be two entries in the requestHeaders. One update the Authorization header with value "Token"
+        Assert.assertEquals(1, requestHeaders.size());
+        Map<String, Object> updateMap = (Map)requestHeaders.get("update");
+        Assert.assertEquals("password", updateMap.get("Authorization"));
+    }
+
 }

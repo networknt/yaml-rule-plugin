@@ -1,5 +1,6 @@
 package com.networknt.rule;
 
+import com.networknt.config.ConfigInjection;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import org.slf4j.Logger;
@@ -45,6 +46,7 @@ public class HeaderReplaceResponseTransformAction implements IAction {
         // there are two situations to handler. sourceHeader vs targetValue. One of them should not be null.
         // if both are not null, then only the targetValue will be used.
         if(targetValue != null) {
+            targetValue = (String) ConfigInjection.decryptEnvValue(ConfigInjection.getDecryptor(), targetValue);
             Map<String, Object> responseHeaders = new HashMap<>();
             Map<String, Object> updateMap = new HashMap<>();
             updateMap.put(targetHeader, targetValue);

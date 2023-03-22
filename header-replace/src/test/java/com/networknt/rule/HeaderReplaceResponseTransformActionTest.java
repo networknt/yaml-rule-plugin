@@ -86,4 +86,39 @@ public class HeaderReplaceResponseTransformActionTest {
         Assert.assertEquals("newToken", updateMap.get("Authorization"));
     }
 
+    /**
+     * The test case is similar to the above with the targetValue encrypted.
+     */
+    @Test
+    public void testEncryptedValue() {
+        HeaderReplaceResponseTransformAction action = new HeaderReplaceResponseTransformAction();
+        Map<String, Object> objMap = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>();
+        List<RuleActionValue> actionValues = new ArrayList<>();
+
+        // set the original oldToken in the Authorization header.
+        HeaderMap headerMap = new HeaderMap();
+        headerMap.add(new HttpString("Authorization"), "oldToken");
+        objMap.put("responseHeaders", headerMap);
+
+        // replace the Authorization header with targetValue newToken
+        RuleActionValue ruleActionValue1 = new RuleActionValue();
+        ruleActionValue1.setActionValueId("targetHeader");
+        ruleActionValue1.setValue("Authorization");
+        actionValues.add(ruleActionValue1);
+        RuleActionValue ruleActionValue2 = new RuleActionValue();
+        ruleActionValue2.setActionValueId("targetValue");
+        ruleActionValue2.setValue("CRYPT:08eXg9TmK604+w06RaBlsPQbplU1F1Ez5pkBO/hNr8w=");
+        actionValues.add(ruleActionValue2);
+
+        action.performAction(objMap, resultMap, actionValues);
+
+        Assert.assertNotNull(resultMap);
+        Map<String, Object> responseHeaders = (Map)resultMap.get("responseHeaders");
+        Assert.assertNotNull(responseHeaders);
+        // there should be one entry in the responseHeaders. One update the Authorization header with value "Token"
+        Assert.assertEquals(1, responseHeaders.size());
+        Map<String, Object> updateMap = (Map)responseHeaders.get("update");
+        Assert.assertEquals("password", updateMap.get("Authorization"));
+    }
 }

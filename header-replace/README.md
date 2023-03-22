@@ -45,6 +45,8 @@ petstore-request-header-replace:
 ```
 There is another use case to replace the targetHeader with a targetValue passed in from the rule action value. Here is the section of the actionValues for this use case. It will update the Authorization header to newToken.
 
+When the targetValue is sensitive, you should encrypt it with the light-4j encrypt utility or your customized utility. The encrypted value will be decrypted in the plugin.
+
 ```
   actions:
     - actionId: header-transform
@@ -173,6 +175,10 @@ petstore-response-header-replace:
 ```
 
 There is another use case to replace the targetHeader with a targetValue passed in from the rule action value. Here is the section of the actionValues for this use case. It will update the My-Header header to newToken.
+
+When the targetValue is sensitive, you should encrypt it with the light-4j encrypt utility or your customized utility. The encrypted value will be decrypted in the plugin.
+
+When the targetValue is sensitive, you should encrypt it with the light-4j encrypt utility or your customized utility. The encrypted value will be decrypted in the plugin.
 
 ```
       actionValues:
