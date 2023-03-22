@@ -25,5 +25,7 @@ mvn versions:set -DnewVersion=1.0.4 -DgenerateBackupPoms=false
 * Finally, release from the master to the maven central.
 
 ```
-
+mvn clean install deploy -DperformRelease
 ```
+
+
