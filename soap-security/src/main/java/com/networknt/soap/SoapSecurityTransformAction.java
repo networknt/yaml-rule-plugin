@@ -32,6 +32,7 @@ public class SoapSecurityTransformAction implements IAction {
     private static final String PASSWORD = "password";
     private static final Logger logger = LoggerFactory.getLogger(SoapSecurityTransformAction.class);
     private static Map<String, Object> config = Config.getInstance().getJsonMapConfigNoCache(CONFIG_NAME);
+    String pattern = "<soapenv:Header>(.*?)</soapenv:Header>";
 
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
@@ -48,7 +49,7 @@ public class SoapSecurityTransformAction implements IAction {
 
     private String transform(String requestBody, String username, String password) {
         // the source input is a string of XML, we will replace the header with security with regex.
-        String output = requestBody.replaceAll("<soapenv:Header/>", generateSecurity(username, password));
+        String output = requestBody.replaceAll(pattern, "<soapenv:Header>" + generateSecurity(username, password) + "</soapenv:Header>");
         return output;
     }
 
