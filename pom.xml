@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.networknt</groupId>
     <artifactId>yaml-rule-plugin</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <packaging>pom</packaging>
     <name>Parent POM</name>
     <description>YAML Rule Plugin Modules</description>
@@ -66,17 +66,17 @@
     <properties>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.light-4j>2.1.8</version.light-4j>
-        <version.jackson>2.14.1</version.jackson>
+        <version.light-4j>2.1.19</version.light-4j>
+        <version.jackson>2.15.2</version.jackson>
         <version.slf4j>1.7.36</version.slf4j>
         <version.jose4j>0.6.3</version.jose4j>
         <version.commons.codec>1.13</version.commons.codec>
         <version.encoder>1.2.1</version.encoder>
         <version.logback>1.2.11</version.logback>
         <version.junit>4.13.1</version.junit>
-        <version.undertow>2.3.0.Final</version.undertow>
-        <version.yaml-rule>1.0.1</version.yaml-rule>
-        <version.snakeyaml>1.33</version.snakeyaml>
+        <version.undertow>2.3.5.Final</version.undertow>
+        <version.yaml-rule>1.0.2</version.yaml-rule>
+        <version.snakeyaml>2.0</version.snakeyaml>
         <version.commons-codec>1.15</version.commons-codec>
         <version.commons-text>1.10.0</version.commons-text>
         <version.maven-version>2.7</version.maven-version>
