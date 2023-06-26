@@ -1,0 +1,15 @@
+# Configuration for ePAM rule plugin
+# Certificate file name. The private key alias is the filename without the .jks extension.
+certFilename: ${epam.certFilename:epam.jks}
+# Certificate file password
+certPassword: ${epam.certPassword:password}
+# Proxy Host if calling within the corp network with a gateway like Mcafee gateway.
+proxyHost: ${epam.proxyHost:}
+# Proxy Port if proxy host is used. default value will be 443 which means HTTPS.
+proxyPort: ${epam.proxyPort:}
+# If HTTP2 is used to connect to the epam site.
+enableHttp2: ${epam.enableHttp2:false}
+# Client Id for the ePAM token access.
+clientId: ${epam.clientId:}
+# Token scope for the ePAM token access.
+scope: ${epam.scope:}
