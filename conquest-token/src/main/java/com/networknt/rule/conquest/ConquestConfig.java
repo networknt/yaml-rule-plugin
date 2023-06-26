@@ -34,7 +34,7 @@ public class ConquestConfig {
     int proxyPort;
     boolean enableHttp2;
     List<PathPrefixAuth> pathPrefixAuths;
-    private Config config;
+    private final Config config;
     private Map<String, Object> mappedConfig;
 
     private ConquestConfig() {

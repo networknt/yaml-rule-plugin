@@ -63,7 +63,7 @@ public class EpamTokenRequestTransformAction implements IAction {
                 if(logger.isTraceEnabled()) logger.trace("found with requestPath = " + requestPath + " prefix = " + pathPrefixAuth.getPathPrefix());
                 if(System.currentTimeMillis() >= (pathPrefixAuth.getExpiration())) {
                     if(logger.isTraceEnabled()) logger.trace("Cached token {} is expired with current time {} and expired time {}", pathPrefixAuth.getAccessToken() != null ? pathPrefixAuth.getAccessToken().substring(0, 20) : null, System.currentTimeMillis(), pathPrefixAuth.getExpiration());
-                    TokenResponse tokenResponse = getAccessToken(pathPrefixAuth.getTokenUrl());
+                    TokenResponse tokenResponse = getAccessToken(pathPrefixAuth.getTokenUrl(), pathPrefixAuth.getClientId(), pathPrefixAuth.getScope());
                     if(tokenResponse != null) {
                         pathPrefixAuth.setExpiration(System.currentTimeMillis() + tokenResponse.getExpiresIn() * 1000 - 60000);
                         pathPrefixAuth.setAccessToken(tokenResponse.getAccessToken());
@@ -85,7 +85,7 @@ public class EpamTokenRequestTransformAction implements IAction {
         }
     }
 
-    private TokenResponse getAccessToken(String serverUrl) {
+    private TokenResponse getAccessToken(String serverUrl, String clientId, String scope) {
         String certFileName = config.getCertFilename(); // PKCS12 format
         String certPassword = config.getCertPassword();
         TokenResponse tokenResponse = null;
@@ -125,8 +125,8 @@ public class EpamTokenRequestTransformAction implements IAction {
             }
             Map<String, String> parameters = new HashMap<>();
             parameters.put("grant_type", "client_credentials");
-            parameters.put("client_id", config.getClientId());
-            parameters.put("scope", config.getScope());
+            parameters.put("client_id", clientId);
+            parameters.put("scope", scope);
 
             String form = parameters.entrySet()
                     .stream()
