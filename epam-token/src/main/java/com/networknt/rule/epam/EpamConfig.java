@@ -32,13 +32,9 @@ public class EpamConfig {
     String proxyHost;
     int proxyPort;
     boolean enableHttp2;
-    String clientId;
-    String scope;
-    String tokenUrl;
-    int tokenTtl;
 
     List<PathPrefixAuth> pathPrefixAuths;
-    private Config config;
+    private final Config config;
     private Map<String, Object> mappedConfig;
 
     private EpamConfig() {
@@ -110,38 +106,6 @@ public class EpamConfig {
         this.enableHttp2 = enableHttp2;
     }
 
-    public String getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    public String getScope() {
-        return scope;
-    }
-
-    public void setScope(String scope) {
-        this.scope = scope;
-    }
-
-    public String getTokenUrl() {
-        return tokenUrl;
-    }
-
-    public void setTokenUrl(String tokenUrl) {
-        this.tokenUrl = tokenUrl;
-    }
-
-    public int getTokenTtl() {
-        return tokenTtl;
-    }
-
-    public void setTokenTtl(int tokenTtl) {
-        this.tokenTtl = tokenTtl;
-    }
-
     public List<PathPrefixAuth> getPathPrefixAuths() {
         return pathPrefixAuths;
     }
@@ -170,22 +134,6 @@ public class EpamConfig {
         object = mappedConfig.get(ENABLE_HTTP2);
         if(object != null && (Boolean) object) {
             setEnableHttp2(true);
-        }
-        object = mappedConfig.get(TOKEN_URL);
-        if(object != null) {
-            setTokenUrl((String) object);
-        }
-        object = mappedConfig.get(CLIENT_ID);
-        if(object != null) {
-            setClientId((String) object);
-        }
-        object = mappedConfig.get(SCOPE);
-        if(object != null) {
-            setScope((String) object);
-        }
-        object = mappedConfig.get(TOKEN_TTL);
-        if (object != null) {
-            setTokenTtl((int) object);
         }
     }
 
