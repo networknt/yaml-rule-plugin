@@ -9,11 +9,6 @@ proxyHost: ${epam.proxyHost:}
 proxyPort: ${epam.proxyPort:}
 # If HTTP2 is used to connect to the epam site.
 enableHttp2: ${epam.enableHttp2:false}
-# Client Id for the ePAM token access.
-clientId: ${epam.clientId:}
-# Token scope for the ePAM token access.
-scope: ${epam.scope:}
-
 
 # A list of applied request path prefixes and authentication mappings, other requests will skip this handler.
 # Each item will have properties to help get the token from the ePAM access token service. For each API
