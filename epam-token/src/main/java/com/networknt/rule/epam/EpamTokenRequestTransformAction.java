@@ -147,12 +147,14 @@ public class EpamTokenRequestTransformAction implements IAction {
             HttpResponse<?> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if(response.statusCode() == 200) {
                 // construct a token response and return it.
+                if(logger.isTraceEnabled()) logger.trace("response body " + response.body().toString());
                 Map<String, Object> map = JsonMapper.string2Map(response.body().toString());
                 if(map != null) {
                     tokenResponse = new TokenResponse();
                     tokenResponse.setAccessToken((String)map.get("access_token"));
                     tokenResponse.setTokenType((String)map.get("token_type"));
                     tokenResponse.setExpiresIn((Integer)map.get("expires_in"));
+                    if(logger.isTraceEnabled()) logger.trace("tokenResponse = " + tokenResponse.toString());
                     return tokenResponse;
                 } else {
                     logger.error("response body cannot be parsed as a JSON " + response.body());
