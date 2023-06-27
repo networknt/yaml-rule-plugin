@@ -19,10 +19,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.ProxySelector;
-import java.net.URI;
-import java.net.URLEncoder;
+import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -104,11 +101,18 @@ public class EpamTokenRequestTransformAction implements IAction {
                         .followRedirects(HttpClient.Redirect.NORMAL)
                         .connectTimeout(Duration.ofMillis(ClientConfig.get().getTimeout()))
                         .sslContext(sslContext);
-                if(config.getProxyHost() != null) clientBuilder.proxy(ProxySelector.of(new InetSocketAddress(config.getProxyHost(), config.getProxyPort() == 0 ? 443 : config.getProxyPort())));
-                if(config.isEnableHttp2()) clientBuilder.version(HttpClient.Version.HTTP_2);
+                if(config.getProxyHost() != null) {
+                    if(logger.isTraceEnabled()) logger.trace("use proxy " + config.getProxyHost() + ":" + config.getProxyPort());
+                    clientBuilder.proxy(ProxySelector.of(new InetSocketAddress(config.getProxyHost(), config.getProxyPort() == 0 ? 443 : config.getProxyPort())));
+                }
+                if(config.isEnableHttp2()) {
+                    if(logger.isTraceEnabled()) logger.trace("enable http2 is true");
+                    clientBuilder.version(HttpClient.Version.HTTP_2);
+                }
                 // this a workaround to bypass the hostname verification in jdk11 http client.
                 Map<String, Object> tlsMap = (Map<String, Object>)ClientConfig.get().getMappedConfig().get(Http2Client.TLS);
                 if(tlsMap != null && !Boolean.TRUE.equals(tlsMap.get(TLSConfig.VERIFY_HOSTNAME))) {
+                    if(logger.isTraceEnabled()) logger.trace("disable hostname verification");
                     final Properties props = System.getProperties();
                     props.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
                 }
@@ -136,7 +140,7 @@ public class EpamTokenRequestTransformAction implements IAction {
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(serverUrl))
-                    .headers("Content-Type", "application/x-www-form-urlencoded", "accept", "application/json")
+                    .headers("Content-Type", "application/x-www-form-urlencoded", "accept", "application/json", "Host", extractHost(serverUrl))
                     .POST(HttpRequest.BodyPublishers.ofString(form))
                     .build();
 
@@ -162,5 +166,15 @@ public class EpamTokenRequestTransformAction implements IAction {
             logger.error("Exception:", e);
             return null;
         }
+    }
+
+    public String extractHost(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            return url.getHost();
+        } catch (Exception e) {
+            logger.error("Exception:", e);
+        }
+        return null;
     }
 }
