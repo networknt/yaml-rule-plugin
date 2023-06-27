@@ -4,6 +4,7 @@ import com.networknt.client.ClientConfig;
 import com.networknt.client.Http2Client;
 import com.networknt.client.oauth.TokenResponse;
 import com.networknt.client.ssl.TLSConfig;
+import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
 import com.networknt.config.TlsUtil;
 import com.networknt.proxy.PathPrefixAuth;
@@ -93,7 +94,7 @@ public class EpamTokenRequestTransformAction implements IAction {
             try {
                 //  create keystore
                 KeyStore keyStore = KeyStore.getInstance("PKCS12");
-                keyStore.load(new FileInputStream(certFileName), certPassword.toCharArray());
+                keyStore.load(Config.getInstance().getInputStreamFromFile(certFileName), certPassword.toCharArray());
                 KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
                 kmf.init(keyStore, certPassword.toCharArray());
                 SSLContext sslContext = SSLContext.getInstance("TLS");
