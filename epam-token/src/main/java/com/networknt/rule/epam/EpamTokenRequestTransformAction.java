@@ -140,7 +140,7 @@ public class EpamTokenRequestTransformAction implements IAction {
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(serverUrl))
-                    .headers("Content-Type", "application/x-www-form-urlencoded", "accept", "application/json", "Host", extractHost(serverUrl))
+                    .headers("Content-Type", "application/x-www-form-urlencoded", "accept", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(form))
                     .build();
 
@@ -168,15 +168,5 @@ public class EpamTokenRequestTransformAction implements IAction {
             logger.error("Exception:", e);
             return null;
         }
-    }
-
-    public String extractHost(String urlString) {
-        try {
-            URL url = new URL(urlString);
-            return url.getHost();
-        } catch (Exception e) {
-            logger.error("Exception:", e);
-        }
-        return null;
     }
 }
