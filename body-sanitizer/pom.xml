@@ -25,14 +25,22 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>context-validator</artifactId>
+    <artifactId>body-sanitizer</artifactId>
     <packaging>jar</packaging>
-    <description>A yaml rule action implementation to validate the context against a constant string and return an error message to the caller if not matched..</description>
+    <description>A yaml rule action implementation to sanitize the request body in http-sidecar and light-gateway in the request transform interceptor.</description>
 
     <dependencies>
         <dependency>
             <groupId>com.networknt</groupId>
             <artifactId>yaml-rule</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>sanitizer</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -51,11 +59,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.networknt</groupId>
-            <artifactId>config</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

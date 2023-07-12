@@ -1,0 +1,4 @@
+# sanitizer.yml
+sanitizer.enabled: true
+sanitizer.bodyEnabled: true
+sanitizer.bodyEncoder: javascript-source
