@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.networknt</groupId>
     <artifactId>yaml-rule-plugin</artifactId>
-    <version>1.0.12</version>
+    <version>1.0.13</version>
     <packaging>pom</packaging>
     <name>Parent POM</name>
     <description>YAML Rule Plugin Modules</description>
@@ -66,7 +66,7 @@
     <properties>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.light-4j>2.1.23-SNAPSHOT</version.light-4j>
+        <version.light-4j>2.1.23</version.light-4j>
         <version.jackson>2.15.2</version.jackson>
         <version.slf4j>1.7.36</version.slf4j>
         <version.jose4j>0.6.3</version.jose4j>
@@ -102,6 +102,7 @@
         <module>context-validator</module>
         <module>generic-rest2soap</module>
         <module>epam-token</module>
+        <module>body-sanitizer</module>
     </modules>
 
     <dependencyManagement>
@@ -139,7 +140,17 @@
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
+                <artifactId>body-sanitizer</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
                 <artifactId>config</artifactId>
+                <version>${version.light-4j}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>sanitizer</artifactId>
                 <version>${version.light-4j}</version>
             </dependency>
             <dependency>
