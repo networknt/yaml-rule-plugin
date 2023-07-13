@@ -134,7 +134,9 @@ Add the endpoint /v1/pets@post and the ruleId to the mapping.
 
 ### Tutorial
 
-
 The following is a video walk through; however, some the configuration might be changed already. Please following the configuration above if you want try it out. 
+
+[video tutorial](https://youtu.be/Tkg9Q-XVT4U)
+
 
 
