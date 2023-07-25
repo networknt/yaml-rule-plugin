@@ -85,6 +85,7 @@ public class EpamTokenRequestTransformAction implements IAction {
 
     private TokenResponse getAccessToken(String serverUrl, String clientId, String scope) {
         String certFileName = config.getCertFilename(); // PKCS12 format
+        if(logger.isTraceEnabled()) logger.trace("certFileName = " + certFileName + " serverUrl = " + serverUrl + " clientId = " + clientId + " scope = " + scope);
         String certPassword = config.getCertPassword();
         TokenResponse tokenResponse = null;
         if(client == null) {
