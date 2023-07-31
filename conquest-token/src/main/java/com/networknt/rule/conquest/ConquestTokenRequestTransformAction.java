@@ -11,6 +11,7 @@ import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.utility.HashUtil;
+import com.networknt.utility.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +63,7 @@ public class ConquestTokenRequestTransformAction implements IAction {
                     // get a new access token.
                     String jwt = null;
                     try {
-                        jwt = createJwt(pathPrefixAuth.getAuthIssuer(), pathPrefixAuth.getAuthSubject(), pathPrefixAuth.getAuthAudience(), HashUtil.generateUUID(), pathPrefixAuth.getTokenTtl());
+                        jwt = createJwt(pathPrefixAuth.getCertFilename(), pathPrefixAuth.getCertPassword(), pathPrefixAuth.getAuthIssuer(), pathPrefixAuth.getAuthSubject(), pathPrefixAuth.getAuthAudience(), HashUtil.generateUUID(), pathPrefixAuth.getTokenTtl());
                     } catch (Exception e) {
                         logger.error("Exception", e);
                         return;
@@ -92,10 +93,8 @@ public class ConquestTokenRequestTransformAction implements IAction {
         }
     }
 
-    private String createJwt(String issuer, String subject, String audience, String jti, int tokenTtl) throws Exception {
-        String certFileName = config.getCertFilename();
-        String certPassword = config.getCertPassword();
-
+    private String createJwt(String certFilename, String certPassword, String issuer, String subject, String audience, String jti, int tokenTtl) throws Exception {
+        if(logger.isTraceEnabled()) logger.trace("certFilename = " + certFilename + " certPassword = " + StringUtils.maskHalfString(certPassword) + " issuer = " + issuer + " subject = " + subject + " audience = " + audience + " jti = " + jti + " tokenTtl = " + tokenTtl);
         String header = "{\"typ\":\"JWT\", \"alg\":\"RS256\"}";
         String claimTemplate = "'{'\"iss\": \"{0}\", \"sub\": \"{1}\", \"aud\": \"{2}\", \"jti\": \"{3}\", \"iat\": {4}, \"exp\": {5}'}'";
         StringBuffer token = new StringBuffer();
@@ -119,8 +118,8 @@ public class ConquestTokenRequestTransformAction implements IAction {
         // Add the encoded claims object
         token.append(org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(payload.getBytes("UTF-8")));
 
-        KeyStore keystore = TlsUtil.loadKeyStore(certFileName, certPassword.toCharArray());
-        PrivateKey privateKey = (PrivateKey) keystore.getKey(certFileName.substring(0, certFileName.indexOf(".")), certPassword.toCharArray());
+        KeyStore keystore = TlsUtil.loadKeyStore(certFilename, certPassword.toCharArray());
+        PrivateKey privateKey = (PrivateKey) keystore.getKey(certFilename.substring(0, certFilename.indexOf(".")), certPassword.toCharArray());
 
         // Sign the JWT Header + "." + JWT Claims Object
         Signature signature = Signature.getInstance("SHA256withRSA");
