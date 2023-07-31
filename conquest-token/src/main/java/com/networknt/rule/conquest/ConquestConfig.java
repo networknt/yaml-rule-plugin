@@ -28,8 +28,6 @@ public class ConquestConfig {
     public static final String ENABLE_HTTP2 = "enableHttps";
     public static final String PATH_PREFIX_AUTHS = "pathPrefixAuths";
 
-    String certFilename;
-    String certPassword;
     String proxyHost;
     int proxyPort;
     boolean enableHttp2;
@@ -66,22 +64,6 @@ public class ConquestConfig {
         setConfigList();
     }
 
-    public String getCertFilename() {
-        return certFilename;
-    }
-
-    public void setCertFilename(String certFilename) {
-        this.certFilename = certFilename;
-    }
-
-    public String getCertPassword() {
-        return certPassword;
-    }
-
-    public void setCertPassword(String certPassword) {
-        this.certPassword = certPassword;
-    }
-
     public String getProxyHost() {
         return proxyHost;
     }
@@ -115,15 +97,7 @@ public class ConquestConfig {
     }
 
     private void setConfigData() {
-        Object object = mappedConfig.get(CERT_FILENAME);
-        if(object != null) {
-            setCertFilename((String) object);
-        }
-        object = mappedConfig.get(CERT_PASSWORD);
-        if(object != null) {
-            setCertPassword((String) object);
-        }
-        object = mappedConfig.get(PROXY_HOST);
+        Object object = mappedConfig.get(PROXY_HOST);
         if(object != null) {
             setProxyHost((String) object);
         }
@@ -167,6 +141,8 @@ public class ConquestConfig {
                     pathPrefixAuth.setAuthAudience((String)value.get(AUTH_AUDIENCE));
                     pathPrefixAuth.setTokenTtl((Integer)value.get(TOKEN_TTL));
                     pathPrefixAuth.setTokenUrl((String)value.get(TOKEN_URL));
+                    pathPrefixAuth.setCertFilename((String)value.get(CERT_FILENAME));
+                    pathPrefixAuth.setCertPassword((String)value.get(CERT_PASSWORD));
                     pathPrefixAuths.add(pathPrefixAuth);
                 }
             } else {
