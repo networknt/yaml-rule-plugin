@@ -13,14 +13,12 @@ enableHttp2: ${epam.enableHttp2:false}
 # A list of applied request path prefixes and authentication mappings, other requests will skip this handler.
 # Each item will have properties to help get the token from the ePAM access token service. For each API
 # or request path prefix, you need to define an item in the list for authentication. This will allow the object
-# to be created and cache the token per path prefix.
+# to be created and cache the token per path prefix. The client_id and scope are passed from the request.
 pathPrefixAuths: ${epam.pathPrefixAuths:}
 # format with JSON for config server
-#  [{"pathPrefix":"/epam","clientId":"networknt-uat01","scope":"ePAM","tokenTtl":180,"tokenUrl":"https://epamws-test.ssgx.com/auth"}]
+#  [{"pathPrefix":"/epam","tokenTtl":180,"tokenUrl":"https://epamws-test.ssgx.com/auth"}]
 
 # format with YAML for readability
 #  - pathPrefix: /epam
-#    clientId: networknt-uat01
-#    scope: ePAM
 #    tokenTtl: 180
 #    tokenUrl: https://epamws-test.ssgx.com/auth

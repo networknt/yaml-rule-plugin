@@ -24,8 +24,6 @@ public class EpamConfig {
     public static final String PROXY_PORT = "proxyPort";
     public static final String ENABLE_HTTP2 = "enableHttp2";
     public static final String PATH_PREFIX_AUTHS = "pathPrefixAuths";
-    public static final String CLIENT_ID = "clientId";
-    public static final String SCOPE = "scope";
 
     String certFilename;
     String certPassword;
@@ -162,8 +160,6 @@ public class EpamConfig {
                 for(Map<String, Object> value: values) {
                     PathPrefixAuth pathPrefixAuth = new PathPrefixAuth();
                     pathPrefixAuth.setPathPrefix((String)value.get(PATH_PREFIX));
-                    pathPrefixAuth.setClientId((String)value.get(CLIENT_ID));
-                    pathPrefixAuth.setScope((String)value.get(SCOPE));
                     pathPrefixAuth.setTokenTtl((Integer)value.get(TOKEN_TTL));
                     pathPrefixAuth.setTokenUrl((String)value.get(TOKEN_URL));
                     pathPrefixAuths.add(pathPrefixAuth);
