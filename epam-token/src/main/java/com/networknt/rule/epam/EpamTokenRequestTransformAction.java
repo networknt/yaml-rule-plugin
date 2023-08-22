@@ -65,10 +65,7 @@ public class EpamTokenRequestTransformAction implements IAction {
                     if(logger.isTraceEnabled()) logger.trace("Cached token {} is expired with current time {} and expired time {}", pathPrefixAuth.getAccessToken() != null ? pathPrefixAuth.getAccessToken().substring(0, 20) : null, System.currentTimeMillis(), pathPrefixAuth.getExpiration());
                     String requestBody = (String)objMap.get("requestBody");
                     if(logger.isTraceEnabled()) logger.trace("requestBody = " + requestBody);
-                    Map<String, Object> requestMap = JsonMapper.string2Map(requestBody);
-                    String clientId = (String)requestMap.get("client_id");
-                    String scope = (String)requestMap.get("scope");
-                    TokenResponse tokenResponse = getAccessToken(pathPrefixAuth.getTokenUrl(), clientId, scope);
+                    TokenResponse tokenResponse = getAccessToken(pathPrefixAuth.getTokenUrl(), requestBody);
                     if(tokenResponse != null) {
                         pathPrefixAuth.setExpiration(System.currentTimeMillis() + tokenResponse.getExpiresIn() * 1000 - 60000);
                         pathPrefixAuth.setAccessToken(tokenResponse.getAccessToken());
@@ -99,9 +96,9 @@ public class EpamTokenRequestTransformAction implements IAction {
         }
     }
 
-    private TokenResponse getAccessToken(String serverUrl, String clientId, String scope) {
+    private TokenResponse getAccessToken(String serverUrl, String requestBody) {
         String certFileName = config.getCertFilename(); // PKCS12 format
-        if(logger.isTraceEnabled()) logger.trace("certFileName = " + certFileName + " serverUrl = " + serverUrl + " clientId = " + clientId + " scope = " + scope);
+        if(logger.isTraceEnabled()) logger.trace("certFileName = " + certFileName + " serverUrl = " + serverUrl);
         String certPassword = config.getCertPassword();
         TokenResponse tokenResponse = null;
         if(client == null) {
@@ -145,20 +142,11 @@ public class EpamTokenRequestTransformAction implements IAction {
                 logger.error("tokenUrl is null");
                 return null;
             }
-            Map<String, String> parameters = new HashMap<>();
-            parameters.put("grant_type", "client_credentials");
-            parameters.put("client_id", clientId);
-            parameters.put("scope", scope);
-
-            String form = parameters.entrySet()
-                    .stream()
-                    .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
-                    .collect(Collectors.joining("&"));
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(serverUrl))
                     .headers("Content-Type", "application/x-www-form-urlencoded", "accept", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(form))
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
             HttpResponse<?> response = client.send(request, HttpResponse.BodyHandlers.ofString());
