@@ -66,7 +66,7 @@
     <properties>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.light-4j>2.1.26-SNAPSHOT</version.light-4j>
+        <version.light-4j>2.1.26</version.light-4j>
         <version.jackson>2.15.2</version.jackson>
         <version.slf4j>1.7.36</version.slf4j>
         <version.jose4j>0.6.3</version.jose4j>
@@ -103,6 +103,7 @@
         <module>generic-rest2soap</module>
         <module>epam-token</module>
         <module>body-sanitizer</module>
+        <module>tealium-token</module>
     </modules>
 
     <dependencyManagement>
@@ -141,6 +142,11 @@
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>body-sanitizer</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>tealium-token</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
