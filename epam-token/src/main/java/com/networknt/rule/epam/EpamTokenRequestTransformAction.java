@@ -13,6 +13,7 @@ import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.status.Status;
 import com.networknt.utility.HashUtil;
+import com.networknt.utility.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,9 @@ public class EpamTokenRequestTransformAction implements IAction {
 
     public EpamTokenRequestTransformAction() {
         if(logger.isInfoEnabled()) logger.info("EpamTokenRequestTransformAction is constructed");
+        List<String> masks = new ArrayList<>();
+        masks.add("certPassword");
+        ModuleRegistry.registerModule(EpamTokenRequestTransformAction.class.getName(), config.getMappedConfig(), masks);
     }
 
     @Override

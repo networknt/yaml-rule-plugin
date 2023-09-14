@@ -9,6 +9,7 @@ import com.networknt.proxy.PathPrefixAuth;
 import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
+import com.networknt.utility.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,9 @@ public class TealiumTokenRequestTransformAction implements IAction {
 
     public TealiumTokenRequestTransformAction() {
         if(logger.isInfoEnabled()) logger.info("TealiumTokenRequestTransformAction is constructed");
+        List<String> masks = new ArrayList<>();
+        masks.add("password");
+        ModuleRegistry.registerModule(TealiumTokenRequestTransformAction.class.getName(), config.getMappedConfig(), masks);
     }
 
     @Override
