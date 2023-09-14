@@ -64,6 +64,14 @@ public class ConquestConfig {
         setConfigList();
     }
 
+    public Map<String, Object> getMappedConfig() {
+        return mappedConfig;
+    }
+
+    public void setMappedConfig(Map<String, Object> mappedConfig) {
+        this.mappedConfig = mappedConfig;
+    }
+
     public String getProxyHost() {
         return proxyHost;
     }

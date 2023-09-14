@@ -11,6 +11,7 @@ import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.utility.HashUtil;
+import com.networknt.utility.ModuleRegistry;
 import com.networknt.utility.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,10 @@ public class ConquestTokenRequestTransformAction implements IAction {
     private static HttpClient client;
 
     public ConquestTokenRequestTransformAction() {
+        if(logger.isTraceEnabled()) logger.trace("ConquestTokenRequestTransformAction is constructed");
+        List<String> masks = new ArrayList<>();
+        masks.add("certPassword");
+        ModuleRegistry.registerModule(ConquestTokenRequestTransformAction.class.getName(), config.getMappedConfig(), masks);
     }
 
     @Override

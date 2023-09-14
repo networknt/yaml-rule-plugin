@@ -4,6 +4,7 @@ import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.config.Config;
+import com.networknt.utility.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,13 @@ public class SoapSecurityTransformAction implements IAction {
     private static final Logger logger = LoggerFactory.getLogger(SoapSecurityTransformAction.class);
     private static Map<String, Object> config = Config.getInstance().getJsonMapConfigNoCache(CONFIG_NAME);
     String pattern = "<soapenv:Header>(.*?)</soapenv:Header>";
+
+    public SoapSecurityTransformAction() {
+        if(logger.isTraceEnabled()) logger.trace("SoapSecurityTransformAction is constructed.");
+        List<String> masks = new ArrayList<>();
+        masks.add("password");
+        ModuleRegistry.registerModule(SoapSecurityTransformAction.class.getName(), config, masks);
+    }
 
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
