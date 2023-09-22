@@ -104,6 +104,7 @@
         <module>epam-token</module>
         <module>body-sanitizer</module>
         <module>tealium-token</module>
+        <module>snow-token</module>
     </modules>
 
     <dependencyManagement>
@@ -147,6 +148,11 @@
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>tealium-token</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>snow-token</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
