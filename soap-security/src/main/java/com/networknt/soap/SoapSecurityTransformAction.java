@@ -39,7 +39,7 @@ public class SoapSecurityTransformAction implements IAction {
         if(logger.isTraceEnabled()) logger.trace("SoapSecurityTransformAction is constructed.");
         List<String> masks = new ArrayList<>();
         masks.add("password");
-        ModuleRegistry.registerModule(SoapSecurityTransformAction.class.getName(), config, masks);
+        ModuleRegistry.registerModule(SoapSecurityTransformAction.class.getName(), Config.getInstance().getJsonMapConfigNoCache(CONFIG_NAME), masks);
     }
 
     @Override

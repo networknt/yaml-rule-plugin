@@ -4,6 +4,7 @@ import com.networknt.client.ClientConfig;
 import com.networknt.client.Http2Client;
 import com.networknt.client.oauth.TokenResponse;
 import com.networknt.client.ssl.TLSConfig;
+import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
 import com.networknt.proxy.PathPrefixAuth;
 import com.networknt.rule.IAction;
@@ -40,7 +41,7 @@ public class TealiumTokenRequestTransformAction implements IAction {
         if(logger.isInfoEnabled()) logger.info("TealiumTokenRequestTransformAction is constructed");
         List<String> masks = new ArrayList<>();
         masks.add("password");
-        ModuleRegistry.registerModule(TealiumTokenRequestTransformAction.class.getName(), config.getMappedConfig(), masks);
+        ModuleRegistry.registerModule(TealiumTokenRequestTransformAction.class.getName(), Config.getInstance().getJsonMapConfigNoCache(TealiumConfig.CONFIG_NAME), masks);
     }
 
     @Override
