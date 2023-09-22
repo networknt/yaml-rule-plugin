@@ -4,6 +4,7 @@ import com.networknt.client.ClientConfig;
 import com.networknt.client.Http2Client;
 import com.networknt.client.oauth.TokenResponse;
 import com.networknt.client.ssl.TLSConfig;
+import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
 import com.networknt.config.TlsUtil;
 import com.networknt.proxy.PathPrefixAuth;
@@ -52,7 +53,7 @@ public class ConquestTokenRequestTransformAction implements IAction {
         if(logger.isTraceEnabled()) logger.trace("ConquestTokenRequestTransformAction is constructed");
         List<String> masks = new ArrayList<>();
         masks.add("certPassword");
-        ModuleRegistry.registerModule(ConquestTokenRequestTransformAction.class.getName(), config.getMappedConfig(), masks);
+        ModuleRegistry.registerModule(ConquestTokenRequestTransformAction.class.getName(), Config.getInstance().getJsonMapConfigNoCache(ConquestConfig.CONFIG_NAME), masks);
     }
 
     @Override
