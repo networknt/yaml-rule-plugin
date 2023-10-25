@@ -74,7 +74,7 @@
         <version.encoder>1.2.1</version.encoder>
         <version.logback>1.2.11</version.logback>
         <version.junit>4.13.1</version.junit>
-        <version.undertow>2.3.7.Final</version.undertow>
+        <version.undertow>2.3.10.Final</version.undertow>
         <version.yaml-rule>1.0.2</version.yaml-rule>
         <version.snakeyaml>2.0</version.snakeyaml>
         <version.commons-codec>1.15</version.commons-codec>
