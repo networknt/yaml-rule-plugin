@@ -67,16 +67,16 @@
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.light-4j>2.1.31-SNAPSHOT</version.light-4j>
-        <version.jackson>2.15.2</version.jackson>
+        <version.jackson>2.15.3</version.jackson>
         <version.slf4j>1.7.36</version.slf4j>
         <version.jose4j>0.6.3</version.jose4j>
         <version.commons.codec>1.13</version.commons.codec>
         <version.encoder>1.2.1</version.encoder>
-        <version.logback>1.2.11</version.logback>
+        <version.logback>1.4.14</version.logback>
         <version.junit>4.13.1</version.junit>
-        <version.undertow>2.3.7.Final</version.undertow>
+        <version.undertow>2.3.10.Final</version.undertow>
         <version.yaml-rule>1.0.2</version.yaml-rule>
-        <version.snakeyaml>2.0</version.snakeyaml>
+        <version.snakeyaml>2.2</version.snakeyaml>
         <version.commons-codec>1.15</version.commons-codec>
         <version.commons-text>1.10.0</version.commons-text>
         <version.maven-version>2.7</version.maven-version>
