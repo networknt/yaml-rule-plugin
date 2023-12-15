@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
+import com.networknt.utility.ModuleRegistry;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
@@ -22,6 +23,18 @@ import java.util.Map;
 
 public class Soap2RestTransformAction implements IAction {
     protected static final Logger logger = LoggerFactory.getLogger(Soap2RestTransformAction.class);
+
+    public Soap2RestTransformAction() {
+        if (logger.isInfoEnabled()) logger.info("Soap2RestTransformAction is constructed");
+        ModuleRegistry.registerPlugin(
+                Soap2RestTransformAction.class.getPackage().getImplementationTitle(),
+                Soap2RestTransformAction.class.getPackage().getImplementationVersion(),
+                null,
+                Soap2RestTransformAction.class.getName(),
+                null,
+                null);
+
+    }
 
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {

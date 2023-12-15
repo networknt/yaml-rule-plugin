@@ -52,7 +52,13 @@ public class EpamTokenRequestTransformAction implements IAction {
         if(logger.isInfoEnabled()) logger.info("EpamTokenRequestTransformAction is constructed");
         List<String> masks = new ArrayList<>();
         masks.add("certPassword");
-        ModuleRegistry.registerModule(EpamTokenRequestTransformAction.class.getName(), Config.getInstance().getJsonMapConfigNoCache(EpamConfig.CONFIG_NAME), masks);
+        ModuleRegistry.registerPlugin(
+                EpamTokenRequestTransformAction.class.getPackage().getImplementationTitle(),
+                EpamTokenRequestTransformAction.class.getPackage().getImplementationVersion(),
+                EpamConfig.CONFIG_NAME,
+                EpamTokenRequestTransformAction.class.getName(),
+                Config.getInstance().getJsonMapConfigNoCache(EpamConfig.CONFIG_NAME),
+                masks);
     }
 
     @Override

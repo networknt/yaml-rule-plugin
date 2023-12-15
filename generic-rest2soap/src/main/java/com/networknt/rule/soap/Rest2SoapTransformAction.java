@@ -4,6 +4,7 @@ import com.networknt.rule.soap.exception.InvalidJsonBodyException;
 import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
+import com.networknt.utility.ModuleRegistry;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
@@ -22,6 +23,17 @@ import java.util.Map;
 
 public class Rest2SoapTransformAction implements IAction {
     protected static final Logger logger = LoggerFactory.getLogger(Rest2SoapTransformAction.class);
+
+    public Rest2SoapTransformAction() {
+        if(logger.isInfoEnabled()) logger.info("Rest2SoapTransformAction is constructed");
+        ModuleRegistry.registerPlugin(
+                Rest2SoapTransformAction.class.getPackage().getImplementationTitle(),
+                Rest2SoapTransformAction.class.getPackage().getImplementationVersion(),
+                null,
+                Rest2SoapTransformAction.class.getName(),
+                null,
+                null);
+    }
 
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {

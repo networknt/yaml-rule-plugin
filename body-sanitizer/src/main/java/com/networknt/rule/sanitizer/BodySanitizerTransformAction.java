@@ -6,6 +6,7 @@ import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.config.Config;
 import com.networknt.sanitizer.SanitizerConfig;
+import com.networknt.utility.ModuleRegistry;
 import org.owasp.encoder.EncoderWrapper;
 import org.owasp.encoder.Encoders;
 import org.slf4j.Logger;
@@ -23,6 +24,16 @@ public class BodySanitizerTransformAction implements IAction {
     private static final Logger logger = LoggerFactory.getLogger(BodySanitizerTransformAction.class);
     private static final SanitizerConfig config = SanitizerConfig.load();
     private static final EncoderWrapper bodyEncoder = new EncoderWrapper(Encoders.forName(config.getBodyEncoder()), config.getBodyAttributesToIgnore(), config.getBodyAttributesToEncode());
+    public BodySanitizerTransformAction() {
+        if(logger.isInfoEnabled()) logger.info("BodySanitizerTransformAction is constructed");
+        ModuleRegistry.registerPlugin(
+                BodySanitizerTransformAction.class.getPackage().getImplementationTitle(),
+                BodySanitizerTransformAction.class.getPackage().getImplementationVersion(),
+                SanitizerConfig.CONFIG_NAME,
+                BodySanitizerTransformAction.class.getName(),
+                config.getMappedConfig(),
+                null);
+    }
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         // get the body from the objMap and create a new body in the resultMap. Both in string format.

@@ -33,7 +33,7 @@ petstore-request-header-replace:
           conditionValue: /v1/pets
   actions:
     - actionId: header-transform
-      actionClassName: com.networknt.rule.HeaderReplaceRequestTransformAction
+      actionClassName: com.networknt.rule.header.HeaderReplaceRequestTransformAction
       actionValues:
         - actionValueId: sourceHeader
           value: Flink-Token
@@ -50,7 +50,7 @@ When the targetValue is sensitive, you should encrypt it with the light-4j encry
 ```
   actions:
     - actionId: header-transform
-      actionClassName: com.networknt.rule.HeaderReplaceRequestTransformAction
+      actionClassName: com.networknt.rule.header.HeaderReplaceRequestTransformAction
       actionValues:
         - actionValueId: targetHeader
           value: Authorization
@@ -166,7 +166,7 @@ petstore-response-header-replace:
           conditionValue: /v1/pets
   actions:
     - actionId: header-transform
-      actionClassName: com.networknt.rule.HeaderReplaceResponseTransformAction
+      actionClassName: com.networknt.rule.header.HeaderReplaceResponseTransformAction
       actionValues:
         - actionValueId: sourceHeader
           value: X-Test-1
@@ -225,7 +225,7 @@ petstore-response-header-replace:
 
   actions:
     - actionId: header-transform
-      actionClassName: com.networknt.rule.HeaderReplaceResponseTransformAction
+      actionClassName: com.networknt.rule.header.HeaderReplaceResponseTransformAction
       actionValues:
         - actionValueId: sourceHeader
           value: X-Test-1
