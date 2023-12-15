@@ -1,5 +1,9 @@
-package com.networknt.rule;
+package com.networknt.rule.validator;
 
+import com.networknt.rule.IAction;
+import com.networknt.rule.RuleActionValue;
+import com.networknt.rule.RuleConstants;
+import com.networknt.utility.ModuleRegistry;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import org.slf4j.Logger;
@@ -18,6 +22,17 @@ public class ContextValidatorRequestTransformAction implements IAction {
 
     // In the real implementation, this should be put into the configuration file.
     static final String secretContext = "secret";
+
+    public ContextValidatorRequestTransformAction() {
+        if(logger.isInfoEnabled()) logger.info("ContextValidatorRequestTransformAction is constructed");
+        ModuleRegistry.registerPlugin(
+                ContextValidatorRequestTransformAction.class.getPackage().getImplementationTitle(),
+                ContextValidatorRequestTransformAction.class.getPackage().getImplementationVersion(),
+                null,
+                ContextValidatorRequestTransformAction.class.getName(),
+                null,
+                null);
+    }
 
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {

@@ -46,14 +46,19 @@ import java.util.stream.Collectors;
 public class ConquestTokenRequestTransformAction implements IAction {
     private static final Logger logger = LoggerFactory.getLogger(ConquestTokenRequestTransformAction.class);
     // change the config to static so that it can cache the token retrieved until expiration time.
-    private static ConquestConfig config = ConquestConfig.load();
+    private static final ConquestConfig config = ConquestConfig.load();
     private static HttpClient client;
 
     public ConquestTokenRequestTransformAction() {
-        if(logger.isTraceEnabled()) logger.trace("ConquestTokenRequestTransformAction is constructed");
+        if(logger.isInfoEnabled()) logger.info("ConquestTokenRequestTransformAction is constructed");
         List<String> masks = new ArrayList<>();
         masks.add("certPassword");
-        ModuleRegistry.registerModule(ConquestTokenRequestTransformAction.class.getName(), Config.getInstance().getJsonMapConfigNoCache(ConquestConfig.CONFIG_NAME), masks);
+        ModuleRegistry.registerPlugin(
+                ConquestTokenRequestTransformAction.class.getPackage().getImplementationTitle(),
+                ConquestTokenRequestTransformAction.class.getPackage().getImplementationVersion(),
+                ConquestConfig.CONFIG_NAME,
+                ConquestTokenRequestTransformAction.class.getName(),
+                Config.getInstance().getJsonMapConfigNoCache(ConquestConfig.CONFIG_NAME), masks);
     }
 
     @Override

@@ -32,14 +32,20 @@ public class SoapSecurityTransformAction implements IAction {
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
     private static final Logger logger = LoggerFactory.getLogger(SoapSecurityTransformAction.class);
-    private static Map<String, Object> config = Config.getInstance().getJsonMapConfigNoCache(CONFIG_NAME);
+    private static final Map<String, Object> config = Config.getInstance().getJsonMapConfigNoCache(CONFIG_NAME);
     String pattern = "<soapenv:Header>(.*?)</soapenv:Header>";
 
     public SoapSecurityTransformAction() {
-        if(logger.isTraceEnabled()) logger.trace("SoapSecurityTransformAction is constructed.");
+        if(logger.isInfoEnabled()) logger.info("SoapSecurityTransformAction is constructed.");
         List<String> masks = new ArrayList<>();
         masks.add("password");
-        ModuleRegistry.registerModule(SoapSecurityTransformAction.class.getName(), Config.getInstance().getJsonMapConfigNoCache(CONFIG_NAME), masks);
+        ModuleRegistry.registerPlugin(
+                SoapSecurityTransformAction.class.getPackage().getImplementationTitle(),
+                SoapSecurityTransformAction.class.getPackage().getImplementationVersion(),
+                "cannex",
+                SoapSecurityTransformAction.class.getName(),
+                Config.getInstance().getJsonMapConfigNoCache(CONFIG_NAME),
+                masks);
     }
 
     @Override

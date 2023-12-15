@@ -42,7 +42,13 @@ public class SnowTokenRequestTransformAction implements IAction {
         List<String> masks = new ArrayList<>();
         masks.add("password");
         masks.add("client_secret");
-        ModuleRegistry.registerModule(SnowTokenRequestTransformAction.class.getName(), Config.getInstance().getJsonMapConfigNoCache(SnowConfig.CONFIG_NAME), masks);
+        ModuleRegistry.registerPlugin(
+                SnowTokenRequestTransformAction.class.getPackage().getImplementationTitle(),
+                SnowTokenRequestTransformAction.class.getPackage().getImplementationVersion(),
+                SnowConfig.CONFIG_NAME,
+                SnowTokenRequestTransformAction.class.getName(),
+                Config.getInstance().getJsonMapConfigNoCache(SnowConfig.CONFIG_NAME),
+                masks);
     }
 
     @Override

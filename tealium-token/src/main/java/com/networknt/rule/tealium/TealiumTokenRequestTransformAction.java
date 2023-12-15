@@ -41,7 +41,13 @@ public class TealiumTokenRequestTransformAction implements IAction {
         if(logger.isInfoEnabled()) logger.info("TealiumTokenRequestTransformAction is constructed");
         List<String> masks = new ArrayList<>();
         masks.add("password");
-        ModuleRegistry.registerModule(TealiumTokenRequestTransformAction.class.getName(), Config.getInstance().getJsonMapConfigNoCache(TealiumConfig.CONFIG_NAME), masks);
+        ModuleRegistry.registerPlugin(
+                TealiumTokenRequestTransformAction.class.getPackage().getImplementationTitle(),
+                TealiumTokenRequestTransformAction.class.getPackage().getImplementationVersion(),
+                TealiumConfig.CONFIG_NAME,
+                TealiumTokenRequestTransformAction.class.getName(),
+                Config.getInstance().getJsonMapConfigNoCache(TealiumConfig.CONFIG_NAME),
+                masks);
     }
 
     @Override
