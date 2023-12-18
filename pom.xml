@@ -75,7 +75,7 @@
         <version.logback>1.4.14</version.logback>
         <version.junit>4.13.1</version.junit>
         <version.undertow>2.3.10.Final</version.undertow>
-        <version.yaml-rule>1.0.2</version.yaml-rule>
+        <version.yaml-rule>1.0.3</version.yaml-rule>
         <version.snakeyaml>2.2</version.snakeyaml>
         <version.commons-codec>1.15</version.commons-codec>
         <version.commons-text>1.10.0</version.commons-text>
