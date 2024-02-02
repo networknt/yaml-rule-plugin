@@ -46,7 +46,7 @@ public class TealiumTokenRequestTransformAction implements IAction {
                 TealiumTokenRequestTransformAction.class.getPackage().getImplementationVersion(),
                 TealiumConfig.CONFIG_NAME,
                 TealiumTokenRequestTransformAction.class.getName(),
-                Config.getInstance().getJsonMapConfigNoCache(TealiumConfig.CONFIG_NAME),
+                Config.getNoneDecryptedInstance().getJsonMapConfigNoCache(TealiumConfig.CONFIG_NAME),
                 masks);
     }
 

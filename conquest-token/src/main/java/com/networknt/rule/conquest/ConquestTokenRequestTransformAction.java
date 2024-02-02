@@ -58,7 +58,7 @@ public class ConquestTokenRequestTransformAction implements IAction {
                 ConquestTokenRequestTransformAction.class.getPackage().getImplementationVersion(),
                 ConquestConfig.CONFIG_NAME,
                 ConquestTokenRequestTransformAction.class.getName(),
-                Config.getInstance().getJsonMapConfigNoCache(ConquestConfig.CONFIG_NAME), masks);
+                Config.getNoneDecryptedInstance().getJsonMapConfigNoCache(ConquestConfig.CONFIG_NAME), masks);
     }
 
     @Override
