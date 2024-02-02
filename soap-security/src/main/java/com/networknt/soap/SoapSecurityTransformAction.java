@@ -44,7 +44,7 @@ public class SoapSecurityTransformAction implements IAction {
                 SoapSecurityTransformAction.class.getPackage().getImplementationVersion(),
                 "cannex",
                 SoapSecurityTransformAction.class.getName(),
-                Config.getInstance().getJsonMapConfigNoCache(CONFIG_NAME),
+                Config.getNoneDecryptedInstance().getJsonMapConfigNoCache(CONFIG_NAME),
                 masks);
     }
 

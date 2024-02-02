@@ -47,7 +47,7 @@ public class SnowTokenRequestTransformAction implements IAction {
                 SnowTokenRequestTransformAction.class.getPackage().getImplementationVersion(),
                 SnowConfig.CONFIG_NAME,
                 SnowTokenRequestTransformAction.class.getName(),
-                Config.getInstance().getJsonMapConfigNoCache(SnowConfig.CONFIG_NAME),
+                Config.getNoneDecryptedInstance().getJsonMapConfigNoCache(SnowConfig.CONFIG_NAME),
                 masks);
     }
 

@@ -31,7 +31,7 @@ public class BodySanitizerTransformAction implements IAction {
                 BodySanitizerTransformAction.class.getPackage().getImplementationVersion(),
                 SanitizerConfig.CONFIG_NAME,
                 BodySanitizerTransformAction.class.getName(),
-                config.getMappedConfig(),
+                Config.getNoneDecryptedInstance().getJsonMapConfigNoCache(SanitizerConfig.CONFIG_NAME),
                 null);
     }
     @Override
