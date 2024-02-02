@@ -57,7 +57,7 @@ public class EpamTokenRequestTransformAction implements IAction {
                 EpamTokenRequestTransformAction.class.getPackage().getImplementationVersion(),
                 EpamConfig.CONFIG_NAME,
                 EpamTokenRequestTransformAction.class.getName(),
-                Config.getInstance().getJsonMapConfigNoCache(EpamConfig.CONFIG_NAME),
+                Config.getNoneDecryptedInstance().getJsonMapConfigNoCache(EpamConfig.CONFIG_NAME),
                 masks);
     }
 
