@@ -240,11 +240,6 @@
                 <version>${version.undertow}</version>
             </dependency>
             <dependency>
-                <groupId>org.jboss.threads</groupId>
-                <artifactId>jboss-threads</artifactId>
-                <version>2.3.2.Final</version>
-            </dependency>
-            <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${version.snakeyaml}</version>
