@@ -106,6 +106,7 @@
         <module>body-sanitizer</module>
         <module>tealium-token</module>
         <module>snow-token</module>
+        <module>token-transformer</module>
     </modules>
 
     <dependencyManagement>
@@ -154,6 +155,11 @@
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>snow-token</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>token-transformer</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
