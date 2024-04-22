@@ -1,4 +1,4 @@
-This module contains a rule action class implementation to validate the context header to ensure it has to match a specific value. Otherwise, an error message should be returned to the caller. 
+This module contains a rule action class implementation to validate the context header to ensure it has to match a specific value. Otherwise, an error message should be returned to the caller.
 
 In the RequestTransformerInterceptor, we have the following code to get the validationError from the rule engine to respond to the caller.
 
@@ -16,4 +16,3 @@ In the RequestTransformerInterceptor, we have the following code to get the vali
                                         break;
 
 ```
-

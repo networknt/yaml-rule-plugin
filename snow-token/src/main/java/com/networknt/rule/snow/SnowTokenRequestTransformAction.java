@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 /**
  * It is called from the request transform interceptor from the light-gateway to get the password grant type ServiceNow token
  * to replace the JWT token that consumers use to access the gateway. This allows the ServiceNow API to be exposed on the
- * Gateway as a standard API with client credentials token for API to API invocations. 
+ * Gateway as a standard API with client credentials token for API to API invocations.
  *
  * @author Steve Hu
  */
