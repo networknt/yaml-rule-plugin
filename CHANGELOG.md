@@ -14,4 +14,3 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - fixes #11 upgrade version to 1.0.2 and dependencies
-

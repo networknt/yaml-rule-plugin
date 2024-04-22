@@ -37,7 +37,7 @@ public class Rest2SoapTransformAction implements IAction {
 
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
-        
+
     	resultMap.put(RuleConstants.RESULT, true);
         String direction = "";
         logger.info("actionValues: {}", actionValues);
@@ -55,7 +55,7 @@ public class Rest2SoapTransformAction implements IAction {
                     logger.trace("actionValueID = direction and value = " + direction);
             }
         }
-        
+
         switch (direction) {
         case Constants.REQUEST_DIRECTION:
         	transformRequest(objMap, resultMap, actionValues);
@@ -67,7 +67,7 @@ public class Rest2SoapTransformAction implements IAction {
         	logger.error("Rules.yml actionValue direction must be request or response. Please fix config");
         }
     }
-    
+
     private void transformRequest(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
     	String body = (String)objMap.get("requestBody");
 
@@ -109,7 +109,7 @@ public class Rest2SoapTransformAction implements IAction {
         }
 
     }
-    
+
     private void transformResponse(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
     	String body = (String)objMap.get("responseBody");
 

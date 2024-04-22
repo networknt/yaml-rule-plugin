@@ -1,12 +1,12 @@
-This module contains a yaml rule action implementation to replace one request header value with another request header value in the request transformer and a yaml rule action implementation to replace one response header value with another response header value in the response transformer. 
+This module contains a yaml rule action implementation to replace one request header value with another request header value in the request transformer and a yaml rule action implementation to replace one response header value with another response header value in the response transformer.
 
-The file jar file for the module is about 6.5KB and it can be dropped into the rulesjar folder in the light-gateway or http-sidecar for RequestTransformerInterceptor and ResponseTransformerInterceptor to invoke via YAML RuleEngine. The RuleEngine rules and values.yml config file can be deployed to the light-portal if you have license. Otherwise, you can put them into the config folder. 
+The file jar file for the module is about 6.5KB and it can be dropped into the rulesjar folder in the light-gateway or http-sidecar for RequestTransformerInterceptor and ResponseTransformerInterceptor to invoke via YAML RuleEngine. The RuleEngine rules and values.yml config file can be deployed to the light-portal if you have license. Otherwise, you can put them into the config folder.
 
-The jar file can be built locally or you can download it from the maven central for the released version or sonatype for the snapshot version. 
+The jar file can be built locally or you can download it from the maven central for the released version or sonatype for the snapshot version.
 
 snapshot: https://oss.sonatype.org/service/local/repositories/snapshots/content/com/networknt/header-replace/2.1.3-SNAPSHOT/header-replace-2.1.3-20221025.034617-2.jar
 
-release: 
+release:
 
 
 ### HeaderReplaceRequestTransformAction
@@ -58,9 +58,9 @@ When the targetValue is sensitive, you should encrypt it with the light-4j encry
           value: newToken
 ```
 
-The above rule will be triggered when the request path is /v1/pets, which is an endpoint for the petstore API in the backend. Once the rule is triggered, it passes sourceHeader name, targetHeader name and removeSourceHeader flag through actionValues parameter to the plugin. The plugin will return requestHeaders object that contains a remove list of string for headers to be removed and a map of header name to header value in the update map. 
+The above rule will be triggered when the request path is /v1/pets, which is an endpoint for the petstore API in the backend. Once the rule is triggered, it passes sourceHeader name, targetHeader name and removeSourceHeader flag through actionValues parameter to the plugin. The plugin will return requestHeaders object that contains a remove list of string for headers to be removed and a map of header name to header value in the update map.
 
-Here is the piece of code that in the plugin. 
+Here is the piece of code that in the plugin.
 
 ```
         resultMap.put(RuleConstants.RESULT, true);
@@ -102,7 +102,7 @@ Here is the piece of code that in the plugin.
 
 ```
 
-Here is the section in the RequestTransformerInterceptor. 
+Here is the section in the RequestTransformerInterceptor.
 
 ```
                                     case "requestHeaders":
@@ -123,9 +123,9 @@ Here is the section in the RequestTransformerInterceptor.
 
 ```
 
-The passing object and the logic are the same like the header handler in the light-4j header module. 
+The passing object and the logic are the same like the header handler in the light-4j header module.
 
-For values.yml config file, we need to make the following changes. 
+For values.yml config file, we need to make the following changes.
 
 ```
 # rule-loader.yml
@@ -135,9 +135,9 @@ rule-loader.endpointRules: {"/v1/pets@get":{"request-transform":[{"ruleId":"pets
 request-transformer.appliedPathPrefixes: ["/v1/pets","/pets","/v1/flowers","/devext/CANX/AntcMultiService"]
 ```
 
-You can see that we added an endpoint /v1/pets@get in the endpointRules with a request-transform and a response-transform ruleId. Also, add /v1/pets to the request-transformer.appliedPathPrefixes list. 
+You can see that we added an endpoint /v1/pets@get in the endpointRules with a request-transform and a response-transform ruleId. Also, add /v1/pets to the request-transformer.appliedPathPrefixes list.
 
-Here is the link to the video walkthrough. 
+Here is the link to the video walkthrough.
 
 https://www.youtube.com/watch?v=-mpzIOL41ZM
 
@@ -188,7 +188,7 @@ When the targetValue is sensitive, you should encrypt it with the light-4j encry
           value: My-Header
 ```
 
-If you have multiple request paths that need to apply this rule, you can construct your rule like this. Notice that the first joinCode is AND, and all others are OR.  
+If you have multiple request paths that need to apply this rule, you can construct your rule like this. Notice that the first joinCode is AND, and all others are OR.
 
 ```
 petstore-response-header-replace:
@@ -233,7 +233,7 @@ petstore-response-header-replace:
           value: My-Header
 
 ```
-Or you can write your rule this way. Notice that we use IN operator code and give multiple conditionValues objects. 
+Or you can write your rule this way. Notice that we use IN operator code and give multiple conditionValues objects.
 
 ```
 petstore-response-header-replace-in:
@@ -266,7 +266,7 @@ petstore-response-header-replace-in:
 
 ```
 
-If you have request path with query parameters, you can use pattern matching as the condition. For example. 
+If you have request path with query parameters, you can use pattern matching as the condition. For example.
 
 ```
 petstore-response-header-replace-match:
@@ -311,7 +311,7 @@ petstore-response-header-replace-match:
 
 ```
 
-The above rule can pass the following paths. 
+The above rule can pass the following paths.
 
 ```
 /v3/{customerId}/BankingServices/Token
@@ -322,7 +322,7 @@ The above rule can pass the following paths.
 
 Compare with the request side of the rule, we only pass the sourceHeader and targetHeader to the rule engine, so the source header won't be removed after the execution.
 
-Make the following update to the values.yml to add the /v1/pets to the appliedPathPrefixes to the response-transformer.appliedPathPrefixes. 
+Make the following update to the values.yml to add the /v1/pets to the appliedPathPrefixes to the response-transformer.appliedPathPrefixes.
 
 ```
 # response-transformer.yml
@@ -331,4 +331,3 @@ response-transformer.appliedPathPrefixes: ["/v1/pets","/v1/notifications","/v1/f
 ```
 
 In the previous step, we have added the ruleId to the rule-loader.endpointRules, so we don't need to do anything extra here.
-

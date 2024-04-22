@@ -1,14 +1,14 @@
-This module contains a rule action implementation to sanitize request body in the request transform interceptor based on the rule engine. 
+This module contains a rule action implementation to sanitize request body in the request transform interceptor based on the rule engine.
 
 For users who use http-sidecar or light-gateway, you cannot use the middleware handler [SanitizerHandler](https://doc.networknt.com/concern/sanitizer/). The only option is to use this plugin to transform the request body with the sanitizer.yml configuration.
 
 ### Download Jar
 
-The plugin jar file can be downloaded at 
+The plugin jar file can be downloaded at
 
 https://mvnrepository.com/artifact/com.networknt/body-sanitizer
 
-### Configuration: 
+### Configuration:
 
 In the rules.yml file, add the following rule.
 
@@ -34,7 +34,7 @@ body-sanitizer-request:
 
 ```
 
-This rule will be triggered when the request path matches the condition and the action class will be invoked to encode the request body. 
+This rule will be triggered when the request path matches the condition and the action class will be invoked to encode the request body.
 
 In the values.yml file, we need to do that following changes to overwrite default bodyEncoder. Also, you need to make sure that RequestTransformerInterceptor and RequestBodyInterceptor are configured in the service.yml section.
 
@@ -97,7 +97,7 @@ handler.chains.default:
   .
 ```
 
-When you are sanitizing the body, you might sanitize the request headers at the same time. You need to update the handler.yml section to add the SanitizerHandler and put it into the default chain before proxy and router handler. 
+When you are sanitizing the body, you might sanitize the request headers at the same time. You need to update the handler.yml section to add the SanitizerHandler and put it into the default chain before proxy and router handler.
 
 
 service.yml
@@ -111,7 +111,7 @@ service.yml
 
 Above add the RequestTransformerInterceptor and RequestBodyInterceptor to the default chain via requestInterceptor defined in the handler.yml file.
 
-Please note that RequestBodyInterceptor must be the last interceptor in the interceptor list. 
+Please note that RequestBodyInterceptor must be the last interceptor in the interceptor list.
 
 request-transformer.yml
 
@@ -121,7 +121,7 @@ request-transformer.appliedPathPrefixes: ["/v1/pets","/v1/flowers"]
 
 ```
 
-Add the request path prefix to the request-transformer.appliedPathPrefixes list. 
+Add the request path prefix to the request-transformer.appliedPathPrefixes list.
 
 rule-loader.yml
 
@@ -134,9 +134,6 @@ Add the endpoint /v1/pets@post and the ruleId to the mapping.
 
 ### Tutorial
 
-The following is a video walk through; however, some the configuration might be changed already. Please following the configuration above if you want try it out. 
+The following is a video walk through; however, some the configuration might be changed already. Please following the configuration above if you want try it out.
 
 [video tutorial](https://youtu.be/Tkg9Q-XVT4U)
-
-
-
