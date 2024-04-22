@@ -1,0 +1,7 @@
+proxyHost:
+proxyPort:
+enableHttp2: false
+pathPrefixAuths:
+  - clientId: "mmmyyy-ccllientt-idd"
+    clientSecret: "mY_CL13nT-$3Cr3T"
+    tokenUrl: "https://networknttest.asp.lifeware.lu/api/v0/token"
