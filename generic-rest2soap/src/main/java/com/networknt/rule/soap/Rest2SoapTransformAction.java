@@ -5,9 +5,6 @@ import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.utility.ModuleRegistry;
-import io.undertow.util.HeaderMap;
-import io.undertow.util.HeaderValues;
-import io.undertow.util.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,20 +84,16 @@ public class Rest2SoapTransformAction implements IAction {
 	    }
 
         // transform the content type header.
-        HeaderMap headerMap = (HeaderMap)objMap.get("requestHeaders");
-        String contentType = null;
-        HeaderValues contentTypeObject = headerMap.get(Headers.CONTENT_TYPE);
-
-        if(contentTypeObject != null)
-            contentType = contentTypeObject.getFirst();
+        Map<String, String> headerMap = (Map<String, String>)objMap.get("requestHeaders");
+        String contentType = headerMap.get("Content-Type");
 
         if(logger.isTraceEnabled())
             logger.trace("header contentType = " + contentType);
 
         if(contentType != null && contentType.startsWith("application/json")) {
             // change it to text/xml
-            headerMap.remove(Headers.CONTENT_TYPE);
-            headerMap.put(Headers.CONTENT_TYPE, "text/xml");
+            headerMap.remove("Content-Type");
+            headerMap.put("Content-Type", "text/xml");
 
             if(logger.isTraceEnabled())
                 logger.trace("request contentType has been changed from application/json to text/xml");
@@ -132,20 +125,16 @@ public class Rest2SoapTransformAction implements IAction {
 	    }
 
         // transform the content type header.
-        HeaderMap headerMap = (HeaderMap)objMap.get("responseHeaders");
-        String contentType = null;
-        HeaderValues contentTypeObject = headerMap.get(Headers.CONTENT_TYPE);
-
-        if(contentTypeObject != null)
-            contentType = contentTypeObject.getFirst();
+        Map<String, String> headerMap = (Map<String, String>)objMap.get("responseHeaders");
+        String contentType = headerMap.get("Content-Type");
 
         if(logger.isTraceEnabled())
             logger.trace("header contentType = " + contentType);
 
         if(contentType != null && contentType.startsWith("application/json")) {
             // change it to text/xml
-            headerMap.remove(Headers.CONTENT_TYPE);
-            headerMap.put(Headers.CONTENT_TYPE, "text/xml");
+            headerMap.remove("Content-Type");
+            headerMap.put("Content-Type", "text/xml");
 
             if(logger.isTraceEnabled())
                 logger.trace("response contentType has been changed from application/json to text/xml");

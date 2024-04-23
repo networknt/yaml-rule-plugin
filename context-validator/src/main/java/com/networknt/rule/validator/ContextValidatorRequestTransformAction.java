@@ -4,8 +4,6 @@ import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.utility.ModuleRegistry;
-import io.undertow.util.HeaderMap;
-import io.undertow.util.HeaderValues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,10 +34,8 @@ public class ContextValidatorRequestTransformAction implements IAction {
 
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
-        HeaderMap headerMap = (HeaderMap)objMap.get("requestHeaders");
-        String contextValue = null;
-        HeaderValues contextObject = headerMap.get("context");
-        if(contextObject != null) contextValue = contextObject.getFirst();
+        Map<String, String> headerMap = (Map<String, String>)objMap.get("requestHeaders");
+        String contextValue  = headerMap.get("context");
         if(logger.isTraceEnabled()) logger.trace("context request header is {}" + contextValue);
         if(contextValue != null && secretContext.equals(contextValue)) {
             // validation passed and don't return anything to the request transformer interceptor

@@ -1,38 +1,28 @@
 package com.networknt.rule.epam;
 
 import com.networknt.client.ClientConfig;
-import com.networknt.client.Http2Client;
 import com.networknt.client.oauth.TokenResponse;
-import com.networknt.client.ssl.TLSConfig;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
-import com.networknt.config.TlsUtil;
-import com.networknt.proxy.PathPrefixAuth;
+import com.networknt.config.PathPrefixAuth;
+import com.networknt.http.client.ssl.TLSConfig;
 import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.status.Status;
-import com.networknt.utility.HashUtil;
 import com.networknt.utility.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.Signature;
-import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * It is called from the request transform interceptor from the light-gateway to get the e-PAM API access token with
@@ -134,7 +124,7 @@ public class EpamTokenRequestTransformAction implements IAction {
                     clientBuilder.version(HttpClient.Version.HTTP_2);
                 }
                 // this a workaround to bypass the hostname verification in jdk11 http client.
-                Map<String, Object> tlsMap = (Map<String, Object>)ClientConfig.get().getMappedConfig().get(Http2Client.TLS);
+                Map<String, Object> tlsMap = (Map<String, Object>)ClientConfig.get().getMappedConfig().get(ClientConfig.TLS);
                 if(tlsMap != null && !Boolean.TRUE.equals(tlsMap.get(TLSConfig.VERIFY_HOSTNAME))) {
                     if(logger.isTraceEnabled()) logger.trace("disable hostname verification");
                     final Properties props = System.getProperties();

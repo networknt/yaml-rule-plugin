@@ -40,16 +40,16 @@
         </dependency>
         <dependency>
             <groupId>com.networknt</groupId>
-            <artifactId>ingress-proxy</artifactId>
+            <artifactId>utility</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>http-client</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.undertow</groupId>
-            <artifactId>undertow-core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
