@@ -5,8 +5,6 @@ import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.utility.ModuleRegistry;
-import io.undertow.util.HeaderMap;
-import io.undertow.util.HeaderValues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +55,7 @@ public class HeaderReplaceResponseTransformAction implements IAction {
             }
         }
         if(logger.isDebugEnabled()) logger.debug("source response header = " + sourceHeader + " target response header = " + targetHeader + " targetValue = "  + targetValue + " removeSourceHeader = " + removeSourceHeader);
-        HeaderMap headerMap = (HeaderMap)objMap.get("responseHeaders");
+        Map<String, String> headerMap = (Map<String, String>)objMap.get("responseHeaders");
         // there are two situations to handler. sourceHeader vs targetValue. One of them should not be null.
         // if both are not null, then only the targetValue will be used.
         if(targetValue != null) {
@@ -69,9 +67,7 @@ public class HeaderReplaceResponseTransformAction implements IAction {
             if(logger.isDebugEnabled()) logger.debug("final responseHeaders = " + responseHeaders);
             resultMap.put("responseHeaders", responseHeaders);
         } else {
-            String sourceValue = null;
-            HeaderValues sourceObject = headerMap.get(sourceHeader);
-            if(sourceObject != null) sourceValue = sourceObject.getFirst();
+            String sourceValue = headerMap.get(sourceHeader);
             if(logger.isDebugEnabled()) logger.debug("source response header = " + sourceHeader + " value = " + sourceValue);
             if(sourceValue != null) {
                 Map<String, Object> responseHeaders = new HashMap<>();

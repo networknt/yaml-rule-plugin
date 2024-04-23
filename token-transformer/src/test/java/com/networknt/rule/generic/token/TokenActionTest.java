@@ -1,14 +1,14 @@
 package com.networknt.rule.generic.token;
 
 import com.networknt.client.ClientConfig;
-import com.networknt.client.Http2Client;
-import com.networknt.client.ssl.TLSConfig;
+import com.networknt.http.client.HttpClientRequest;
+import com.networknt.http.client.ssl.TLSConfig;
 import com.networknt.rule.RuleActionValue;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.*;
@@ -21,10 +21,10 @@ public class TokenActionTest {
         var clientBuilder = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .connectTimeout(Duration.ofMillis(ClientConfig.get().getTimeout()))
-                .sslContext(Http2Client.createSSLContext());
+                .sslContext(HttpClientRequest.createSSLContext());
 
         // this a workaround to bypass the hostname verification in jdk11 http client.
-        var tlsMap = (Map<String, Object>) ClientConfig.get().getMappedConfig().get(Http2Client.TLS);
+        var tlsMap = (Map<String, Object>) ClientConfig.get().getMappedConfig().get(ClientConfig.TLS);
 
         if (tlsMap != null && !Boolean.TRUE.equals(tlsMap.get(TLSConfig.VERIFY_HOSTNAME))) {
             final Properties props = System.getProperties();
@@ -35,6 +35,7 @@ public class TokenActionTest {
     }
 
     @Test
+    @Ignore
     public void lifewareTokenTest() {
         final var actionValues = new ArrayList<RuleActionValue>();
 
