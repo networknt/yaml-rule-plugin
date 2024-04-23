@@ -1,9 +1,9 @@
 package com.networknt.rule.generic.token;
 
 import com.networknt.client.ClientConfig;
-import com.networknt.client.Http2Client;
-import com.networknt.client.ssl.TLSConfig;
 import com.networknt.config.Config;
+import com.networknt.http.client.HttpClientRequest;
+import com.networknt.http.client.ssl.TLSConfig;
 import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
@@ -78,7 +78,7 @@ public class TokenTransformerAction implements IAction {
             var clientBuilder = HttpClient.newBuilder()
                     .followRedirects(HttpClient.Redirect.NORMAL)
                     .connectTimeout(Duration.ofMillis(ClientConfig.get().getTimeout()))
-                    .sslContext(Http2Client.createSSLContext());
+                    .sslContext(HttpClientRequest.createSSLContext());
 
             if (CONFIG.getProxyHost() != null)
                 clientBuilder.proxy(ProxySelector.of(new InetSocketAddress(
@@ -90,7 +90,7 @@ public class TokenTransformerAction implements IAction {
                 clientBuilder.version(HttpClient.Version.HTTP_2);
 
             // this a workaround to bypass the hostname verification in jdk11 http client.
-            var tlsMap = (Map<String, Object>) ClientConfig.get().getMappedConfig().get(Http2Client.TLS);
+            var tlsMap = (Map<String, Object>) ClientConfig.get().getMappedConfig().get(ClientConfig.TLS);
 
             if (tlsMap != null && !Boolean.TRUE.equals(tlsMap.get(TLSConfig.VERIFY_HOSTNAME))) {
                 final Properties props = System.getProperties();

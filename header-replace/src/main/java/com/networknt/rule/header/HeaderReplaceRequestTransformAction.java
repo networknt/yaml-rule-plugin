@@ -6,8 +6,6 @@ import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.utility.ModuleRegistry;
-import io.undertow.util.HeaderMap;
-import io.undertow.util.HeaderValues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +56,7 @@ public class HeaderReplaceRequestTransformAction implements IAction {
             }
         }
         if(logger.isDebugEnabled()) logger.debug("source request header = " + sourceHeader + " target request header = " + targetHeader + " targetValue = " + targetValue + " removeSourceHeader = " + removeSourceHeader);
-        HeaderMap headerMap = (HeaderMap)objMap.get("requestHeaders");
+        Map<String, String> headerMap = (Map<String, String>)objMap.get("requestHeaders");
         // there are two situations to handler. sourceHeader vs targetValue. One of them should not be null.
         // if both are not null, then only the targetValue will be used.
         if(targetValue != null) {
@@ -72,9 +70,7 @@ public class HeaderReplaceRequestTransformAction implements IAction {
             resultMap.put("requestHeaders", requestHeaders);
         } else {
             // use the sourceHeader to retrieve the value and replace the targetHeader.
-            String sourceValue = null;
-            HeaderValues sourceObject = headerMap.get(sourceHeader);
-            if(sourceObject != null) sourceValue = sourceObject.getFirst();
+            String sourceValue = headerMap.get(sourceHeader);
             if(logger.isDebugEnabled()) logger.debug("source request header = " + sourceHeader + " value = " + sourceValue);
             if(sourceValue != null) {
                 Map<String, Object> requestHeaders = new HashMap<>();

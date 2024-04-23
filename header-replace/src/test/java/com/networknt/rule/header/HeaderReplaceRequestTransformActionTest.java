@@ -1,9 +1,6 @@
 package com.networknt.rule.header;
 
 import com.networknt.rule.RuleActionValue;
-import com.networknt.rule.header.HeaderReplaceRequestTransformAction;
-import io.undertow.util.HeaderMap;
-import io.undertow.util.HttpString;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,8 +22,8 @@ public class HeaderReplaceRequestTransformActionTest {
         Map<String, Object> resultMap = new HashMap<>();
         List<RuleActionValue> actionValues = new ArrayList<>();
 
-        HeaderMap headerMap = new HeaderMap();
-        headerMap.add(new HttpString("Flink-Token"), "Token");
+        Map<String, String> headerMap = new HashMap<>();
+        headerMap.put("Flink-Token", "Token");
         objMap.put("requestHeaders", headerMap);
 
         RuleActionValue ruleActionValue1 = new RuleActionValue();
@@ -70,8 +67,8 @@ public class HeaderReplaceRequestTransformActionTest {
         List<RuleActionValue> actionValues = new ArrayList<>();
 
         // set the original oldToken in the Authorization header.
-        HeaderMap headerMap = new HeaderMap();
-        headerMap.add(new HttpString("Authorization"), "oldToken");
+        Map<String, String> headerMap = new HashMap<>();
+        headerMap.put("Authorization", "oldToken");
         objMap.put("requestHeaders", headerMap);
 
         // replace the Authorization header with targetValue newToken
@@ -108,8 +105,8 @@ public class HeaderReplaceRequestTransformActionTest {
         List<RuleActionValue> actionValues = new ArrayList<>();
 
         // set the original oldToken in the Authorization header.
-        HeaderMap headerMap = new HeaderMap();
-        headerMap.add(new HttpString("Authorization"), "oldToken");
+        Map<String, String> headerMap = new HashMap<>();
+        headerMap.put("Authorization", "oldToken");
         objMap.put("requestHeaders", headerMap);
 
         // replace the Authorization header with targetValue newToken

@@ -5,9 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.networknt.client.oauth.TokenResponse;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
-import com.networknt.proxy.PathPrefixAuth;
+import com.networknt.config.PathPrefixAuth;
 import com.networknt.rule.RuleActionValue;
-import org.apache.commons.lang3.EnumUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,8 +91,11 @@ public final class TokenAction {
                     break;
                 }
                 case DESTINATION: {
-                    if (EnumUtils.isValidEnum(TokenSection.class, action.getValue()))
-                        this.tokenDestination = EnumUtils.getEnum(TokenSection.class, action.getValue());
+                    try {
+                        this.tokenDestination = TokenSection.valueOf(action.getValue());
+                    } catch (IllegalArgumentException e) {
+                        this.tokenDestination = TokenSection.NONE;
+                    }
                     break;
                 }
                 case DESTINATION_FIELD: {
@@ -105,8 +107,11 @@ public final class TokenAction {
                     break;
                 }
                 case SOURCE: {
-                    if (EnumUtils.isValidEnum(TokenSection.class, action.getValue()))
-                        this.tokenSource = EnumUtils.getEnum(TokenSection.class, action.getValue());
+                    try {
+                        this.tokenSource = TokenSection.valueOf(action.getValue());
+                    } catch (IllegalArgumentException e) {
+                        this.tokenSource = TokenSection.NONE;
+                    }
                     break;
                 }
                 case SOURCE_FIELD: {
@@ -384,6 +389,3 @@ public final class TokenAction {
         }
     }
 }
-
-
-
