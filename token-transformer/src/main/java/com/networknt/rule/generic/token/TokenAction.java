@@ -91,7 +91,11 @@ public final class TokenAction {
                     break;
                 }
                 case DESTINATION: {
-                    this.tokenDestination = TokenSection.valueOf(action.getValue());
+                    try {
+                        this.tokenDestination = TokenSection.valueOf(action.getValue());
+                    } catch (IllegalArgumentException e) {
+                        this.tokenDestination = TokenSection.NONE;
+                    }
                     break;
                 }
                 case DESTINATION_FIELD: {
@@ -103,7 +107,11 @@ public final class TokenAction {
                     break;
                 }
                 case SOURCE: {
-                    this.tokenSource = TokenSection.valueOf(action.getValue());
+                    try {
+                        this.tokenSource = TokenSection.valueOf(action.getValue());
+                    } catch (IllegalArgumentException e) {
+                        this.tokenSource = TokenSection.NONE;
+                    }
                     break;
                 }
                 case SOURCE_FIELD: {
