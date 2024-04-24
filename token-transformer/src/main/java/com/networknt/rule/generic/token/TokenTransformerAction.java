@@ -86,8 +86,11 @@ public class TokenTransformerAction implements IAction {
                         CONFIG.getProxyPort() == 0 ? 443 : CONFIG.getProxyPort())
                 ));
 
-            if (CONFIG.isEnableHttp2())
+            if (CONFIG.isEnableHttp2()) {
                 clientBuilder.version(HttpClient.Version.HTTP_2);
+            } else {
+                clientBuilder.version(HttpClient.Version.HTTP_1_1);
+            }
 
             // this a workaround to bypass the hostname verification in jdk11 http client.
             var tlsMap = (Map<String, Object>) ClientConfig.get().getMappedConfig().get(ClientConfig.TLS);
