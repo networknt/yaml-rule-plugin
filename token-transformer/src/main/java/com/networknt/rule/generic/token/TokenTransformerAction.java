@@ -27,7 +27,6 @@ public class TokenTransformerAction implements IAction {
 
     private static final Logger LOG = LoggerFactory.getLogger(TokenTransformerAction.class);
     private static final TokenTransformerConfig CONFIG = TokenTransformerConfig.load();
-    private static HttpClient client;
 
     public TokenTransformerAction() {
         ModuleRegistry.registerPlugin(
@@ -59,22 +58,26 @@ public class TokenTransformerAction implements IAction {
                             System.currentTimeMillis(),
                             authPath.getExpiration()
                     );
-
-                    if (client == null && !createClient()) {
-                        LOG.error("Could not create client!");
-                        return;
+                    HttpClient httpClient = authPath.getHttpClient();
+                    if (httpClient == null) {
+                        httpClient = createClient();
+                        if (httpClient == null) {
+                            LOG.error("Could not create client!");
+                            return;
+                        } else {
+                            authPath.setHttpClient(httpClient);
+                        }
                     }
 
-                    action.requestToken(client, resultMap);
+                    action.requestToken(httpClient, resultMap);
                     return;
                 }
             }
         }
     }
 
-    private static boolean createClient() {
+    private static HttpClient createClient() {
         try {
-
             var clientBuilder = HttpClient.newBuilder()
                     .followRedirects(HttpClient.Redirect.NORMAL)
                     .connectTimeout(Duration.ofMillis(ClientConfig.get().getTimeout()))
@@ -99,13 +102,10 @@ public class TokenTransformerAction implements IAction {
                 final Properties props = System.getProperties();
                 props.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
             }
-
-            client = clientBuilder.build();
-            return true;
-
+            return clientBuilder.build();
         } catch (IOException e) {
             LOG.error("Cannot create HttpClient:", e);
-            return false;
+            return null;
         }
     }
 }
