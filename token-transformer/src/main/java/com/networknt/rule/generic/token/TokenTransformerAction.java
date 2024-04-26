@@ -2,6 +2,7 @@ package com.networknt.rule.generic.token;
 
 import com.networknt.client.ClientConfig;
 import com.networknt.config.Config;
+import com.networknt.config.PathPrefixAuth;
 import com.networknt.http.client.HttpClientRequest;
 import com.networknt.http.client.ssl.TLSConfig;
 import com.networknt.rule.IAction;
@@ -11,9 +12,13 @@ import com.networknt.utility.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.*;
 import java.net.http.HttpClient;
+import java.security.*;
+import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.util.*;
 
@@ -89,11 +94,10 @@ public class TokenTransformerAction implements IAction {
                         CONFIG.getProxyPort() == 0 ? 443 : CONFIG.getProxyPort())
                 ));
 
-            if (CONFIG.isEnableHttp2()) {
+            if (CONFIG.isEnableHttp2())
                 clientBuilder.version(HttpClient.Version.HTTP_2);
-            } else {
-                clientBuilder.version(HttpClient.Version.HTTP_1_1);
-            }
+
+            else clientBuilder.version(HttpClient.Version.HTTP_1_1);
 
             // this a workaround to bypass the hostname verification in jdk11 http client.
             var tlsMap = (Map<String, Object>) ClientConfig.get().getMappedConfig().get(ClientConfig.TLS);
@@ -102,7 +106,9 @@ public class TokenTransformerAction implements IAction {
                 final Properties props = System.getProperties();
                 props.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
             }
+
             return clientBuilder.build();
+
         } catch (IOException e) {
             LOG.error("Cannot create HttpClient:", e);
             return null;

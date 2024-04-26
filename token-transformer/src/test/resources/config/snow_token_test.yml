@@ -1,0 +1,10 @@
+proxyHost:
+proxyPort:
+enableHttp2: false
+pathPrefixAuths:
+  - username: "my-username"
+    password: "my-password"
+    clientId: "my-client-id"
+    clientSecret: "my-client_secret"
+    grantType: "grant-type"
+    tokenUrl: "https://networknttest.snow/api/v0/token"
