@@ -2,7 +2,7 @@ package com.networknt.rule.generic.token;
 
 import com.networknt.client.ClientConfig;
 import com.networknt.config.Config;
-import com.networknt.config.PathPrefixAuth;
+import com.networknt.proxy.PathPrefixAuth;
 import com.networknt.http.client.HttpClientRequest;
 import com.networknt.http.client.ssl.TLSConfig;
 import com.networknt.rule.IAction;
@@ -12,13 +12,9 @@ import com.networknt.utility.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.*;
 import java.net.http.HttpClient;
-import java.security.*;
-import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.util.*;
 
@@ -32,6 +28,7 @@ public class TokenTransformerAction implements IAction {
 
     private static final Logger LOG = LoggerFactory.getLogger(TokenTransformerAction.class);
     private static final TokenTransformerConfig CONFIG = TokenTransformerConfig.load();
+    private static HttpClient httpClient;
 
     public TokenTransformerAction() {
         ModuleRegistry.registerPlugin(
@@ -63,17 +60,13 @@ public class TokenTransformerAction implements IAction {
                             System.currentTimeMillis(),
                             authPath.getExpiration()
                     );
-                    HttpClient httpClient = authPath.getHttpClient();
                     if (httpClient == null) {
                         httpClient = createClient();
                         if (httpClient == null) {
                             LOG.error("Could not create client!");
                             return;
-                        } else {
-                            authPath.setHttpClient(httpClient);
                         }
                     }
-
                     action.requestToken(httpClient, resultMap);
                     return;
                 }
