@@ -4,7 +4,7 @@ import com.networknt.client.ClientConfig;
 import com.networknt.client.oauth.TokenResponse;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
-import com.networknt.config.PathPrefixAuth;
+import com.networknt.proxy.PathPrefixAuth;
 import com.networknt.http.client.ssl.TLSConfig;
 import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;

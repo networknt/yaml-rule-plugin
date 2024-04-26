@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
-import com.networknt.config.PathPrefixAuth;
+import com.networknt.proxy.PathPrefixAuth;
 import com.networknt.rule.RuleActionValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
