@@ -2,7 +2,6 @@ package com.networknt.rule.generic.token;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.networknt.client.oauth.TokenResponse;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
 import com.networknt.config.PathPrefixAuth;
@@ -35,41 +34,40 @@ public final class TokenAction {
 
     private static final Logger LOG = LoggerFactory.getLogger(TokenAction.class);
 
-    private enum TokenSection {
-        HEADER,
-        BODY,
-        URL,
+    private enum TokenDirection {
+        REQUEST,
+        RESPONSE,
         NONE
     }
 
-    private static final Pattern pattern = Pattern.compile("\\$\\{(.*?)\\}");
     private static final String CONFIG_PREFIX = "config";
     private static final String RESPONSE_PREFIX = "response";
     static final String REQUEST_HEADERS = "requestHeaders";
     static final String REQUEST_BODY_ENTRIES = "requestBodyEntries";
-    static final String SOURCE = "tokenSource";
-    static final String SOURCE_FIELD = "tokenSourceField";
-    static final String DESTINATION = "tokenDestination";
-    static final String DESTINATION_FIELD = "tokenDestinationField";
-    static final String DESTINATION_VALUE = "tokenDestinationValue";
+    static final String SOURCE_HEADERS = "sourceHeaders";
+    static final String SOURCE_BODY_ENTRIES = "sourceBodyEntries";
+    static final String TOKEN_DIRECTION = "tokenDirection";
+    static final String DESTINATION_HEADERS = "destinationHeaders";
+    static final String DESTINATION_BODY_ENTRIES = "destinationBodyEntries";
     private final Collection<RuleActionValue> actionValues;
     private HttpRequest request;
     private final PathPrefixAuth pathPrefixAuth;
-    String[] headers = null;
-    String[] bodyEntries = null;
+    String[] requestHeaders = null;
+    String[] requestBodyEntries = null;
     String requestContentType = null;
-    TokenSection tokenSource = TokenSection.NONE;
-    TokenSection tokenDestination = TokenSection.NONE;
-    String destinationField = null;
-    String destinationValue = null;
-    String tokenSourceField = null;
+    String[] sourceHeaders = null;
+    String[] sourceBodyEntries = null;
+    String[] destinationHeaders = null;
+    String[] destinationBodyEntries = null;
+    TokenDirection tokenDirection = TokenDirection.NONE;
+
 
     private final TokenActionVariables tokenActionVariables = new TokenActionVariables();
 
     public TokenAction(final Collection<RuleActionValue> actionValues, final PathPrefixAuth pathPrefixAuth) {
         this.actionValues = actionValues;
         this.pathPrefixAuth = pathPrefixAuth;
-        this.tokenActionVariables.parsePathPrefixAuthVariables(CONFIG_PREFIX, this.pathPrefixAuth);
+        this.tokenActionVariables.parseVariablesFromObject(CONFIG_PREFIX, this.pathPrefixAuth);
         this.parseActionValues();
         this.buildRequest();
     }
@@ -80,42 +78,42 @@ public final class TokenAction {
     private void parseActionValues() {
         for (var action : this.actionValues) {
             switch (action.getActionValueId()) {
+
+                /* We can resolve request headers because the config is already loaded. */
                 case REQUEST_HEADERS: {
                     String[] temp = action.getValue().split(",");
-                    this.headers = this.tokenActionVariables.resolveArrayValues(temp);
+                    this.requestHeaders = this.tokenActionVariables.resolveArrayValues(temp);
                     break;
                 }
+
+                /* We can resolve request body entries because the config is already loaded. */
                 case REQUEST_BODY_ENTRIES: {
                     String[] temp = action.getValue().split(",");
-                    this.bodyEntries = this.tokenActionVariables.resolveArrayValues(temp);
+                    this.requestBodyEntries = this.tokenActionVariables.resolveArrayValues(temp);
                     break;
                 }
-                case DESTINATION: {
+                case TOKEN_DIRECTION: {
                     try {
-                        this.tokenDestination = TokenSection.valueOf(action.getValue());
+                        this.tokenDirection = TokenDirection.valueOf(action.getValue());
                     } catch (IllegalArgumentException e) {
-                        this.tokenDestination = TokenSection.NONE;
+                        this.tokenDirection = TokenDirection.NONE;
                     }
                     break;
                 }
-                case DESTINATION_FIELD: {
-                    this.destinationField = action.getValue();
+                case DESTINATION_HEADERS: {
+                    this.destinationHeaders = action.getValue().split(",");
                     break;
                 }
-                case DESTINATION_VALUE: {
-                    this.destinationValue = action.getValue();
+                case DESTINATION_BODY_ENTRIES: {
+                    this.destinationBodyEntries = action.getValue().split(",");
                     break;
                 }
-                case SOURCE: {
-                    try {
-                        this.tokenSource = TokenSection.valueOf(action.getValue());
-                    } catch (IllegalArgumentException e) {
-                        this.tokenSource = TokenSection.NONE;
-                    }
+                case SOURCE_HEADERS: {
+                    this.sourceHeaders = action.getValue().split(",");
                     break;
                 }
-                case SOURCE_FIELD: {
-                    this.tokenSourceField = action.getValue();
+                case SOURCE_BODY_ENTRIES: {
+                    this.sourceBodyEntries = action.getValue().split(",");
                     break;
                 }
                 default: {
@@ -131,7 +129,6 @@ public final class TokenAction {
      */
     private void buildRequest() {
         final var builder = HttpRequest.newBuilder();
-
         try {
             builder.uri(new URI(this.pathPrefixAuth.getTokenUrl()));
 
@@ -140,25 +137,25 @@ public final class TokenAction {
         }
 
         /* handle request headers */
-        if (this.isValidArrayLength(this.headers)) {
+        if (this.isValidArrayLength(this.requestHeaders)) {
 
-            for (int x = 0; x < this.headers.length; x = x + 2) {
+            for (int x = 0; x < this.requestHeaders.length; x = x + 2) {
 
-                if (this.headers[x].equalsIgnoreCase("Content-Type"))
-                    this.requestContentType = this.headers[x + 1];
+                if (this.requestHeaders[x].equalsIgnoreCase("Content-Type"))
+                    this.requestContentType = this.requestHeaders[x + 1];
 
-                builder.header(this.headers[x], this.headers[x + 1]);
+                builder.header(this.requestHeaders[x], this.requestHeaders[x + 1]);
             }
         }
 
         /* handle request body */
-        if (this.isValidArrayLength(this.bodyEntries)) {
+        if (this.isValidArrayLength(this.requestBodyEntries)) {
 
             /* add body key + value pairs to the request */
             final Map<String, String> parameters = new HashMap<>();
 
-            for (int x = 0; x < this.bodyEntries.length; x = x + 2)
-                parameters.put(this.bodyEntries[x], this.bodyEntries[x + 1]);
+            for (int x = 0; x < this.requestBodyEntries.length; x = x + 2)
+                parameters.put(this.requestBodyEntries[x], this.requestBodyEntries[x + 1]);
 
             String body;
 
@@ -190,7 +187,7 @@ public final class TokenAction {
      * @return      - true if the array is valid.
      */
     private boolean isValidArrayLength(Object[] arr) {
-        return arr != null && arr.length % 2 == 0;
+        return arr != null && (arr.length & 1) == 0;
     }
 
     private boolean isUrlEncoded() {
@@ -208,21 +205,81 @@ public final class TokenAction {
 
         try {
             final HttpResponse<?> response = client.send(this.request, HttpResponse.BodyHandlers.ofString());
-
             if (response.statusCode() == 200) {
-                final TokenResponse tokenResponse = this.handleTokenSource(response);
+                final var tokenResponseMap = new HashMap<String, Object>();
 
-                /* TODO - should expiration be set statically like this? */
-                this.pathPrefixAuth.setExpiration(System.currentTimeMillis() + this.pathPrefixAuth.getTokenTtl() * 1000L - 60000);
-                this.pathPrefixAuth.setAccessToken(tokenResponse.getAccessToken());
-                this.tokenActionVariables.parsePathPrefixAuthVariables(RESPONSE_PREFIX, this.pathPrefixAuth);
+                if (this.sourceHeaders != null)
+                    tokenResponseMap.putAll(parseTokenResponseArrayVariables(
+                            this.sourceHeaders,
+                            response.headers().toString()
+                            ));
+
+                if (this.sourceBodyEntries != null)
+                    tokenResponseMap.putAll(parseTokenResponseArrayVariables(
+                                    this.sourceBodyEntries,
+                                    response.body().toString()
+                            ));
+
+                this.tokenActionVariables.parseVariablesFromMap(RESPONSE_PREFIX, tokenResponseMap);
+                this.destinationHeaders = this.tokenActionVariables.resolveArrayValues(this.destinationHeaders);
+                this.destinationBodyEntries = this.tokenActionVariables.resolveArrayValues(this.destinationBodyEntries);
+
+                /* update path prefix auth token info */
+                if (tokenResponseMap.containsKey("accessToken")) {
+                    this.pathPrefixAuth.setAccessToken((String)tokenResponseMap.get("accessToken"));
+                }
+
+                if (tokenResponseMap.containsKey("grantType")) {
+                    this.pathPrefixAuth.setGrantType((String)tokenResponseMap.get("grantType"));
+                }
+
+                if (tokenResponseMap.containsKey("expiration")) {
+                    this.pathPrefixAuth.setExpiration((Integer)tokenResponseMap.get("expiration"));
+                } else {
+                    /* TODO - should expiration be set statically like this? */
+                    this.pathPrefixAuth.setExpiration(System.currentTimeMillis() + this.pathPrefixAuth.getTokenTtl() * 1000L - 60000);
+                }
 
                 LOG.trace("Received a new token '{}' and cached it with an expiration time of '{}'.",
                         this.pathPrefixAuth.getAccessToken() != null ? this.pathPrefixAuth.getAccessToken().substring(0, 20) : null,
                         this.pathPrefixAuth.getExpiration()
                 );
 
-                this.handleTokenDestination(resultMap);
+                /* update result map */
+                switch (this.tokenDirection) {
+
+                    case REQUEST: {
+                        if (this.destinationBodyEntries != null) {
+                            final var requestBodyMap = createUpdateMap(this.destinationBodyEntries);
+                            resultMap.put("requestBody", requestBodyMap);
+                        }
+
+                        if (this.destinationHeaders != null) {
+                            final var requestHeadersMap = createUpdateMap(this.destinationHeaders);
+                            final var updateMap = new HashMap<String, Object>();
+                            updateMap.put("update", requestHeadersMap);
+                            resultMap.put("requestHeaders", updateMap);
+                        }
+                        break;
+                    }
+                    case RESPONSE: {
+                        if (this.destinationBodyEntries != null) {
+                            final var responseBodyMap = createUpdateMap(this.destinationBodyEntries);
+                            resultMap.put("responseBody", responseBodyMap);
+                        }
+
+                        if (this.destinationHeaders != null) {
+                            final var responseHeadersMap = createUpdateMap(this.destinationHeaders);
+                            final var updateMap = new HashMap<String, Object>();
+                            updateMap.put("update", responseHeadersMap);
+                            resultMap.put("responseHeaders", updateMap);
+                        }
+                        break;
+                    }
+                    case NONE:
+                    default:
+                        break;
+                }
 
             } else LOG.error("Error in getting the token with status code {} and body {}", response.statusCode(), response.body());
 
@@ -231,78 +288,52 @@ public final class TokenAction {
         }
     }
 
-    /**
-     * Places a newly received token into the configured destination.
-     * i.e. tokenDestination: HEADER, tokenDestinationField: Authorization will update the Authorization header with a token.
-     *
-     * @param resultMap - resultMap from the executed rule.
-     */
-    private void handleTokenDestination(Map<String, Object> resultMap) {
-        final var resolvedDestinationValue = this.tokenActionVariables.resolveValue(this.destinationValue);
-        switch (this.tokenDestination) {
-            case HEADER: {
-                final Map<String, Object> requestHeaders = new HashMap<>();
-                final Map<String, Object> updateMap = new HashMap<>();
-                updateMap.put(this.destinationField, resolvedDestinationValue);
-                requestHeaders.put("update", updateMap);
-                resultMap.put("requestHeaders", requestHeaders);
-                break;
-            }
-            case BODY: {
-                final Map<String, Object> requestBody = new HashMap<>();
-                requestBody.put(this.destinationField, resolvedDestinationValue);
-                try {
-                    resultMap.put("requestBody", Config.getInstance().getMapper().writeValueAsString(requestBody));
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-                break;
-            }
-            case URL: {
-                // TODO
-                break;
-            }
-            case NONE:
-            default: {
-                break;
-            }
-        }
-    }
+    private static Map<String, Object> createUpdateMap(final String[] dataSourceArray) {
+        final var updateMap = new HashMap<String, Object>();
 
-    /**
-     * Parses the token from a 200 TokenResponse.
-     * We grab the token based on the provided rule configuration.
-     *
-     * @param response - 200 response for the token request.
-     * @return - returns a TokenResponse with data.
-     */
-    private TokenResponse handleTokenSource(final HttpResponse<?> response) {
-        final var tokenResponse = new TokenResponse();
-        switch (this.tokenSource) {
-            case BODY: {
-                final var map = JsonMapper.string2Map(response.body().toString());
-                tokenResponse.setAccessToken((String) map.get(this.tokenSourceField));
-                break;
-            }
-            case HEADER: {
-                final var map = JsonMapper.string2Map(response.headers().toString());
-                tokenResponse.setAccessToken((String) map.get(this.tokenSourceField));
-                break;
-            }
-            case URL: {
-                // TODO
-                break;
-            }
-            case NONE:
-            default: {
-                break;
-            }
+        if (dataSourceArray == null || dataSourceArray.length == 0)
+            return updateMap;
+
+        for (int x = 0 ; x < dataSourceArray.length; x = x + 2) {
+            updateMap.put(dataSourceArray[x], dataSourceArray[x+1]);
         }
 
-        return tokenResponse;
+        return updateMap;
     }
+
+    private static Map<String, Object> parseTokenResponseArrayVariables(final String[] arr, final String string) {
+        if (string == null || arr == null)
+            return new HashMap<>();
+
+        final Map<String, Object> tokenResponseData = new HashMap<>();
+        final var map = JsonMapper.string2Map(string);
+        if (arr.length > 0 && (arr.length & 1) == 0) {
+            for (int x = 0; x < arr.length; x = x + 2) {
+                final var value = map.get(arr[x]);
+                final var key = getLocalVariableName(arr[x+1]);
+                tokenResponseData.put(key, value);
+            }
+        }
+        return tokenResponseData;
+    }
+
+    private static String getLocalVariableName(String in) {
+        if (!in.contains("{") || !in.contains("}")) {
+            return in;
+        }
+        final var spl = in.split("\\.");
+        if (spl.length != 2) {
+            return in;
+        }
+
+        return spl[1].replace("}", "");
+    }
+
+
 
     private static final class TokenActionVariables {
+
+        private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{(.*?)\\}");
 
         private final Map<String, String> variables = new HashMap<>();
 
@@ -326,7 +357,7 @@ public final class TokenAction {
          */
         private String[] resolveArrayValues(String[] arr) {
 
-            if (arr.length == 0)
+            if (arr == null || arr.length == 0)
                 return arr;
 
             var copy = Arrays.copyOf(arr, arr.length);
@@ -344,7 +375,7 @@ public final class TokenAction {
          * @return - string containing the resolved variable value.
          */
         private String resolveValue(String unresolved) {
-            final var matcher = pattern.matcher(unresolved);
+            final var matcher = VARIABLE_PATTERN.matcher(unresolved);
             final var stringBuilder = new StringBuilder();
             while (matcher.find()) {
                 final var value = this.get(matcher.group(1));
@@ -359,24 +390,30 @@ public final class TokenAction {
             return matcher.appendTail(stringBuilder).toString();
         }
 
+        public void parseVariablesFromJsonString(final String variablePrefix, final String string) {
+            final var jsonMap = JsonMapper.string2Map(string);
+            this.parseVariablesFromMap(variablePrefix, jsonMap);
+        }
+
         /**
-         * Updates the token variable pool with the data from the PathPrefixAuth instance and a prefix associated.
+         * Updates the token variable pool with the data from an Object instance and a prefix associated.
          * Duplicates will override the old value.
          *
          * @param variablePrefix - prefix the variable will have.
-         * @param pathPrefixAuth - the PathPrefixAuth instance that contains the data we want to save to the variables.
+         * @param obj - Provided source of variables.
          */
-        public void parsePathPrefixAuthVariables(String variablePrefix, PathPrefixAuth pathPrefixAuth) {
-            final var pathPrefixMap = Config.getInstance().getMapper().convertValue(pathPrefixAuth, new TypeReference<Map<String, Object>>() {
-            });
-            for (var pair : pathPrefixMap.entrySet()) {
+        public void parseVariablesFromObject(final String variablePrefix, final Object obj) {
+            final var objMap = Config.getInstance().getMapper().convertValue(obj, new TypeReference<Map<String, Object>>() {});
+            this.parseVariablesFromMap(variablePrefix, objMap);
+        }
+        public void parseVariablesFromMap(final String variablePrefix, final Map<String, Object> input) {
+            for (final var pair : input.entrySet()) {
                 if (pair.getValue() instanceof String) {
                     final var key = buildVariableKeyLookup(variablePrefix, pair.getKey());
                     this.addVariable(key, (String) pair.getValue());
                 }
             }
         }
-
         /**
          * Formats the variable key before storing.
          *
