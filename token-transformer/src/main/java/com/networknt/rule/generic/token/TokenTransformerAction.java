@@ -52,14 +52,18 @@ public class TokenTransformerAction implements IAction {
         for (var authPath : CONFIG.getPathPrefixAuths()) {
 
             if (requestPath.startsWith(authPath.getPathPrefix())) {
+                final var action = new TokenAction(actionValues, authPath);
 
-                var action = new TokenAction(actionValues, authPath);
                 if (System.currentTimeMillis() >= authPath.getExpiration()) {
                     LOG.trace("Cached token '{}' is expired with current time '{}' and expired time '{}'",
                             authPath.getAccessToken() != null ? authPath.getAccessToken().substring(0, 20) : null,
                             System.currentTimeMillis(),
                             authPath.getExpiration()
                     );
+
+                    /* token is expired, build the token request */
+                    action.buildRequest();
+
                     if (httpClient == null) {
                         httpClient = createClient();
                         if (httpClient == null) {
@@ -68,7 +72,12 @@ public class TokenTransformerAction implements IAction {
                         }
                     }
                     action.requestToken(httpClient, resultMap);
-                    return;
+
+                } else {
+                    LOG.trace("Cached token '{}' is NOT expired. Updating resultMap using cache.",
+                            authPath.getAccessToken() != null ? authPath.getAccessToken().substring(0, 20) : null
+                    );
+                    action.useCachedToken(resultMap);
                 }
             }
         }
