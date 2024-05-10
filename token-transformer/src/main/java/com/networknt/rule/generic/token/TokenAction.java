@@ -69,7 +69,6 @@ public final class TokenAction {
         this.pathPrefixAuth = pathPrefixAuth;
         this.tokenActionVariables.parseVariablesFromObject(CONFIG_PREFIX, this.pathPrefixAuth);
         this.parseActionValues();
-        this.buildRequest();
     }
 
     /**
@@ -127,7 +126,7 @@ public final class TokenAction {
     /**
      * Builds the Http request based on the provided configuration.
      */
-    private void buildRequest() {
+    public void buildRequest() {
         final var builder = HttpRequest.newBuilder();
         try {
             builder.uri(new URI(this.pathPrefixAuth.getTokenUrl()));
@@ -245,47 +244,64 @@ public final class TokenAction {
                         this.pathPrefixAuth.getExpiration()
                 );
 
-                /* update result map */
-                switch (this.tokenDirection) {
-
-                    case REQUEST: {
-                        if (this.destinationBodyEntries != null) {
-                            final var requestBodyMap = createUpdateMap(this.destinationBodyEntries);
-                            resultMap.put("requestBody", requestBodyMap);
-                        }
-
-                        if (this.destinationHeaders != null) {
-                            final var requestHeadersMap = createUpdateMap(this.destinationHeaders);
-                            final var updateMap = new HashMap<String, Object>();
-                            updateMap.put("update", requestHeadersMap);
-                            resultMap.put("requestHeaders", updateMap);
-                        }
-                        break;
-                    }
-                    case RESPONSE: {
-                        if (this.destinationBodyEntries != null) {
-                            final var responseBodyMap = createUpdateMap(this.destinationBodyEntries);
-                            resultMap.put("responseBody", responseBodyMap);
-                        }
-
-                        if (this.destinationHeaders != null) {
-                            final var responseHeadersMap = createUpdateMap(this.destinationHeaders);
-                            final var updateMap = new HashMap<String, Object>();
-                            updateMap.put("update", responseHeadersMap);
-                            resultMap.put("responseHeaders", updateMap);
-                        }
-                        break;
-                    }
-                    case NONE:
-                    default:
-                        break;
-                }
+                /* update the contents of the resultMap */
+                this.updateResultMap(resultMap);
 
             } else LOG.error("Error in getting the token with status code {} and body {}", response.statusCode(), response.body());
 
         } catch (Exception e) {
             LOG.error("Exception:", e);
         }
+    }
+
+    private void updateResultMap(final Map<String, Object> resultMap) {
+        /* update result map */
+        switch (this.tokenDirection) {
+
+            case REQUEST: {
+                if (this.destinationBodyEntries != null) {
+                    final var requestBodyMap = createUpdateMap(this.destinationBodyEntries);
+                    resultMap.put("requestBody", requestBodyMap);
+                }
+
+                if (this.destinationHeaders != null) {
+                    final var requestHeadersMap = createUpdateMap(this.destinationHeaders);
+                    final var updateMap = new HashMap<String, Object>();
+                    updateMap.put("update", requestHeadersMap);
+                    resultMap.put("requestHeaders", updateMap);
+                }
+                break;
+            }
+            case RESPONSE: {
+                if (this.destinationBodyEntries != null) {
+                    final var responseBodyMap = createUpdateMap(this.destinationBodyEntries);
+                    resultMap.put("responseBody", responseBodyMap);
+                }
+
+                if (this.destinationHeaders != null) {
+                    final var responseHeadersMap = createUpdateMap(this.destinationHeaders);
+                    final var updateMap = new HashMap<String, Object>();
+                    updateMap.put("update", responseHeadersMap);
+                    resultMap.put("responseHeaders", updateMap);
+                }
+                break;
+            }
+            case NONE:
+            default:
+                break;
+        }
+    }
+
+
+    public void useCachedToken(final Map<String, Object> resultMap) {
+        final var tokenResponseMap = new HashMap<>(Config.getInstance().getMapper().convertValue(
+                this.pathPrefixAuth,
+                new TypeReference<Map<String, Object>>() {}
+        ));
+        this.tokenActionVariables.parseVariablesFromMap(RESPONSE_PREFIX, tokenResponseMap);
+
+        /* update the contents of the resultMap */
+        this.updateResultMap(resultMap);
     }
 
     private static Map<String, Object> createUpdateMap(final String[] dataSourceArray) {
