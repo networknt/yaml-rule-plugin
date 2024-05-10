@@ -39,48 +39,20 @@ public class TokenActionTest {
     public void lifewareTokenTest() {
         final var actionValues = new ArrayList<RuleActionValue>();
 
-        final var requestHeadersKey = "requestHeaders";
-        final var requestHeadersValue = "Content-Type,application/json,Accept,application/json";
-        final var requestHeaders = new RuleActionValue();
-        requestHeaders.setActionValueId(requestHeadersKey);
-        requestHeaders.setValue(requestHeadersValue);
-        actionValues.add(requestHeaders);
-
-        final var requestBodyEntriesKey = "requestBodyEntries";
-        final var requestBodyEntriesValue = "client_id,${config.clientId},client_secret,${config.clientSecret}";
-        final var requestBodyEntries = new RuleActionValue();
-        requestBodyEntries.setActionValueId(requestBodyEntriesKey);
-        requestBodyEntries.setValue(requestBodyEntriesValue);
-        actionValues.add(requestBodyEntries);
-
-        final var sourceBodyEntriesKey = "sourceBodyEntries";
-        final var sourceBodyEntriesValue = "access_token,${response.accessToken}";
-        final var sourceBodyEntries = new RuleActionValue();
-        sourceBodyEntries.setActionValueId(sourceBodyEntriesKey);
-        sourceBodyEntries.setValue(sourceBodyEntriesValue);
-        actionValues.add(sourceBodyEntries);
-
-        final var tokenDirectionKey = "tokenDirection";
-        final var tokenDirectionValue = "REQUEST";
-        final var tokenDirection = new RuleActionValue();
-        tokenDirection.setActionValueId(tokenDirectionKey);
-        tokenDirection.setValue(tokenDirectionValue);
-        actionValues.add(tokenDirection);
-
-        final var destinationHeadersKey = "destinationHeaders";
-        final var destinationHeadersValue = "Authorization,Bearer ${response.accessToken}";
-        final var destinationHeaders = new RuleActionValue();
-        destinationHeaders.setActionValueId(destinationHeadersKey);
-        destinationHeaders.setValue(destinationHeadersValue);
-        actionValues.add(destinationHeaders);
+        addNewRuleAction(actionValues, "requestHeaders", "Content-Type,application/json,Accept,application/json");
+        addNewRuleAction(actionValues, "requestBodyEntries", "client_id,${config.clientId},client_secret,${config.clientSecret}");
+        addNewRuleAction(actionValues, "sourceBodyEntries", "access_token,${response.accessToken}");
+        addNewRuleAction(actionValues, "tokenDirection", "REQUEST");
+        addNewRuleAction(actionValues, "destinationHeaders", "Authorization,Bearer ${response.accessToken}");
 
         final var config = new TokenTransformerConfig("lifeware_token_test");
-
         final var action = new TokenAction(actionValues, config.getPathPrefixAuths().get(0));
+
         Assert.assertEquals(4, action.requestBodyEntries.length);
         Assert.assertEquals(4, action.requestHeaders.length);
 
         Map<String, Object> resultMap = new HashMap<>();
+        action.buildRequest();
         action.requestToken(this.client, resultMap);
 
         /* token response should have been 200 and resultMap should contain the new token. */
@@ -93,45 +65,17 @@ public class TokenActionTest {
     public void tealiumTokenTest() {
         final var actionValues = new ArrayList<RuleActionValue>();
 
-        final var tokenRequestHeaderFieldsKey = "requestHeaders";
-        final var tokenRequestHeaderFieldsValue = "Content-Type,application/x-www-form-urlencoded";
-        final var tokenRequestHeaderFieldsActionValue = new RuleActionValue();
-        tokenRequestHeaderFieldsActionValue.setActionValueId(tokenRequestHeaderFieldsKey);
-        tokenRequestHeaderFieldsActionValue.setValue(tokenRequestHeaderFieldsValue);
-        actionValues.add(tokenRequestHeaderFieldsActionValue);
-
-        final var requestBodyEntriesKey = "requestBodyEntries";
-        final var requestBodyEntriesValue = "username,${config.username},key,${config.password}";
-        final var requestBodyEntries = new RuleActionValue();
-        requestBodyEntries.setActionValueId(requestBodyEntriesKey);
-        requestBodyEntries.setValue(requestBodyEntriesValue);
-        actionValues.add(requestBodyEntries);
-
-        final var tokenDestinationSourceFieldKey = "sourceBodyEntries";
-        final var tokenDestinationSourceValueKey = "token,${response.accessToken}";
-        final var tokenDestinationSourceValueActionValue = new RuleActionValue();
-        tokenDestinationSourceValueActionValue.setActionValueId(tokenDestinationSourceFieldKey);
-        tokenDestinationSourceValueActionValue.setValue(tokenDestinationSourceValueKey);
-        actionValues.add(tokenDestinationSourceValueActionValue);
-
-        final var tokenDirectionKey = "tokenDirection";
-        final var tokenDirectionValue = "REQUEST";
-        final var tokenDirection = new RuleActionValue();
-        tokenDirection.setActionValueId(tokenDirectionKey);
-        tokenDirection.setValue(tokenDirectionValue);
-        actionValues.add(tokenDirection);
-
-        final var destinationHeadersKey = "destinationHeaders";
-        final var destinationHeadersValue = "Authorization,Bearer ${response.accessToken}";
-        final var destinationHeaders = new RuleActionValue();
-        destinationHeaders.setActionValueId(destinationHeadersKey);
-        destinationHeaders.setValue(destinationHeadersValue);
-        actionValues.add(destinationHeaders);
+        addNewRuleAction(actionValues, "requestHeaders", "Content-Type,application/x-www-form-urlencoded");
+        addNewRuleAction(actionValues, "requestBodyEntries", "username,${config.username},key,${config.password}");
+        addNewRuleAction(actionValues, "sourceBodyEntries", "token,${response.accessToken}");
+        addNewRuleAction(actionValues, "tokenDirection", "REQUEST");
+        addNewRuleAction(actionValues, "destinationHeaders", "Authorization,Bearer ${response.accessToken}");
 
         final var config = new TokenTransformerConfig("tealium_token_test");
-
         final var action = new TokenAction(actionValues, config.getPathPrefixAuths().get(0));
+
         Map<String, Object> resultMap = new HashMap<>();
+        action.buildRequest();
         action.requestToken(this.client, resultMap);
 
         /* token response should have been 200 and resultMap should contain the new token. */
@@ -143,49 +87,52 @@ public class TokenActionTest {
     public void snowTokenTest() {
         final var actionValues = new ArrayList<RuleActionValue>();
 
-        final var tokenRequestHeaderFieldsKey = "requestHeaders";
-        final var tokenRequestHeaderFieldsValue = "Content-Type,application/x-www-form-urlencoded";
-        final var tokenRequestHeaderFieldsActionValue = new RuleActionValue();
-        tokenRequestHeaderFieldsActionValue.setActionValueId(tokenRequestHeaderFieldsKey);
-        tokenRequestHeaderFieldsActionValue.setValue(tokenRequestHeaderFieldsValue);
-        actionValues.add(tokenRequestHeaderFieldsActionValue);
-
-        final var requestBodyEntriesKey = "requestBodyEntries";
-        final var requestBodyEntriesValue = "username,${config.username},password,${config.password},client_id,${config.clientId},client_secret,${config.clientSecret},grant_type,${config.grantType}";
-        final var requestBodyEntries = new RuleActionValue();
-        requestBodyEntries.setActionValueId(requestBodyEntriesKey);
-        requestBodyEntries.setValue(requestBodyEntriesValue);
-        actionValues.add(requestBodyEntries);
-
-        final var tokenDestinationSourceFieldKey = "sourceBodyEntries";
-        final var tokenDestinationSourceValueKey = "access_token,${response.accessToken},token_type,expires_in,${response.expiration}";
-        final var tokenDestinationSourceValueActionValue = new RuleActionValue();
-        tokenDestinationSourceValueActionValue.setActionValueId(tokenDestinationSourceFieldKey);
-        tokenDestinationSourceValueActionValue.setValue(tokenDestinationSourceValueKey);
-        actionValues.add(tokenDestinationSourceValueActionValue);
-
-        final var tokenDirectionKey = "tokenDirection";
-        final var tokenDirectionValue = "REQUEST";
-        final var tokenDirection = new RuleActionValue();
-        tokenDirection.setActionValueId(tokenDirectionKey);
-        tokenDirection.setValue(tokenDirectionValue);
-        actionValues.add(tokenDirection);
-
-        final var destinationHeadersKey = "destinationHeaders";
-        final var destinationHeadersValue = "Authorization,Bearer ${response.accessToken}";
-        final var destinationHeaders = new RuleActionValue();
-        destinationHeaders.setActionValueId(destinationHeadersKey);
-        destinationHeaders.setValue(destinationHeadersValue);
-        actionValues.add(destinationHeaders);
+        addNewRuleAction(actionValues, "requestHeaders", "Content-Type,application/x-www-form-urlencoded");
+        addNewRuleAction(actionValues, "requestBodyEntries", "username,${config.username},password,${config.password},client_id,${config.clientId},client_secret,${config.clientSecret},grant_type,${config.grantType}");
+        addNewRuleAction(actionValues, "sourceBodyEntries", "access_token,${response.accessToken},token_type,expires_in,${response.expiration}");
+        addNewRuleAction(actionValues, "tokenDirection", "REQUEST");
+        addNewRuleAction(actionValues, "destinationHeaders", "Authorization,Bearer ${response.accessToken}");
 
         final var config = new TokenTransformerConfig("snow_token_test");
-
         final var action = new TokenAction(actionValues, config.getPathPrefixAuths().get(0));
+
         Map<String, Object> resultMap = new HashMap<>();
+        action.buildRequest();
         action.requestToken(this.client, resultMap);
 
         /* token response should have been 200 and resultMap should contain the new token. */
         Assert.assertTrue(resultMap.containsKey("requestHeaders"));
+    }
+
+    @Test
+    @Ignore
+    public void jwtCacheTest() {
+        final var actionValues = new ArrayList<RuleActionValue>();
+
+        addNewRuleAction(actionValues, "requestHeaders", "Content-Type,application/json,Accept,application/json");
+        addNewRuleAction(actionValues, "requestBodyEntries", "client_id,${config.clientId},client_secret,${config.clientSecret}");
+        addNewRuleAction(actionValues, "sourceBodyEntries", "access_token,${response.accessToken}");
+        addNewRuleAction(actionValues, "tokenDirection", "REQUEST");
+        addNewRuleAction(actionValues, "destinationHeaders", "Authorization,Bearer ${response.accessToken}");
+
+        final var config = new TokenTransformerConfig("jwtCache_token_test");
+        final var action = new TokenAction(actionValues, config.getPathPrefixAuths().get(0));
+
+        Assert.assertEquals(4, action.requestBodyEntries.length);
+        Assert.assertEquals(4, action.requestHeaders.length);
+
+        Map<String, Object> resultMap = new HashMap<>();
+        action.useCachedToken(resultMap);
+
+        /* token response should have been 200 and resultMap should contain the new token. */
+        Assert.assertTrue(resultMap.containsKey("requestHeaders"));
+    }
+
+    private static void addNewRuleAction(final List<RuleActionValue> actionValues, final String key, final String value) {
+        final var newRuleAction = new RuleActionValue();
+        newRuleAction.setActionValueId(key);
+        newRuleAction.setValue(value);
+        actionValues.add(newRuleAction);
     }
 
 

@@ -219,9 +219,7 @@ public final class TokenAction {
                                     response.body().toString()
                             ));
 
-                this.tokenActionVariables.parseVariablesFromMap(RESPONSE_PREFIX, tokenResponseMap);
-                this.destinationHeaders = this.tokenActionVariables.resolveArrayValues(this.destinationHeaders);
-                this.destinationBodyEntries = this.tokenActionVariables.resolveArrayValues(this.destinationBodyEntries);
+                this.resolveVariablesFromResponseMap(tokenResponseMap);
 
                 /* update path prefix auth token info */
                 if (tokenResponseMap.containsKey("accessToken")) {
@@ -298,10 +296,16 @@ public final class TokenAction {
                 this.pathPrefixAuth,
                 new TypeReference<Map<String, Object>>() {}
         ));
-        this.tokenActionVariables.parseVariablesFromMap(RESPONSE_PREFIX, tokenResponseMap);
+        this.resolveVariablesFromResponseMap(tokenResponseMap);
 
         /* update the contents of the resultMap */
         this.updateResultMap(resultMap);
+    }
+
+    private void resolveVariablesFromResponseMap(final Map<String, Object> variableMap) {
+        this.tokenActionVariables.parseVariablesFromMap(RESPONSE_PREFIX, variableMap);
+        this.destinationHeaders = this.tokenActionVariables.resolveArrayValues(this.destinationHeaders);
+        this.destinationBodyEntries = this.tokenActionVariables.resolveArrayValues(this.destinationBodyEntries);
     }
 
     private static Map<String, Object> createUpdateMap(final String[] dataSourceArray) {
