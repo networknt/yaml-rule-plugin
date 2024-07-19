@@ -107,6 +107,7 @@
         <module>tealium-token</module>
         <module>snow-token</module>
         <module>token-transformer</module>
+        <module>body-encoder</module>
     </modules>
 
     <dependencyManagement>
@@ -160,6 +161,11 @@
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>token-transformer</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>body-encoder</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
