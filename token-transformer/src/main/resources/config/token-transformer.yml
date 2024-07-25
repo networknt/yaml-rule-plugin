@@ -134,7 +134,3 @@ tokenSchemas:
 #
 #        # accessToken is populated by configured jwtSchema
 #        assertion: "!ref(pathPrefixAuth.accessToken)"
-
-
-
-
