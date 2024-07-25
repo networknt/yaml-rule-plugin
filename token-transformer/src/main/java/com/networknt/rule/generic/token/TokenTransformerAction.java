@@ -3,7 +3,6 @@ package com.networknt.rule.generic.token;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.networknt.client.ClientConfig;
 import com.networknt.config.Config;
-import com.networknt.client.Http2Client;
 import com.networknt.config.JsonMapper;
 import com.networknt.config.TlsUtil;
 import com.networknt.http.client.HttpClientRequest;
@@ -239,7 +238,7 @@ public class TokenTransformerAction implements IAction {
 
         // TODO - do we want to use default context
         if (schema.getSslContextSchema() == null)
-            return Http2Client.createSSLContext();
+            return HttpClientRequest.createSSLContext();
 
         /* Create a new context if we don't have one cached, or if we have cache disabled. */
         if (schema.getSslContext() == null || !schema.isCacheSSLContext()) {
