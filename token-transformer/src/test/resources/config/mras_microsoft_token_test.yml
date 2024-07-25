@@ -1,0 +1,31 @@
+proxyHost: ""
+proxyPort: ""
+enableHttp2: false
+tokenSchemas:
+  mrasMicrosoft:
+    pathPrefixAuth:
+      clientId: "my-microsoft-client-id"
+      clientSecret: "my-microsoft-client-secret"
+    request:
+      cacheHttpClient: true
+      url: "https://test.mras.com/services/oauth2/token"
+      type: application/x-www-form-urlencoded
+      headers:
+        Content-Type: application/x-www-form-urlencoded
+      body:
+        grant_type: "client_credentials"
+        resource: "9bcadce-3312-4c2b-9a5d-0e90e8b92c67"
+        client_id: "!ref(pathPrefixAuth.clientId)"
+        client_secret: "!ref(pathPrefixAuth.clientSecret)"
+
+    source:
+      body:
+        - source: access_token
+          destination: "!ref(pathPrefixAuth.accessToken)"
+        - source: expires_in
+          destination: "!ref(pathPrefixAuth.tokenTtl)"
+
+    update:
+      direction: REQUEST
+      headers:
+        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
