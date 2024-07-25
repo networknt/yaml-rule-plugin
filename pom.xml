@@ -198,6 +198,16 @@
                 <artifactId>http-client</artifactId>
                 <version>${version.http-client}</version>
             </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>client</artifactId>
+                <version>${version.light-4j}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>client-config</artifactId>
+                <version>${version.light-4j}</version>
+            </dependency>
 
             <!-- External dependencies -->
 

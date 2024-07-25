@@ -1,16 +1,140 @@
-proxyHost: ${token-transformer.proxyHost:}
+proxyHost: ""
+proxyPort: ""
+enableHttp2: false
+tokenSchemas:
+#*-------------------------------------------------*#
+#*---------< mras two-way SSL example >------------*#
+#*-------------------------------------------------*#
+#  mrasSSL:
+#    pathPrefixAuth:
+#      username: "my-basic-username"
+#      password: "my-basic-password"
+#      tokenTtl: 300
+#    request:
+#      cacheHttpClient: true
+#      cacheSSLContext: false
+#      url: "https://test.mras.com/services/oauth2/token"
+#      type: application/x-www-form-urlencoded
+#      sslContextSchema:
+#        tlsVersion: TLSv1.2
+#        trustStore:
+#          name: mras_ts.jks
+#          password: password
+#        keyStore:
+#          name: api.ais-dev
+#          password: password
+#          aliasPass: password
+#      headers:
+#        Content-Type: application/x-www-form-urlencoded
+#        Authorization: "BASIC <encoded_credentials>"
+#      body:
+#        grant_type: client_credentials
+#
+#    source:
+#      body:
+#        - source: access_token
+#          destination: "!ref(pathPrefixAuth.accessToken)"
+#        - source: scope
+#          destination: "!ref(pathPrefixAuth.scope)"
+#
+#    update:
+#      direction: REQUEST
+#      headers:
+#        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
 
-# Proxy Port if proxy host is used. default value will be 443 which means HTTPS.
-proxyPort: ${token-transformer.proxyPort:}
+#*-------------------------------------------------*#
+#*----------< mras microsoft example >-------------*#
+#*-------------------------------------------------*#
+#  mrasMicrosoft:
+#    pathPrefixAuth:
+#      clientId: "my-microsoft-client-id"
+#      clientSecret: "my-microsoft-client-secret"
+#    request:
+#      cacheHttpClient: true
+#      url: "https://test.mras.com/services/oauth2/token"
+#      type: application/x-www-form-urlencoded
+#      headers:
+#        Content-Type: application/x-www-form-urlencoded
+#      body:
+#        grant_type: "client_credentials"
+#        resource: "9bcadce-3312-4c2b-9a5d-0e90e8b92c67"
+#        client_id: "!ref(pathPrefixAuth.clientId)"
+#        client_secret: "!ref(pathPrefixAuth.clientSecret)"
+#
+#    source:
+#      body:
+#        - source: access_token
+#          destination: "!ref(pathPrefixAuth.accessToken)"
+#        - source: expires_in
+#          destination: "!ref(pathPrefixAuth.tokenTtl)"
+#
+#    update:
+#      direction: REQUEST
+#      headers:
+#        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
 
-# If HTTP2 is used to connect to the specified auth token source.
-enableHttp2: ${token-transformer.enableHttp2:false}
+#*-------------------------------------------------*#
+#*-------------< lifeware example >----------------*#
+#*-------------------------------------------------*#
+#  lifeware:
+#    pathPrefixAuth:
+#      clientId: "my-id"
+#      clientSecret: "abc-123"
+#    request:
+#      cacheHttpClient: true
+#      url: "https://networknttest.asp.lifeware.lu/api/v0/token"
+#      type: application/json
+#      headers:
+#        Content-Type: application/json
+#        Accept: application/json
+#      body:
+#        client_id: "!ref(pathPrefixAuth.clientId)"
+#        client_secret: "!ref(pathPrefixAuth.clientSecret)"
+#    source:
+#      body:
+#        - source: access_key
+#          destination: "!ref(pathPrefixAuth.accessToken)"
+#    update:
+#      direction: REQUEST
+#      headers:
+#        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
 
-# A list of applied request path prefixes and authentication mappings, other requests will skip this handler.
-# Each item will have properties to help get the token from the tealium access token service. For each API
-# or request path prefix, you need to define an item in the list for authentication. This will allow the object
-# to be created and cache the token per path prefix.
-pathPrefixAuths: ${token-transformer.pathPrefixAuths:}
+#*-------------------------------------------------*#
+#*------------< Salesforce example >---------------*#
+#*-------------------------------------------------*#
+#  salesforce:
+#    pathPrefixAuth:
+#      grantType: urn:ietf:params:oauth:grant-type:jwt-bearer
+#      tokenTtl: 60
+#    request:
+#      cacheHttpClient: false
+#      url: https://test.salesforce.com/services/oauth2/token
+#      jwtSchema:
+#        jwtTtl: 300
+#        keyStore:
+#          name: apigatewayuat.pfx
+#          password: password01
+#          alias: apigatewayuat
+#          aliasPass: password01
+#        algorithm: SHA256withRSA
+#        jwtHeader:
+#          staticFields:
+#            alg: RS256
+#        jwtBody:
+#          staticFields:
+#            iss: 3MVG9S11UK8FGR3O.vJebzXvWgAE211Z9KX_7vmKt6k300-2913g_AdsTWtzBTLI232Y1w21kw2HANBfU9jTTJF9h5mL.2tJdY142hyaPW
+#            sub: apiuser.conquestintegration@networknt.sit
+#            aud: https://test.salesforce.com
+#          expiryFields:
+#            - exp
+#      headers:
+#        Content-Type: application/x-www-form-urlencoded
+#      body:
+#        grant_type: "!ref(pathPrefixAuth.grantType)"
+#
+#        # accessToken is populated by configured jwtSchema
+#        assertion: "!ref(pathPrefixAuth.accessToken)"
 
-# Masks used in module registry
-moduleMasks: ${token-transformer.moduleMasks:}
+
+
+

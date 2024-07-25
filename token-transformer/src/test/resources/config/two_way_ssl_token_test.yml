@@ -1,0 +1,40 @@
+proxyHost: ""
+proxyPort: ""
+enableHttp2: false
+tokenSchemas:
+  mrasSSL:
+    pathPrefixAuth:
+      username: "my-basic-username"
+      password: "my-basic-password"
+      tokenTtl: 300
+    request:
+      cacheHttpClient: true
+      cacheSSLContext: false
+      url: "https://test.mras.com/services/oauth2/token"
+      type: application/x-www-form-urlencoded
+      sslContextSchema:
+        tlsVersion: TLSv1.2
+        trustStore:
+          name: mras_ts.jks
+          password: password
+        keyStore:
+          name: api.ais-dev
+          password: password
+          aliasPass: password
+      headers:
+        Content-Type: application/x-www-form-urlencoded
+        Authorization: "BASIC <encoded_credentials>"
+      body:
+        grant_type: client_credentials
+
+    source:
+      body:
+        - source: access_token
+          destination: "!ref(pathPrefixAuth.accessToken)"
+        - source: scope
+          destination: "!ref(pathPrefixAuth.scope)"
+
+    update:
+      direction: REQUEST
+      headers:
+        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
