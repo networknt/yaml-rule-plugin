@@ -50,7 +50,10 @@
             <groupId>com.networknt</groupId>
             <artifactId>http-client</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>client-config</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
