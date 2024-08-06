@@ -32,7 +32,8 @@ public class SourceSchema extends PathPrefixAuthWriteSchema {
     }
 
     public void writeResponseToPathPrefix(final PathPrefixAuth pathPrefixAuth, final HttpResponse<?> response) {
-        this.writeJsonStringToPathPrefix(pathPrefixAuth, response.headers().toString(), this.headers);
+        // TODO - add support for response headers
+        //this.writeJsonStringToPathPrefix(pathPrefixAuth, response.headers().toString(), this.headers);
         this.writeJsonStringToPathPrefix(pathPrefixAuth, response.body().toString(), this.body);
     }
 
