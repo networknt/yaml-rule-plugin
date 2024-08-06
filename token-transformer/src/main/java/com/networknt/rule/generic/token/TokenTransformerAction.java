@@ -212,6 +212,7 @@ public class TokenTransformerAction implements IAction {
 
         /* append unsigned payload + signed payload together */
         tokenBuilder.append(".");
+
         tokenBuilder.append(signedPayload);
         return tokenBuilder.toString();
     }

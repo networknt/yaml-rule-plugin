@@ -49,6 +49,7 @@ public class HttpTokenRequestBuilder {
 
             LOG.trace("Adding body to token request.");
 
+
             final var parameters = new HashMap<String, String>();
             for (final var entry : body.entrySet()) {
                 LOG.trace("Body key = {} Body value = {}", entry.getKey(), entry.getValue());

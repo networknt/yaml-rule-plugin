@@ -25,7 +25,7 @@ public class TokenTransformerActionTest {
             final var actionValues = new ArrayList<RuleActionValue>();
 
             final var tokenSchemaKey = "tokenSchemas";
-            final var tokenSchemaValue = "GrsOps-salesforce-schema";
+            final var tokenSchemaValue = "lifeware";
             final var tokenSchemaActionValue = new RuleActionValue();
             tokenSchemaActionValue.setActionValueId(tokenSchemaKey);
             tokenSchemaActionValue.setValue(tokenSchemaValue);
