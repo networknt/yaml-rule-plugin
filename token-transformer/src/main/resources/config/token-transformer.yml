@@ -1,9 +1,8 @@
 proxyHost: ${token-transformer.proxyHost:}
 proxyPort: ${token-transformer.proxyPort:}
-enableHttp2: ${token-transformer.enableHttp2:true}
+enableHttp2: ${token-transformer.enableHttp2:false}
 moduleMasks: ${token-transformer.moduleMasks:}
-#tokenSchemas: ${token-transformer.tokenSchemas:}
-tokenSchemas:
+tokenSchemas: ${token-transformer.tokenSchemas:}
 #*-------------------------------------------------*#
 #*---------< mras two-way SSL example >------------*#
 #*-------------------------------------------------*#
@@ -104,42 +103,44 @@ tokenSchemas:
 #*-------------------------------------------------*#
 #*------------< Salesforce example >---------------*#
 #*-------------------------------------------------*#
-    GrsOps-salesforce-schema:
-      pathPrefixAuth:
-        grantType: urn:ietf:params:oauth:grant-type:jwt-bearer
-        tokenTtl: 60
-      request:
-        cacheHttpClient: false
-        url: https://test.salesforce.com/services/oauth2/token
-        type: "application/x-www-form-urlencoded"
-        jwtSchema:
-          jwtTtl: 300
-          keyStore:
-            name: lightgateway.pfx
-            password: CRYPT:3d24fc5e86fbcaf491f33def88560b47:ef7cc9693ea88e18da01b149ea5f5742
-            alias: lightgateway
-            aliasPass: CRYPT:3d24fc5e86fbcaf491f33def88560b47:ef7cc9693ea88e18da01b149ea5f5742
-          algorithm: SHA256withRSA
-          jwtHeader:
-            staticFields:
-              alg: RS256
-          jwtBody:
-            staticFields:
-              iss: 3MVG9P7Pp4QrREPm4EkHavd5XztJYKqHYA6rWIEg81zeewLuI.GMZOEDMfKIsbkGtxBbHC5W8EwArz0g79dDT
-              sub: apiuser.kafka@sunlife.group.stage.grsopdev09
-              aud: https://test.salesforce.com
-            expiryFields:
-              - exp
-        headers:
-          Content-Type: application/x-www-form-urlencoded
-        body:
-          grant_type: "!ref(pathPrefixAuth.grantType)"
-          assertion: "!ref(pathPrefixAuth.accessToken)"
-      source:
-        body:
-          - source: access_token
-            destination: "!ref(pathPrefixAuth.accessToken)"
-      update:
-        direction: REQUEST
-        headers:
-          Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
+#  salesforce:
+#    pathPrefixAuth:
+#      grantType: urn:ietf:params:oauth:grant-type:jwt-bearer
+#      tokenTtl: 60
+#    request:
+#      cacheHttpClient: false
+#      url: https://test.salesforce.com/services/oauth2/token
+#      type: "application/x-www-form-urlencoded"
+#      jwtSchema:
+#        jwtTtl: 300
+#        keyStore:
+#          name: apigatewayuat.pfx
+#          password: password01
+#          alias: apigatewayuat
+#          aliasPass: password01
+#        algorithm: SHA256withRSA
+#        jwtHeader:
+#          staticFields:
+#            alg: RS256
+#        jwtBody:
+#          staticFields:
+#            iss: 3MVG9S11UK8FGR3O.vJebzXvWgAE211Z9KX_7vmKt6k300-2913g_AdsTWtzBTLI232Y1w21kw2HANBfU9jTTJF9h5mL.2tJdY142hyaPW
+#            sub: apiuser.conquestintegration@networknt.sit
+#            aud: https://test.salesforce.com
+#          expiryFields:
+#            - exp
+#      headers:
+#        Content-Type: application/x-www-form-urlencoded
+#      body:
+#        grant_type: "!ref(pathPrefixAuth.grantType)"
+#
+#        # accessToken is populated by configured jwtSchema
+#        assertion: "!ref(pathPrefixAuth.accessToken)"
+#    source:
+#      body:
+#        - source: access_token
+#          destination: "!ref(pathPrefixAuth.accessToken)"
+#    update:
+#      direction: REQUEST
+#      headers:
+#        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
