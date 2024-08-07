@@ -1,25 +1,20 @@
 package com.networknt.rule.generic.token;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.networknt.client.ClientConfig;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
-import com.networknt.config.TlsUtil;
 import com.networknt.http.client.HttpClientRequest;
 import com.networknt.http.client.ssl.ClientX509ExtendedTrustManager;
 import com.networknt.http.client.ssl.TLSConfig;
 import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
-import com.networknt.rule.generic.token.schema.cert.KeyStoreSchema;
-import com.networknt.rule.generic.token.schema.cert.TrustStoreSchema;
 import com.networknt.rule.generic.token.schema.RequestSchema;
 import com.networknt.rule.generic.token.schema.TokenSchema;
 import com.networknt.rule.generic.token.schema.UpdateSchema;
 import com.networknt.utility.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.net.ssl.*;
 import java.io.IOException;
 import java.net.*;
@@ -37,8 +32,10 @@ public class TokenTransformerAction implements IAction {
 
     private static final Logger LOG = LoggerFactory.getLogger(TokenTransformerAction.class);
     private static final TokenTransformerConfig CONFIG = TokenTransformerConfig.load();
+    private final TokenKeyStoreManager keyStoreManager = new TokenKeyStoreManager();
 
     public TokenTransformerAction() throws URISyntaxException, JsonProcessingException {
+        LOG.trace("Constructing token-transformer plugin");
         ModuleRegistry.registerPlugin(
                 TokenTransformerAction.class.getPackage().getImplementationTitle(),
                 TokenTransformerAction.class.getPackage().getImplementationVersion(),
@@ -51,63 +48,58 @@ public class TokenTransformerAction implements IAction {
 
     @Override
     public void performAction(final Map<String, Object> objMap, final Map<String, Object> resultMap, final Collection<RuleActionValue> actionValues) {
+        LOG.trace("TokenTransformer plugin starts.");
         for (final var actionValue : actionValues) {
             if (actionValue.getActionValueId().equals(TokenTransformerConfig.TOKEN_SCHEMA)) {
                 try {
                     this.handleTokenAction(actionValue.getValue(), resultMap);
-                } catch (URISyntaxException e) {
-                    LOG.error("Invalid token URL provided for tokenSchema '{}'", actionValue.getValue());
-                    return;
-                } catch (IOException e) {
-                    LOG.error("Could not create HTTP Client for schema '{}'. Ended with exception {}", actionValue.getValue(), e.getMessage());
-                    return;
                 } catch (InterruptedException e) {
                     LOG.error("Exception occurred while sending a new token request for schema '{}'", actionValue.getValue());
+                    LOG.trace("TokenTransformer plugin ends with error.");
                     Thread.currentThread().interrupt();
-                    return;
-                } catch (UnrecoverableKeyException e) {
-                    LOG.error("Exception finding key: '{}'", e.getMessage());
-                    return;
-                } catch (NoSuchAlgorithmException e) {
-                    LOG.error("Unknown algorithm: '{}'", e.getMessage());
-                    return;
-                } catch (KeyStoreException e) {
-                    LOG.error("Exception while loading key store: '{}'", e.getMessage());
-                    return;
-                } catch (SignatureException e) {
-                    LOG.error("Exception while signing JWT: '{}'", e.getMessage());
-                    return;
-                } catch (InvalidKeyException e) {
-                    LOG.error("Exception while loading key: '{}'", e.getMessage());
-                    return;
-                } catch (KeyManagementException e) {
-                    LOG.error("Exception while loading key manager: '{}'", e.getMessage());
                     return;
                 }
             }
         }
+        LOG.trace("TokenTransformer plugin ends.");
         resultMap.put(RuleConstants.RESULT, true);
     }
 
-    public void handleTokenAction(final String tokenSchema, final Map<String, Object> resultMap) throws
-            URISyntaxException,
-            IOException,
-            InterruptedException,
-            UnrecoverableKeyException,
-            NoSuchAlgorithmException,
-            KeyStoreException,
-            SignatureException,
-            InvalidKeyException,
-            KeyManagementException {
+    public void handleTokenAction(final String tokenSchema, final Map<String, Object> resultMap) throws InterruptedException {
+
+        if (CONFIG.getTokenSchemas() == null)
+            return;
+
         final var schema = CONFIG.getTokenSchemas().get(tokenSchema);
         if (schema != null) {
             if (System.currentTimeMillis() >= schema.getPathPrefixAuth().getExpiration()) {
+                LOG.debug("Cached token is expired. Requesting a new token.");
                 final var client = this.getTokenSchemaHttpClient(schema);
                 final var request = this.getTokenSchemaHttpRequest(schema);
-                this.requestNewToken(schema, client, request, resultMap);
+
+                final HttpResponse<?> response;
+                try {
+                    response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                    LOG.trace("Status = {}, ResponseBody = {}", response.statusCode(), response.body());
+                } catch (IOException e) {
+                    LOG.trace("URI = {}, Headers = {}, Method = {} ", request.uri(), request.headers(), request.method());
+                    throw new RuntimeException("Exception while trying to send a request." + e.getMessage());
+                }
+                if (response.statusCode() == 200) {
+
+                    /* update pathPrefix from http response */
+                    schema.getTokenSource().writeResponseToPathPrefix(schema.getPathPrefixAuth(), response);
+
+                    /* write new values to 'update' section of the tokenSchema */
+                    schema.getTokenUpdate().writeSchemaFromPathPrefix(schema.getPathPrefixAuth());
+                    updateResultMapFromSchema(schema.getTokenUpdate(), resultMap);
+                } else {
+                    LOG.error("The token request returned statusCode: '{}'", response.statusCode());
+                }
             } else {
                 // TODO - Do we still update resultMap with cachedToken?
-                LOG.info("Cached token is not expired");
+                LOG.debug("Cached token is not expired");
+                updateResultMapFromSchema(schema.getTokenUpdate(), resultMap);
 
             }
 
@@ -115,14 +107,7 @@ public class TokenTransformerAction implements IAction {
 
     }
 
-    private HttpRequest getTokenSchemaHttpRequest(final TokenSchema schema) throws
-            URISyntaxException,
-            JsonProcessingException,
-            UnrecoverableKeyException,
-            NoSuchAlgorithmException,
-            KeyStoreException,
-            SignatureException,
-            InvalidKeyException {
+    private HttpRequest getTokenSchemaHttpRequest(final TokenSchema schema) {
 
         /* Use the same request if it already exists and if we do not have a defined JWT schema. */
         if (this.shouldBuildHttpRequest(schema)) {
@@ -147,12 +132,8 @@ public class TokenTransformerAction implements IAction {
         return schema.getTokenRequest().getHttpRequest();
     }
 
-    private HttpClient getTokenSchemaHttpClient(final TokenSchema schema) throws
-            IOException,
-            NoSuchAlgorithmException,
-            KeyManagementException,
-            UnrecoverableKeyException,
-            KeyStoreException {
+    private HttpClient getTokenSchemaHttpClient(final TokenSchema schema) {
+
         if (this.shouldCreateHttpClient(schema)) {
 
             /* Use SSL configuration if we have one, otherwise create a default context */
@@ -185,83 +166,100 @@ public class TokenTransformerAction implements IAction {
         return schema.getPathPrefixAuth().getHttpClient();
     }
 
-    private String buildJwtToken(final RequestSchema schema) throws
-            NoSuchAlgorithmException,
-            InvalidKeyException,
-            UnrecoverableKeyException,
-            KeyStoreException,
-            SignatureException {
-
+    private String buildJwtToken(final RequestSchema schema) {
         final var tokenBuilder = new StringBuilder();
 
         /* create JWT payload header */
         final var jwtHeaderMap = schema.getJwtSchema().getJwtHeader().buildJwtMap(schema.getJwtSchema().getJwtTtl());
         final var jwtHeaderString = JsonMapper.toJson(jwtHeaderMap);
-        tokenBuilder.append(encodeBase64URLSafeString(jwtHeaderString.getBytes(StandardCharsets.UTF_8)));
+        tokenBuilder.append(org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(jwtHeaderString.getBytes(StandardCharsets.UTF_8)));
         tokenBuilder.append(".");
 
         /* create JWT payload body */
         final var jwtBodyMap = schema.getJwtSchema().getJwtBody().buildJwtMap(schema.getJwtSchema().getJwtTtl());
         final var jwtBodyString = JsonMapper.toJson(jwtBodyMap);
-        tokenBuilder.append(encodeBase64URLSafeString(jwtBodyString.getBytes(StandardCharsets.UTF_8)));
-        tokenBuilder.append(".");
+        tokenBuilder.append(org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(jwtBodyString.getBytes(StandardCharsets.UTF_8)));
 
-        /* load the keystore */
-        final var keystore = TlsUtil.loadKeyStore(
+        // TODO - change 'alias pass' to 'keypass'.
+        final var privateKey = this.keyStoreManager.getPrivateKey(
                 schema.getJwtSchema().getKeyStore().getName(),
-                schema.getJwtSchema().getKeyStore().getPassword().toCharArray()
-        );
-
-        /* load key from keystore based on provided alias */
-        final var privateKey = (PrivateKey) keystore.getKey(
+                schema.getJwtSchema().getKeyStore().getPassword(),
                 schema.getJwtSchema().getKeyStore().getAlias(),
-                schema.getJwtSchema().getKeyStore().getAliasPass().toCharArray()
+                schema.getJwtSchema().getKeyStore().getAliasPass()
         );
 
         /* create a signed payload from 'jwtHeader' + '.' + 'jwtBody'  */
-        final var signature = Signature.getInstance(schema.getJwtSchema().getAlgorithm());
-        signature.initSign(privateKey);
-        signature.update(tokenBuilder.toString().getBytes(StandardCharsets.UTF_8));
-        final var signedPayload = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(signature.sign());
+        final Signature signature;
+        try {
+            signature = Signature.getInstance(schema.getJwtSchema().getAlgorithm());
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException("Algorithm '" + schema.getJwtSchema().getAlgorithm() + "' is invalid.");
+        }
+
+        try {
+            signature.initSign(privateKey);
+        } catch (InvalidKeyException e) {
+            throw new IllegalArgumentException("Invalid key for selected algorithm '" + schema.getJwtSchema().getAlgorithm() +"'.");
+        }
+
+        final String signedPayload;
+        try {
+            signature.update(tokenBuilder.toString().getBytes(StandardCharsets.UTF_8));
+            signedPayload = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(signature.sign());
+        } catch (SignatureException e) {
+            throw new IllegalArgumentException("Invalid signature for JWT.");
+        }
 
         /* append unsigned payload + signed payload together */
+        tokenBuilder.append(".");
+
         tokenBuilder.append(signedPayload);
         return tokenBuilder.toString();
     }
 
-    private SSLContext createSSLContext(final RequestSchema schema) throws
-            NoSuchAlgorithmException,
-            KeyManagementException,
-            KeyStoreException,
-            UnrecoverableKeyException,
-            IOException {
+    private SSLContext createSSLContext(final RequestSchema schema) {
 
         // TODO - do we want to use default context
-        if (schema.getSslContextSchema() == null)
-            return HttpClientRequest.createSSLContext();
+        if (schema.getSslContextSchema() == null) {
+            try {
+                LOG.trace("Creating default SSL context from client.yml.");
+                return HttpClientRequest.createSSLContext();
+            } catch (IOException e) {
+                throw new RuntimeException("Could not create SSL context: " + e.getMessage());
+            }
+        }
 
         /* Create a new context if we don't have one cached, or if we have cache disabled. */
         if (schema.getSslContext() == null || !schema.isCacheSSLContext()) {
+            LOG.trace("Creating new SSL context from the SSL context schema.");
 
             /* keystore */
-            KeyManager[] keyManagers = null;
-            if (schema.getSslContextSchema().getKeyStore() != null) {
-                keyManagers = this.createKeyManagers(schema.getSslContextSchema().getKeyStore());
-            }
+            final var keyStoreName = schema.getSslContextSchema().getKeyStore().getName();
+            final var keyStorePass = schema.getSslContextSchema().getKeyStore().getPassword();
+            final var keyPass = schema.getSslContextSchema().getKeyStore().getAliasPass();
+            KeyManager[] keyManagers = this.keyStoreManager.getKeyManagers(keyStoreName, keyStorePass, keyPass, null);
 
             /* truststore  */
-            List<TrustManager> trustManagerList = new ArrayList<>();
-            if (schema.getSslContextSchema().getTrustStore() != null) {
-                trustManagerList = this.createTrustManagers(schema.getSslContextSchema().getTrustStore());
+            final var trustStoreName = schema.getSslContextSchema().getTrustStore().getName();
+            final var trustStorePass = schema.getSslContextSchema().getTrustStore().getPassword();
+            TrustManager[] trustManagers = this.keyStoreManager.getTrustManagers(trustStoreName, trustStorePass, null);
+
+            final SSLContext sslContext;
+            try {
+                sslContext = SSLContext.getInstance(schema.getSslContextSchema().getTlsVersion());
+            } catch (NoSuchAlgorithmException e) {
+                throw new IllegalArgumentException("Requested algorithm '" + schema.getSslContextSchema().getTlsVersion() + "' is not available." + e.getMessage());
             }
 
-            SSLContext sslContext = null;
-            sslContext = SSLContext.getInstance(schema.getSslContextSchema().getTlsVersion());
-            if (trustManagerList.isEmpty()) {
-                LOG.error("No trust store is loaded. Please check client.yml");
+            if (trustManagers.length == 0) {
+                throw new IllegalStateException("No trust managers found for SSL context.");
             } else {
-                TrustManager[] extendedTrustManagers = { new ClientX509ExtendedTrustManager(trustManagerList) };
-                sslContext.init(keyManagers, extendedTrustManagers, null);
+                TrustManager[] extendedTrustManagers = { new ClientX509ExtendedTrustManager(Arrays.asList(trustManagers)) };
+                try {
+                    sslContext.init(keyManagers, extendedTrustManagers, null);
+                } catch (KeyManagementException e) {
+                    throw new RuntimeException("Exception occurred when initializing ssl context. " + e.getMessage());
+                }
             }
 
             schema.setSslContext(sslContext);
@@ -269,77 +267,20 @@ public class TokenTransformerAction implements IAction {
         return schema.getSslContext();
     }
 
-    private List<TrustManager> createTrustManagers(final TrustStoreSchema trustStoreSchema) throws KeyStoreException, NoSuchAlgorithmException {
-        TrustManager[] trustManagers = null;
-        List<TrustManager> trustManagerList = new ArrayList<>();
-        // temp loading the certificate from the keystore instead of truststore from the config.
-        final var trustStoreName = trustStoreSchema.getName();
-        final var trustStorePass = trustStoreSchema.getPassword();
-        LOG.trace("trustStoreName = {} trustStorePass = {}",
-                trustStoreName,
-                (trustStorePass == null ? null : trustStorePass.substring(0, 4))
-        );
-        if (trustStoreName != null && trustStorePass != null) {
-            KeyStore trustStore = TlsUtil.loadKeyStore(trustStoreName, trustStorePass.toCharArray());
-            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            trustManagerFactory.init(trustStore);
-            trustManagers = trustManagerFactory.getTrustManagers();
-        }
-        if (trustManagers != null && trustManagers.length > 0) {
-            trustManagerList.addAll(Arrays.asList(trustManagers));
-        }
-        return trustManagerList;
-    }
-
-    private KeyManager[] createKeyManagers(final KeyStoreSchema keyStoreSchema) throws
-            NoSuchAlgorithmException,
-            UnrecoverableKeyException,
-            KeyStoreException {
-        // load key store for client certificate as two-way ssl is used.
-        final var keyStoreName = keyStoreSchema.getName();
-        final var keyStorePass = keyStoreSchema.getPassword();
-        final var aliasPass = keyStoreSchema.getAliasPass();
-
-        LOG.trace("keyStoreName = {} keyStorePass = {} keyPass = {}",
-                keyStoreName,
-                (keyStorePass == null ? null : keyStorePass.substring(0, 4)),
-                (aliasPass == null ? null : aliasPass.substring(0, 4))
-        );
-
-        if (keyStoreName != null && keyStorePass != null && aliasPass != null) {
-            final var keyStore = TlsUtil.loadKeyStore(keyStoreName, keyStorePass.toCharArray());
-
-            // TODO - allow configuration of algorithm for loading key manager.
-            final var keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            keyManagerFactory.init(keyStore, aliasPass.toCharArray());
-            return keyManagerFactory.getKeyManagers();
-
-        } else return new KeyManager[0];
-    }
-
-    private void requestNewToken(final TokenSchema schema, final HttpClient client, final HttpRequest request, final Map<String, Object> resultMap) throws IOException, InterruptedException {
-        final HttpResponse<?> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() == 200) {
-
-            /* update pathPrefix from http response */
-            schema.getTokenSource().writeResponseToPathPrefix(schema.getPathPrefixAuth(), response);
-
-            /* write new values to 'update' section of the tokenSchema */
-            schema.getTokenUpdate().writeSchemaFromPathPrefix(schema.getPathPrefixAuth());
-            updateResultMapFromSchema(schema.getTokenUpdate(), resultMap);
-        } else {
-            LOG.error("The token request returned statusCode: '{}'", response.statusCode());
-        }
-    }
-
+    /**
+     * Based on the configured update schema. Populate the result map with data.
+     *
+     * @param update - the update schema.
+     * @param resultMap - the to-be populated result map.
+     */
     private void updateResultMapFromSchema(final UpdateSchema update, final Map<String, Object> resultMap) {
         switch (update.getDirection()) {
             case REQUEST:
-                if (!update.getBody().isEmpty()) {
+                if (update.getBody() != null && !update.getBody().isEmpty()) {
                     final var requestBodyUpdateMap = new HashMap<>(update.getBody());
                     resultMap.put("requestBody", requestBodyUpdateMap);
                 }
-                if (!update.getHeaders().isEmpty()) {
+                if (update.getHeaders() != null && !update.getHeaders().isEmpty()) {
                     final var requestHeaderUpdateMap = new HashMap<>(update.getHeaders());
                     final var updateHeaderMap = new HashMap<String, Object>();
                     updateHeaderMap.put("update", requestHeaderUpdateMap);
@@ -347,11 +288,11 @@ public class TokenTransformerAction implements IAction {
                 }
                 break;
             case RESPONSE:
-                if (!update.getBody().isEmpty()) {
+                if (update.getBody() != null && !update.getBody().isEmpty()) {
                     final var responseBodyUpdateMap = new HashMap<>(update.getBody());
                     resultMap.put("responseBody", responseBodyUpdateMap);
                 }
-                if (!update.getHeaders().isEmpty()) {
+                if (update.getHeaders() != null && !update.getHeaders().isEmpty()) {
                     final var responseHeaderUpdateMap = new HashMap<>(update.getHeaders());
                     final var updateHeaderMap = new HashMap<String, Object>();
                     updateHeaderMap.put("update", responseHeaderUpdateMap);
@@ -363,11 +304,25 @@ public class TokenTransformerAction implements IAction {
         }
     }
 
+    /**
+     * Returns true if you a new client should be created.
+     * If the client is null or if we do not want to cache the client, a new client will need to be created.
+     *
+     * @param schema - the schema containing both the client and cache configuration.
+     * @return - true if client should be created.
+     */
     private boolean shouldCreateHttpClient(final TokenSchema schema) {
         return schema.getPathPrefixAuth().getHttpClient() == null
                 || !schema.getTokenRequest().isCacheHttpClient();
     }
 
+    /**
+     * Returns true if you a new HTTP client should be created.
+     * If the request is null or if we have a JWT configuration, a new request will need to be created.
+     *
+     * @param schema - the schema containing the http request and possible jwt configuration.
+     * @return - true if request should be created.
+     */
     private boolean shouldBuildHttpRequest(final TokenSchema schema) {
         return schema.getTokenRequest().getHttpRequest() == null
                 || schema.getTokenRequest().getJwtSchema() != null;
