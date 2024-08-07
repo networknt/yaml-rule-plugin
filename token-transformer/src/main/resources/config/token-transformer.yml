@@ -1,7 +1,8 @@
-proxyHost: ""
-proxyPort: ""
-enableHttp2: false
-tokenSchemas:
+proxyHost: ${token-transformer.proxyHost:}
+proxyPort: ${token-transformer.proxyPort:}
+enableHttp2: ${token-transformer.enableHttp2:false}
+moduleMasks: ${token-transformer.moduleMasks:}
+tokenSchemas: ${token-transformer.tokenSchemas:}
 #*-------------------------------------------------*#
 #*---------< mras two-way SSL example >------------*#
 #*-------------------------------------------------*#
@@ -92,7 +93,7 @@ tokenSchemas:
 #        client_secret: "!ref(pathPrefixAuth.clientSecret)"
 #    source:
 #      body:
-#        - source: access_key
+#        - source: access_token
 #          destination: "!ref(pathPrefixAuth.accessToken)"
 #    update:
 #      direction: REQUEST
@@ -109,6 +110,7 @@ tokenSchemas:
 #    request:
 #      cacheHttpClient: false
 #      url: https://test.salesforce.com/services/oauth2/token
+#      type: "application/x-www-form-urlencoded"
 #      jwtSchema:
 #        jwtTtl: 300
 #        keyStore:
@@ -134,3 +136,11 @@ tokenSchemas:
 #
 #        # accessToken is populated by configured jwtSchema
 #        assertion: "!ref(pathPrefixAuth.accessToken)"
+#    source:
+#      body:
+#        - source: access_token
+#          destination: "!ref(pathPrefixAuth.accessToken)"
+#    update:
+#      direction: REQUEST
+#      headers:
+#        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
