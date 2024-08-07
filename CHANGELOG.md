@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.0.28 - 2024-08-07
+
+### Added
+- remove duplicated modules in pom.xml files (#97)
+- 91 token transformer refactor (#95) Thanks @KalevGonvick
+
 ## 1.0.27 - 2024-07-25
 
 ### Added
