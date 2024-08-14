@@ -165,4 +165,4 @@ In the above response-transformer, we set up the defaultBodyEncoding to ISO-8859
 The following is a video walk through; however, some the configuration might be changed already. Please following the configuration above if you want try it out.
 
 
-{{< youtube DMZCuHO7tWM >}}
+https://youtu.be/DMZCuHO7tWM
