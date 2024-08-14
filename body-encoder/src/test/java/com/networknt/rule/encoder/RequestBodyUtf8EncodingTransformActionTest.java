@@ -32,4 +32,17 @@ public class RequestBodyUtf8EncodingTransformActionTest {
         String updatedBody = (String) resultMap.get("requestBody");
         Assert.assertEquals(expectedBody, updatedBody);
     }
+
+    @Test
+    public void testISO2UTFEncoding() throws Exception{
+        String str = "Hello, world! çáéíóú ÇÁÉÍÓÚ";
+        System.out.println("original string: " + str);
+        byte[] isoBytes = str.getBytes("ISO-8859-1");
+        // this is the byte array we are dealing with. Convert back to string.
+        String isoString = new String(isoBytes, "ISO-8859-1");
+        System.out.println("ISO-8859-1 string: " + isoString);
+        byte[] utf8Bytes = isoString.getBytes();
+        String utf8String = new String(utf8Bytes);
+        System.out.println("UTF-8 string: " + utf8String);
+    }
 }
