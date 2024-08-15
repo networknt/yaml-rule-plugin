@@ -19,12 +19,12 @@ tokenSchemas: ${token-transformer.tokenSchemas:}
 #      sslContextSchema:
 #        tlsVersion: TLSv1.2
 #        trustStore:
-#          name: mras_ts.jks
+#          name: client.truststore
 #          password: password
 #        keyStore:
-#          name: api.ais-dev
+#          name: keyStoreName.pk12
 #          password: password
-#          aliasPass: password
+#          keyPass: password
 #      headers:
 #        Content-Type: application/x-www-form-urlencoded
 #        Authorization: "BASIC <encoded_credentials>"
@@ -117,14 +117,14 @@ tokenSchemas: ${token-transformer.tokenSchemas:}
 #          name: apigatewayuat.pfx
 #          password: password01
 #          alias: apigatewayuat
-#          aliasPass: password01
+#          keyPass: password01
 #        algorithm: SHA256withRSA
 #        jwtHeader:
 #          staticFields:
 #            alg: RS256
 #        jwtBody:
 #          staticFields:
-#            iss: 3MVG9S11UK8FGR3O.vJebzXvWgAE211Z9KX_7vmKt6k300-2913g_AdsTWtzBTLI232Y1w21kw2HANBfU9jTTJF9h5mL.2tJdY142hyaPW
+#            iss: 3MVG9S11UK8FGR879789g3O.vJebzXvWgAE211Z9KX_7vmKt6k300-2913g_AdsTWtzBTLI232Y1w21kw2HANBfU9jTTJF9h5mL.2tJdY142hyaPW
 #            sub: apiuser.conquestintegration@networknt.sit
 #            aud: https://test.salesforce.com
 #          expiryFields:

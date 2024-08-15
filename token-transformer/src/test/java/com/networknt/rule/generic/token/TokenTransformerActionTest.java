@@ -25,7 +25,7 @@ public class TokenTransformerActionTest {
             final var actionValues = new ArrayList<RuleActionValue>();
 
             final var tokenSchemaKey = "tokenSchemas";
-            final var tokenSchemaValue = "GrsOps-salesforce-schema";
+            final var tokenSchemaValue = "mrasSSL";
             final var tokenSchemaActionValue = new RuleActionValue();
             tokenSchemaActionValue.setActionValueId(tokenSchemaKey);
             tokenSchemaActionValue.setValue(tokenSchemaValue);
@@ -78,5 +78,30 @@ public class TokenTransformerActionTest {
 
         Assert.assertEquals("Bearer abc123", testUpdateSchema.getHeaders().get("Authorization"));
 
+    }
+
+    @Test
+    public void expirationTest() throws URISyntaxException, JsonProcessingException {
+        TokenTransformerAction action = new TokenTransformerAction();
+        final var actionValues = new ArrayList<RuleActionValue>();
+        final var tokenSchemaKey = "tokenSchemas";
+        final var tokenSchemaValue = "expirationTest";
+        final var tokenSchemaActionValue = new RuleActionValue();
+        tokenSchemaActionValue.setActionValueId(tokenSchemaKey);
+        tokenSchemaActionValue.setValue(tokenSchemaValue);
+        actionValues.add(tokenSchemaActionValue);
+
+        final var resultMap = new HashMap<String, Object>();
+        action.performAction(new HashMap<>(), resultMap, actionValues);
+
+        final var requestHeaderMap = (Map<String, Object>)resultMap.get("requestHeaders");
+        Assert.assertNotNull(requestHeaderMap);
+
+        final var updateMap = (Map<String, Object>) requestHeaderMap.get("update");
+        Assert.assertNotNull(updateMap);
+
+        final var authHeader = updateMap.get("Authorization");
+        Assert.assertNotNull(authHeader);
+        Assert.assertEquals("Bearer abc-123", authHeader);
     }
 }

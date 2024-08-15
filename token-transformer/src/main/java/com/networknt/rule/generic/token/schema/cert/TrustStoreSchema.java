@@ -1,14 +1,27 @@
 package com.networknt.rule.generic.token.schema.cert;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class TrustStoreSchema {
+
+    @JsonProperty("name")
     private String name;
-    private String password;
+
+    @JsonProperty("password")
+    private char[] password;
+
+    @JsonProperty("algorithm")
+    private String algorithm;
 
     public String getName() {
         return name;
     }
 
-    public String getPassword() {
+    public char[] getPassword() {
         return password;
+    }
+
+    public String getAlgorithm() {
+        return algorithm;
     }
 }
