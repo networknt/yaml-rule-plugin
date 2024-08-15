@@ -10,7 +10,7 @@ This plugin is used with the Light4J rule engine for loading plugins and applyin
 This section covers how you can configure the token-transformer plugin within token-transformer.yml or within values.yml under the ```token-transformer``` prefix.
 
 ### Generic Properties
-Like a lot of Light4j configurations, the token-transformer has properties for setting a proxy host (```proxyHost```), proxy port (```proxyPort```), 
+Like a lot of Light4j configurations, the token-transformer has properties for setting a proxy host (```proxyHost```), proxy port (```proxyPort```),
 http2 enable/disable (```enableHttp2```), and selecting what fields to mask for module registration (```moduleMasks```).
 ```yaml
 proxyHost: <URL>
@@ -42,8 +42,8 @@ tokenSchema:
     # ...
 ```
 #### request
-Request can define many different types of token requests. From simple application/json to more complex requests that include JWT construction. 
-The ```request``` field is a map object that has a number of different options available. 
+Request can define many different types of token requests. From simple application/json to more complex requests that include JWT construction.
+The ```request``` field is a map object that has a number of different options available.
 
 The full structure looks like the following:
 ```yaml
@@ -59,10 +59,10 @@ tokenSchemas:
         headers: <SOLVABLE map schema that contains the headers to use in the request. key = header key, value = header value>
         body: <SOLVABLE map schema that contains the body to use in the request. key = body key, value = body value>
       # ...
-  
+
 ```
 
-**NOTE:** Anything marked as SOLVABLE means that is can use the ```!ref(pathPrefixAuth.*)``` variables. 
+**NOTE:** Anything marked as SOLVABLE means that is can use the ```!ref(pathPrefixAuth.*)``` variables.
 
 #### source
 Source simply picks out the data needed from the token response.
@@ -84,7 +84,7 @@ tokenSchemas:
 **NOTE:** Destinations have to use the ```!ref(pathPrefixAuth.*)``` field name.
 
 #### update
-Define what fields you want to update in the in-flight request/response. 
+Define what fields you want to update in the in-flight request/response.
 The ```update``` field is a map object containing 3 fields. One to define the direction (REQUEST|RESPONSE), one to define the headers, and another to define the body.
 
 The full structure looks like the following:
@@ -104,13 +104,13 @@ This example highlights all options for request, including 2-way-ssl and jwt con
 
 ```yaml
   exampleSchema:
-    
+
     # Our pathPrefix variables that contains some pre-defined data.
     pathPrefixAuth:
-      clientId: "my-example-id" 
+      clientId: "my-example-id"
       clientSecret: "!mY_P@55w0Rd_S3cR37!"                        # It is recommended to use bcrypt if storing in a config file.
       tokenTtl: 300                                               # You should always define tokenTtl if the response does not contain an expiration field.
-    
+
     # Define the request we are going to make to the token service.
     request:
       cacheHttpClient: false                                      # we want to create the client everytime since we are generating a JWT for the request.
@@ -120,22 +120,22 @@ This example highlights all options for request, including 2-way-ssl and jwt con
       # The SSL context that will be used during the request.
       sslContextSchema:
         tlsVersion: TLSv1.3
-        
+
         # truststore for our trust manager
         trustStore:
           name: client.truststore
           password: password
-        
-        # keystore for our key manager  
+
+        # keystore for our key manager
         keyStore:
           name: client.keystore
           password: password
           keyPass: password
-      
+
       # the JWT structure that will be used in our request.
       jwtSchema:
         jwtTtl: 300
-        
+
         # keystore used when signing the JWT.
         keyStore:
           name: jwtSign.pfx
@@ -143,7 +143,7 @@ This example highlights all options for request, including 2-way-ssl and jwt con
           alias: privateKeyAlias
           keyPass: my-key-pass
         algorithm: SHA256withRSA
-        
+
         # JWT headers
         # "{
         #   \"alg\": \"RS256\
@@ -151,14 +151,14 @@ This example highlights all options for request, including 2-way-ssl and jwt con
         jwtHeader:
           staticFields:
             alg: RS256
-        
+
         # JWT body
         # "{
-        #   \"iss\": \"aaabbbccc.18dddbb898fc\", 
-        #   \"sub\": \"apiuser.kafka@sunlife.group.dev\", 
-        #   \"aud\": \"https://test.token-service.com\", 
-        #   \"exp\": \<currentTime> + <jwtTtl>"\", 
-        #   \"cur\": \<currentTime>"\", 
+        #   \"iss\": \"aaabbbccc.18dddbb898fc\",
+        #   \"sub\": \"apiuser.kafka@sunlife.group.dev\",
+        #   \"aud\": \"https://test.token-service.com\",
+        #   \"exp\": \<currentTime> + <jwtTtl>"\",
+        #   \"cur\": \<currentTime>"\",
         #   \"it\": \"<random uuid>\"
         #  }"
         jwtBody:
@@ -172,26 +172,26 @@ This example highlights all options for request, including 2-way-ssl and jwt con
             - cur
           uuidFields:
             - it
-      
+
       # define the headers for our request.
       headers:
         Content-Type: application/x-www-form-urlencoded
         Accept: application/json
-        
-        # NOTE: The constructed JWT is always stored under pathPrefix access token. 
+
+        # NOTE: The constructed JWT is always stored under pathPrefix access token.
         # It will get overwritten by the new access token retrieved from the token service.
         Authorization: "!ref(pathPrefixAuth.accessToken)"
-      
+
       # define the body for our request.
       body:
         grant_type: "client_credentials"
-        resource: "1abcabc-123123cccbbb-99d99d99" 
+        resource: "1abcabc-123123cccbbb-99d99d99"
         client_id: "!ref(pathPrefixAuth.clientId)"              # this means we will grab the clientId from pathPrefixAuth.
         client_secret: "!ref(pathPrefixAuth.clientSecret)"      # this means we will grab the client secret from pathPrefixAith.
 
     # Define how we grab the data from the token response
     source:
-      
+
       # we are grabbing the new token and putting it into the accessToken pathPrefixAuth field.
       # a new expiration is calculated from the defined ttl in pathPrefixAuth.
       body:
@@ -202,7 +202,7 @@ This example highlights all options for request, including 2-way-ssl and jwt con
     # In this case we are updating the request.
     update:
       direction: REQUEST
-      
+
       # Add/Update the Authorization header with the new or cached token.
       headers:
         Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
