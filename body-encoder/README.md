@@ -1,4 +1,4 @@
-This module contains two rule action implementations to change the request or response body from other encoding to UTF-8 in the request transform interceptor based on the rule engine.
+This module contains two rule action implementations to change the request or response body from ISO-8859-1 encoding to UTF-8 in the request or response transform interceptor based on the rule engine.
 
 The encoding to UTF-8 is done in the interceptor while parsing the stream into a string. However, if the body type is XML and it has encoding="xxx" as the declaration, we need to change it to encoding="UTF-8" to make sure that the body is parsed correctly.
 
@@ -18,7 +18,7 @@ body-encoder-request:
   host: lightapi.net
   ruleType: request-transform
   visibility: public
-  description: Transform the request body to UTF-8 encoding and update the encoding delaration to UTF-8 if it exists.
+  description: Transform the request body to UTF-8 encoding from ISO-8859-1 and update the encoding delaration to UTF-8 if it exists.
   conditions:
     - conditionId: path-encoder
       propertyPath: requestPath
@@ -37,7 +37,7 @@ body-encoder-response:
   host: lightapi.net
   ruleType: response-transform
   visibility: public
-  description: Transform the response body to UTF-8 encoding and update the encoding delaration to UTF-8 if it exists.
+  description: Transform the response body to UTF-8 encoding from ISO-8859-1 and update the encoding delaration to UTF-8 if it exists.
   conditions:
     - conditionId: path-encoder
       propertyPath: requestPath
@@ -53,10 +53,9 @@ body-encoder-response:
 
 ```
 
-This rule will be triggered when the request path matches the condition and the action class will be invoked to encode the request body or response body.
+These rules will be triggered when the request path matches the condition and the action class will be invoked to encode the request body or response body.
 
-In the values.yml file, we need to do that following changes to overwrite default bodyEncoder. Also, you need to make sure that RequestTransformerInterceptor and RequestBodyInterceptor are configured in the service.yml section.
-
+In the values.yml file, we need to do that following changes to overwrite default bodyEncoder. Also, you need to make sure that Request/ResponseTransformerInterceptor and Request/ResponseBodyInterceptor are configured in the service.yml section.
 
 
 ```
@@ -110,35 +109,60 @@ You need to update the handler.yml section to add the interceptor handlers and p
 service.yml
 
 ```
+  - com.networknt.server.StartupHookProvider:
+      - com.networknt.rule.RuleLoaderStartupHook
+  - com.networknt.handler.ResponseInterceptor:
+      - com.networknt.restrans.ResponseTransformerInterceptor
+      - com.networknt.body.ResponseBodyInterceptor
   - com.networknt.handler.RequestInterceptor:
-      - com.networknt.reqtrans.RequestTransformerInterceptor
       - com.networknt.body.RequestBodyInterceptor
+      - com.networknt.reqtrans.RequestTransformerInterceptor
 
 ```
 
-Above add the RequestTransformerInterceptor and RequestBodyInterceptor to the default chain via requestInterceptor defined in the handler.yml file.
+Above add the Request/ResponseTransformerInterceptor and Request/ResponseBodyInterceptor to the service.yml section in the values.yml file. Also, we need to add the RuleLoaderStartupHook to the service section to ensure that rules are loaded during the server startup.
 
-Please note that RequestBodyInterceptor must be the last interceptor in the interceptor list.
+Please note that Request/ResponseBodyInterceptor must be the last interceptor in the interceptor list.
 
-request-transformer.yml
+The following is the rule-loader configuration in the values.yml for the response transformation.
 
 ```
+# rule-loader.yml
+rule-loader.ruleSource: config-folder
+rule-loader.endpointRules: {"/v1/pets@get":{"response-transform":[{"ruleId":"response-body-encoding"}]}}
+
+```
+
+In order to allow the request/response body to be injected.
+
+```
+# request-injection.yml
+request-injection.appliedBodyInjectionPathPrefixes:
+  - /v1/pets
+
+# response-transformer.yml
+response-injection.appliedBodyInjectionPathPrefixes:
+  - /v1/pets
+
+```
+
+To allow the request/response tranform to be configured.
+
+```
+# response-transformer.yml
+response-transformer.defaultBodyEncoding: ISO-8859-1
+response-transformer.appliedPathPrefixes: ["/v1/pets"]
+
 # request-transformer.yml
-request-transformer.appliedPathPrefixes: ["/v1/pets","/v1/flowers"]
+request-transformer.appliedPathPrefixes: ["/v1/pets"]
 
 ```
 
-Add the request path prefix to the request-transformer.appliedPathPrefixes list.
-
-rule-loader.yml
-
-```
-rule-loader.endpointRules: {"/v1/pets@post":{"request-transform":[{"ruleId":"body-sanitizer-request"}]}}
-
-```
-
-Add the endpoint /v1/pets@post and the ruleId to the mapping.
+In the above response-transformer, we set up the defaultBodyEncoding to ISO-8859-1 and it will be converted to UTF8.
 
 ### Tutorial
 
 The following is a video walk through; however, some the configuration might be changed already. Please following the configuration above if you want try it out.
+
+
+https://youtu.be/DMZCuHO7tWM
