@@ -25,6 +25,9 @@ public class UpdateSchema extends PathPrefixAuthReadSchema {
     @JsonProperty("body")
     protected Map<String, String> body;
 
+    @JsonProperty("updateExpirationFromTtl")
+    private boolean updateExpirationFromTtl = true;
+
     public UpdateDirection getDirection() {
         return direction;
     }
@@ -41,6 +44,15 @@ public class UpdateSchema extends PathPrefixAuthReadSchema {
         this.body = body;
     }
 
+    public boolean isUpdateExpirationFromTtl() {
+        return updateExpirationFromTtl;
+    }
+
+    /**
+     * Takes in the a pathPrefix object and populates the header and body fields that use the !ref keyword.
+     *
+     * @param pathPrefixAuth - the provided pathPrefixAuth containing the data.
+     */
     @Override
     public void writeSchemaFromPathPrefix(PathPrefixAuth pathPrefixAuth) {
         PathPrefixAuthReadSchema.updateMapFromPathPrefix(this.headers, pathPrefixAuth);

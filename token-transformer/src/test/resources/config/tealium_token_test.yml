@@ -1,7 +1,0 @@
-proxyHost:
-proxyPort:
-enableHttp2: false
-pathPrefixAuths:
-  - username: "my-username"
-    password: "mY_P@$$W0rd"
-    tokenUrl: "https://networknttest.telium.com/api/v0/token"

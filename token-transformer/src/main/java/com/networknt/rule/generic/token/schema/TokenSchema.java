@@ -31,12 +31,4 @@ public class TokenSchema {
     public UpdateSchema getTokenUpdate() {
         return tokenUpdate;
     }
-
-    public void setTokenRequest(RequestSchema tokenRequest) {
-        this.tokenRequest = tokenRequest;
-    }
-
-    public void setTokenUpdate(UpdateSchema tokenUpdate) {
-        this.tokenUpdate = tokenUpdate;
-    }
 }

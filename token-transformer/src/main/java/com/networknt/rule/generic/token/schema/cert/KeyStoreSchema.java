@@ -8,19 +8,22 @@ public class KeyStoreSchema {
     private String name;
 
     @JsonProperty("password")
-    private String password;
+    private char[] password;
 
     @JsonProperty("alias")
     private String alias;
 
-    @JsonProperty("aliasPass")
-    private String aliasPass;
+    @JsonProperty("keyPass")
+    private char[] keyPass;
+
+    @JsonProperty("algorithm")
+    private String algorithm;
 
     public String getName() {
         return name;
     }
 
-    public String getPassword() {
+    public char[] getPassword() {
         return password;
     }
 
@@ -28,9 +31,11 @@ public class KeyStoreSchema {
         return alias;
     }
 
-    public String getAliasPass() {
-        return aliasPass;
+    public char[] getKeyPass() {
+        return keyPass;
     }
 
-
+    public String getAlgorithm() {
+        return algorithm;
+    }
 }

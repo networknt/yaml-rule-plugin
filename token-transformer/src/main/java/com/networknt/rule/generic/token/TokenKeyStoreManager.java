@@ -18,27 +18,34 @@ public class TokenKeyStoreManager {
     private static final Logger LOG = LoggerFactory.getLogger(TokenKeyStoreManager.class);
     private static final Map<String, KeyStore> KEY_STORE_MAP = new HashMap<>();
 
-    private void addKeyStore(final String keyStoreName, final String keyStorePass) {
+    private void addKeyStore(final String keyStoreName, final char[] keyStorePass) {
         if (keyStoreName == null || keyStorePass == null)
             throw new IllegalArgumentException("name and pass must not be null");
 
-        KEY_STORE_MAP.put(keyStoreName, TlsUtil.loadKeyStore(keyStoreName, keyStorePass.toCharArray()));
+        KEY_STORE_MAP.put(keyStoreName, TlsUtil.loadKeyStore(keyStoreName, keyStorePass));
     }
 
-    private KeyStore getKeyStore(final String keyStoreName, final String keyStorePass) {
+    /**
+     * Retrieve the keystore
+     *
+     * @param keyStoreName
+     * @param keyStorePass
+     * @return
+     */
+    private KeyStore getKeyStore(final String keyStoreName, final char[] keyStorePass) {
         if (!KEY_STORE_MAP.containsKey(keyStoreName))
             this.addKeyStore(keyStoreName, keyStorePass);
         return KEY_STORE_MAP.get(keyStoreName);
     }
 
-    public PrivateKey getPrivateKey(final String keyStoreName, final String keyStorePass, final String keyAlias, final String keyPass) {
+    public PrivateKey getPrivateKey(final String keyStoreName, final char[] keyStorePass, final String keyAlias, final char[] keyPass) {
         if (keyStoreName == null || keyStorePass == null || keyAlias == null || keyPass == null)
             throw new IllegalArgumentException("keyStoreName, keyStorePass, keyAlias, and keyPass must not be null.");
 
         final var keystore = this.getKeyStore(keyStoreName, keyStorePass);
         /* load key from keystore based on provided alias */
         try {
-            return (PrivateKey) keystore.getKey(keyAlias, keyPass.toCharArray());
+            return (PrivateKey) keystore.getKey(keyAlias, keyPass);
         } catch (KeyStoreException e) {
             LOG.error("Keystore was not initialized correctly: {}", e.getMessage());
             return null;
@@ -51,7 +58,7 @@ public class TokenKeyStoreManager {
         }
     }
 
-    public TrustManager[] getTrustManagers(final String keyStoreName, final String keyStorePass, final String algorithm) {
+    public TrustManager[] getTrustManagers(final String keyStoreName, final char[] keyStorePass, final String algorithm) {
         if (keyStoreName == null || keyStorePass == null)
             throw new IllegalArgumentException("keyStoreName, keyStorePass, and ");
 
@@ -78,7 +85,7 @@ public class TokenKeyStoreManager {
         }
     }
 
-    public KeyManager[] getKeyManagers(final String keyStoreName, final String keyStorePass, final String privateKeyPass, final String algorithm) {
+    public KeyManager[] getKeyManagers(final String keyStoreName, final char[] keyStorePass, final char[] privateKeyPass, final String algorithm) {
         if (keyStoreName == null || keyStorePass == null || privateKeyPass == null)
             throw new IllegalArgumentException("keyStoreName, keyStorePass, and ");
 
@@ -97,7 +104,7 @@ public class TokenKeyStoreManager {
         }
 
         try {
-            keyManagerFactory.init(keyStore, privateKeyPass.toCharArray());
+            keyManagerFactory.init(keyStore, privateKeyPass);
             return keyManagerFactory.getKeyManagers();
         } catch (KeyStoreException e) {
             LOG.error("Operation failed for '{}': {}", keyStoreName, e.getMessage());

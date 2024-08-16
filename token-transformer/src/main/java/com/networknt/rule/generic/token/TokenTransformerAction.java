@@ -26,8 +26,13 @@ import java.security.*;
 import java.time.Duration;
 import java.util.*;
 
-import static org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString;
-
+/**
+ * Generic plugin for updating an in-flight request or response with a new/different token.
+ * Tokens are either retrieved from a specified token service, or are taken from cache if not expired yet.
+ * TokenSchema configurations allow for different types of token requests to be defined. (i.e. url-encoded, application/json, JWT construction, 2-Way-SSL, etc.).
+ *
+ * @author Kalev Gonvick
+ */
 public class TokenTransformerAction implements IAction {
 
     private static final Logger LOG = LoggerFactory.getLogger(TokenTransformerAction.class);
@@ -48,11 +53,16 @@ public class TokenTransformerAction implements IAction {
 
     @Override
     public void performAction(final Map<String, Object> objMap, final Map<String, Object> resultMap, final Collection<RuleActionValue> actionValues) {
+
         LOG.trace("TokenTransformer plugin starts.");
+
         for (final var actionValue : actionValues) {
+
             if (actionValue.getActionValueId().equals(TokenTransformerConfig.TOKEN_SCHEMA)) {
+
                 try {
                     this.handleTokenAction(actionValue.getValue(), resultMap);
+
                 } catch (InterruptedException e) {
                     LOG.error("Exception occurred while sending a new token request for schema '{}'", actionValue.getValue());
                     LOG.trace("TokenTransformer plugin ends with error.");
@@ -65,48 +75,79 @@ public class TokenTransformerAction implements IAction {
         resultMap.put(RuleConstants.RESULT, true);
     }
 
+    /**
+     * When an in-flight request/response has a matching tokenSchema, handle the token action for the in-flight request/response.
+     * @param tokenSchema - defined schema for in-flight request/response.
+     * @param resultMap - outbound map that stores the action result.
+     *
+     * @throws InterruptedException - Occurs when sending the request to the token service fails.
+     */
     public void handleTokenAction(final String tokenSchema, final Map<String, Object> resultMap) throws InterruptedException {
 
         if (CONFIG.getTokenSchemas() == null)
             return;
 
         final var schema = CONFIG.getTokenSchemas().get(tokenSchema);
+
         if (schema != null) {
+
             if (System.currentTimeMillis() >= schema.getPathPrefixAuth().getExpiration()) {
+
                 LOG.debug("Cached token is expired. Requesting a new token.");
+
                 final var client = this.getTokenSchemaHttpClient(schema);
                 final var request = this.getTokenSchemaHttpRequest(schema);
 
                 final HttpResponse<?> response;
                 try {
                     response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
                     LOG.trace("Status = {}, ResponseBody = {}", response.statusCode(), response.body());
+
                 } catch (IOException e) {
                     LOG.trace("URI = {}, Headers = {}, Method = {} ", request.uri(), request.headers(), request.method());
                     throw new RuntimeException("Exception while trying to send a request." + e.getMessage());
                 }
+
                 if (response.statusCode() == 200) {
 
                     /* update pathPrefix from http response */
                     schema.getTokenSource().writeResponseToPathPrefix(schema.getPathPrefixAuth(), response);
 
+                    if (schema.getTokenUpdate().isUpdateExpirationFromTtl()) {
+
+                        if (schema.getPathPrefixAuth().getTokenTtl() == 0)
+                            LOG.warn("Token ttl is either not defined or is set to 0, a new token will be requested every time!");
+
+                        final var newExpiration = System.currentTimeMillis() + schema.getPathPrefixAuth().getTokenTtl();
+                        schema.getPathPrefixAuth().setExpiration(newExpiration);
+                    }
+
                     /* write new values to 'update' section of the tokenSchema */
                     schema.getTokenUpdate().writeSchemaFromPathPrefix(schema.getPathPrefixAuth());
                     updateResultMapFromSchema(schema.getTokenUpdate(), resultMap);
-                } else {
-                    LOG.error("The token request returned statusCode: '{}'", response.statusCode());
-                }
-            } else {
-                // TODO - Do we still update resultMap with cachedToken?
-                LOG.debug("Cached token is not expired");
-                updateResultMapFromSchema(schema.getTokenUpdate(), resultMap);
 
+                } else LOG.error("The token request returned statusCode: '{}'", response.statusCode());
+
+            } else {
+
+                LOG.debug("Cached token is not expired. Updating result map from cached token data.");
+
+                schema.getTokenUpdate().writeSchemaFromPathPrefix(schema.getPathPrefixAuth());
+                updateResultMapFromSchema(schema.getTokenUpdate(), resultMap);
             }
 
         } else throw new IllegalArgumentException("Provided token schema '" + tokenSchema + "' does not exist!");
 
     }
 
+    /**
+     * Gets the http request used in the token service call.
+     * It's either created or retrieved from cache.
+     *
+     * @param schema - token schema for in-flight request/response.
+     * @return - HttpRequest for the token service.
+     */
     private HttpRequest getTokenSchemaHttpRequest(final TokenSchema schema) {
 
         /* Use the same request if it already exists and if we do not have a defined JWT schema. */
@@ -132,6 +173,12 @@ public class TokenTransformerAction implements IAction {
         return schema.getTokenRequest().getHttpRequest();
     }
 
+    /**
+     * Gets the Http client for the token request. Either retrieved from cache or a creates a new client.
+     *
+     * @param schema - the token schema
+     * @return - returns HttpClient for the request.
+     */
     private HttpClient getTokenSchemaHttpClient(final TokenSchema schema) {
 
         if (this.shouldCreateHttpClient(schema)) {
@@ -166,6 +213,13 @@ public class TokenTransformerAction implements IAction {
         return schema.getPathPrefixAuth().getHttpClient();
     }
 
+    /**
+     * Token requests that require a JWT to retrieve another will be constructed here.
+     * JWT structure = { jwtHeader } . { jwtBody } . signed({ jwtHeader } . { jwtBody })
+     *
+     * @param schema - the token request schema
+     * @return - returns a newly constructed jwt String.
+     */
     private String buildJwtToken(final RequestSchema schema) {
         final var tokenBuilder = new StringBuilder();
 
@@ -180,12 +234,11 @@ public class TokenTransformerAction implements IAction {
         final var jwtBodyString = JsonMapper.toJson(jwtBodyMap);
         tokenBuilder.append(org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(jwtBodyString.getBytes(StandardCharsets.UTF_8)));
 
-        // TODO - change 'alias pass' to 'keypass'.
         final var privateKey = this.keyStoreManager.getPrivateKey(
                 schema.getJwtSchema().getKeyStore().getName(),
                 schema.getJwtSchema().getKeyStore().getPassword(),
                 schema.getJwtSchema().getKeyStore().getAlias(),
-                schema.getJwtSchema().getKeyStore().getAliasPass()
+                schema.getJwtSchema().getKeyStore().getKeyPass()
         );
 
         /* create a signed payload from 'jwtHeader' + '.' + 'jwtBody'  */
@@ -210,20 +263,29 @@ public class TokenTransformerAction implements IAction {
             throw new IllegalArgumentException("Invalid signature for JWT.");
         }
 
-        /* append unsigned payload + signed payload together */
+        /* Append 'unsigned payload' + '.'  + 'signed payload' together. */
         tokenBuilder.append(".");
-
         tokenBuilder.append(signedPayload);
         return tokenBuilder.toString();
     }
 
+    /**
+     * Token requests that specify needing a different SSLContext will be constructed here.
+     * Otherwise, the default context will be used.
+     *
+     * @param schema - the token request schema.
+     * @return - returns the ssl context for the token request.
+     */
     private SSLContext createSSLContext(final RequestSchema schema) {
 
-        // TODO - do we want to use default context
         if (schema.getSslContextSchema() == null) {
+
             try {
-                LOG.trace("Creating default SSL context from client.yml.");
+
+                LOG.debug("Creating default SSL context from client.yml.");
+
                 return HttpClientRequest.createSSLContext();
+
             } catch (IOException e) {
                 throw new RuntimeException("Could not create SSL context: " + e.getMessage());
             }
@@ -231,28 +293,33 @@ public class TokenTransformerAction implements IAction {
 
         /* Create a new context if we don't have one cached, or if we have cache disabled. */
         if (schema.getSslContext() == null || !schema.isCacheSSLContext()) {
-            LOG.trace("Creating new SSL context from the SSL context schema.");
+
+            LOG.debug("Creating new SSL context from the SSL context schema.");
 
             /* keystore */
             final var keyStoreName = schema.getSslContextSchema().getKeyStore().getName();
             final var keyStorePass = schema.getSslContextSchema().getKeyStore().getPassword();
-            final var keyPass = schema.getSslContextSchema().getKeyStore().getAliasPass();
-            KeyManager[] keyManagers = this.keyStoreManager.getKeyManagers(keyStoreName, keyStorePass, keyPass, null);
+            final var keyPass = schema.getSslContextSchema().getKeyStore().getKeyPass();
+            final var keyStoreAlgorithm = schema.getSslContextSchema().getKeyStore().getAlgorithm();
+            KeyManager[] keyManagers = this.keyStoreManager.getKeyManagers(keyStoreName, keyStorePass, keyPass, keyStoreAlgorithm);
 
             /* truststore  */
             final var trustStoreName = schema.getSslContextSchema().getTrustStore().getName();
             final var trustStorePass = schema.getSslContextSchema().getTrustStore().getPassword();
-            TrustManager[] trustManagers = this.keyStoreManager.getTrustManagers(trustStoreName, trustStorePass, null);
+            final var trustStoreAlgorithm = schema.getSslContextSchema().getTrustStore().getAlgorithm();
+            TrustManager[] trustManagers = this.keyStoreManager.getTrustManagers(trustStoreName, trustStorePass, trustStoreAlgorithm);
 
             final SSLContext sslContext;
             try {
                 sslContext = SSLContext.getInstance(schema.getSslContextSchema().getTlsVersion());
+
             } catch (NoSuchAlgorithmException e) {
                 throw new IllegalArgumentException("Requested algorithm '" + schema.getSslContextSchema().getTlsVersion() + "' is not available." + e.getMessage());
             }
 
             if (trustManagers.length == 0) {
                 throw new IllegalStateException("No trust managers found for SSL context.");
+
             } else {
                 TrustManager[] extendedTrustManagers = { new ClientX509ExtendedTrustManager(Arrays.asList(trustManagers)) };
                 try {
@@ -268,7 +335,7 @@ public class TokenTransformerAction implements IAction {
     }
 
     /**
-     * Based on the configured update schema. Populate the result map with data.
+     * Based on the configured update schema. Populate the result map with the resulting token data.
      *
      * @param update - the update schema.
      * @param resultMap - the to-be populated result map.
@@ -276,10 +343,12 @@ public class TokenTransformerAction implements IAction {
     private void updateResultMapFromSchema(final UpdateSchema update, final Map<String, Object> resultMap) {
         switch (update.getDirection()) {
             case REQUEST:
+
                 if (update.getBody() != null && !update.getBody().isEmpty()) {
                     final var requestBodyUpdateMap = new HashMap<>(update.getBody());
                     resultMap.put("requestBody", requestBodyUpdateMap);
                 }
+
                 if (update.getHeaders() != null && !update.getHeaders().isEmpty()) {
                     final var requestHeaderUpdateMap = new HashMap<>(update.getHeaders());
                     final var updateHeaderMap = new HashMap<String, Object>();
@@ -287,11 +356,14 @@ public class TokenTransformerAction implements IAction {
                     resultMap.put("requestHeaders", updateHeaderMap);
                 }
                 break;
+
             case RESPONSE:
+
                 if (update.getBody() != null && !update.getBody().isEmpty()) {
                     final var responseBodyUpdateMap = new HashMap<>(update.getBody());
                     resultMap.put("responseBody", responseBodyUpdateMap);
                 }
+
                 if (update.getHeaders() != null && !update.getHeaders().isEmpty()) {
                     final var responseHeaderUpdateMap = new HashMap<>(update.getHeaders());
                     final var updateHeaderMap = new HashMap<String, Object>();
@@ -299,6 +371,7 @@ public class TokenTransformerAction implements IAction {
                     resultMap.put("responseHeaders", updateHeaderMap);
                 }
                 break;
+
             default:
                 throw new IllegalArgumentException("Invalid update direction '" + update.getDirection().toString() + "'.");
         }
