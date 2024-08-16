@@ -26,7 +26,7 @@ public class TokenKeyStoreManager {
     }
 
     /**
-     * Retrieve the keystore 
+     * Retrieve the keystore
      *
      * @param keyStoreName
      * @param keyStorePass
