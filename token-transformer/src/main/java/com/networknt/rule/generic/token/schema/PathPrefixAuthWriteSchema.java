@@ -7,6 +7,13 @@ import java.util.Map;
 
 public abstract class PathPrefixAuthWriteSchema extends PathPrefixAuthRelationSchema {
 
+    /**
+     * From a provided source-destination map, write new values to pathPrefixAuth.
+     *
+     * @param pathPrefixAuth - pathPrefixAuth being written to.
+     * @param sourceData - source data that contains new values.
+     * @param sourceDestinationMapping - sourceDestinationMapping that maps the values to a pathPrefixAuth field.
+     */
     protected static void writeToPathPrefixAuth(final PathPrefixAuth pathPrefixAuth, final Map<String, Object> sourceData, final List<SourceSchema.SourceDestinationDefinition> sourceDestinationMapping) {
         if (sourceDestinationMapping == null || sourceDestinationMapping.isEmpty() || sourceData == null || sourceData.isEmpty())
             return;
@@ -19,6 +26,13 @@ public abstract class PathPrefixAuthWriteSchema extends PathPrefixAuthRelationSc
         }
     }
 
+    /**
+     * Sets the value of pathPrefixAuth variable based on provided name.
+     *
+     * @param pathPrefixAuth - the pathPrefixAuth object being written to.
+     * @param find - the variable name as a String
+     * @param value - the new value.
+     */
     private static void setPathPrefixVariable(final PathPrefixAuth pathPrefixAuth, final String find, final String value) {
         final var matcher = VARIABLE_PATTERN.matcher(find);
         if (matcher.find()) {
