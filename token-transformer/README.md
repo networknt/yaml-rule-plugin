@@ -155,7 +155,7 @@ This example highlights all options for request, including 2-way-ssl and jwt con
         # JWT body
         # "{
         #   \"iss\": \"aaabbbccc.18dddbb898fc\",
-        #   \"sub\": \"apiuser.kafka@sunlife.group.dev\",
+        #   \"sub\": \"apiuser.kafka@networknt.group.dev\",
         #   \"aud\": \"https://test.token-service.com\",
         #   \"exp\": \<currentTime> + <jwtTtl>"\",
         #   \"cur\": \<currentTime>"\",
@@ -164,7 +164,7 @@ This example highlights all options for request, including 2-way-ssl and jwt con
         jwtBody:
           staticFields:
             iss: aaabbbccc.18dddbb898fc
-            sub: apiuser.kafka@sunlife.group.dev
+            sub: apiuser.kafka@networknt.group.dev
             aud: https://test.token-service.com
           expiryFields:
             - exp
