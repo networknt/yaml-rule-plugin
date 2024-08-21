@@ -22,7 +22,7 @@ mvn clean install
 * First, increase the version with maven command and upgrade the dependencies.
 
 ```
-mvn versions:set -DnewVersion=1.0.28 -DgenerateBackupPoms=false
+mvn versions:set -DnewVersion=1.0.29 -DgenerateBackupPoms=false
 ```
 
 * Second, check in the updated codebase to the master branch.

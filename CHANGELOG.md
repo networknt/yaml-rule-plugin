@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.0.29 - 2024-08-21
+
+### Added
+- Expiration Fix + Documentation (#99) Thanks @KalevGonvick
+- fixes #98 update test case and readme.md for body-encoder
+
 ## 1.0.28 - 2024-08-07
 
 ### Added
