@@ -93,7 +93,11 @@ public class TealiumTokenRequestTransformAction implements IAction {
                         .connectTimeout(Duration.ofMillis(ClientConfig.get().getTimeout()))
                         .sslContext(HttpClientRequest.createSSLContext());
                 if(config.getProxyHost() != null) clientBuilder.proxy(ProxySelector.of(new InetSocketAddress(config.getProxyHost(), config.getProxyPort() == 0 ? 443 : config.getProxyPort())));
-                if(config.isEnableHttp2()) clientBuilder.version(HttpClient.Version.HTTP_2);
+                if(config.isEnableHttp2()) {
+                    clientBuilder.version(HttpClient.Version.HTTP_2);
+                } else {
+                    clientBuilder.version(HttpClient.Version.HTTP_1_1);
+                }
                 // this a workaround to bypass the hostname verification in jdk11 http client.
                 Map<String, Object> tlsMap = (Map<String, Object>)ClientConfig.get().getMappedConfig().get(ClientConfig.TLS);
                 if(tlsMap != null && !Boolean.TRUE.equals(tlsMap.get(TLSConfig.VERIFY_HOSTNAME))) {
