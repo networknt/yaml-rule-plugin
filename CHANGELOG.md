@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.0.30 - 2024-08-23
+
+### Added
+- handle the HTTP_1_1 explicitly as http-client default to HTTP2 (#103)
+
+
 ## 1.0.29 - 2024-08-21
 
 ### Added
