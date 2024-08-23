@@ -122,6 +122,9 @@ public class EpamTokenRequestTransformAction implements IAction {
                 if(config.isEnableHttp2()) {
                     if(logger.isTraceEnabled()) logger.trace("enable http2 is true");
                     clientBuilder.version(HttpClient.Version.HTTP_2);
+                } else {
+                    if(logger.isTraceEnabled()) logger.trace("enable http2 is false");
+                    clientBuilder.version(HttpClient.Version.HTTP_1_1);
                 }
                 // this a workaround to bypass the hostname verification in jdk11 http client.
                 Map<String, Object> tlsMap = (Map<String, Object>)ClientConfig.get().getMappedConfig().get(ClientConfig.TLS);
