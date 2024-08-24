@@ -5,6 +5,7 @@ import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.config.Config;
 import com.networknt.utility.ModuleRegistry;
+import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,7 +122,7 @@ public class SoapSecurityTransformAction implements IAction {
 
     private String generateNonce() {
         String dateTimeString = Long.toString(new Date().getTime());
-        byte[] nonceByte = dateTimeString.getBytes();
+        byte[] nonceByte = dateTimeString.getBytes(StandardCharsets.UTF_8);
         return Base64.getEncoder().encodeToString(nonceByte);
     }
 

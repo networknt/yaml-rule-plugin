@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.text.StringEscapeUtils;
 
@@ -171,10 +172,10 @@ public class EncodeTransformer extends Transformer {
                     returnString = StringEscapeUtils.escapeHtml4(returnString);
                     break;
                 case BASE64:
-                    returnString = Base64.getEncoder().encodeToString(returnString.getBytes());
+                    returnString = Base64.getEncoder().encodeToString(returnString.getBytes(StandardCharsets.UTF_8));
                     break;
                 case HEX:
-                    returnString = String.valueOf(Hex.encodeHex(returnString.getBytes()));
+                    returnString = String.valueOf(Hex.encodeHex(returnString.getBytes(StandardCharsets.UTF_8)));
                     break;
                 case URL:
                     // TODO
