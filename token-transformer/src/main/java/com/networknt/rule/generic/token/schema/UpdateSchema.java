@@ -1,6 +1,8 @@
 package com.networknt.rule.generic.token.schema;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.networknt.config.PathPrefixAuth;
 
 import java.util.Map;
@@ -26,6 +28,7 @@ public class UpdateSchema extends PathPrefixAuthReadSchema {
     protected Map<String, String> body;
 
     @JsonProperty("updateExpirationFromTtl")
+    @JsonSetter(nulls = Nulls.SKIP)
     private boolean updateExpirationFromTtl = true;
 
     public UpdateDirection getDirection() {

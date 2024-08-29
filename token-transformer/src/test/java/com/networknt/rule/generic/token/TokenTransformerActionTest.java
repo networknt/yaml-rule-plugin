@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -103,5 +104,23 @@ public class TokenTransformerActionTest {
         final var authHeader = updateMap.get("Authorization");
         Assert.assertNotNull(authHeader);
         Assert.assertEquals("Bearer abc-123", authHeader);
+    }
+
+    @Test
+    public void gracePeriodTest() throws URISyntaxException, JsonProcessingException {
+        TokenTransformerAction action = new TokenTransformerAction();
+        final var actionValues = new ArrayList<RuleActionValue>();
+        final var tokenSchemaKey = "tokenSchemas";
+        final var tokenSchemaValue = "gracePeriodTest";
+        final var tokenSchemaActionValue = new RuleActionValue();
+        tokenSchemaActionValue.setActionValueId(tokenSchemaKey);
+        tokenSchemaActionValue.setValue(tokenSchemaValue);
+        actionValues.add(tokenSchemaActionValue);
+
+        final var resultMap = new HashMap<String, Object>();
+
+        /* Since grace period will make us refresh the stored token, we will get an exception when trying to reach out to our fake token service. */
+        RuntimeException exception = Assert.assertThrows(RuntimeException.class, () -> action.performAction(new HashMap<>(), resultMap, actionValues));
+        Assert.assertEquals("Exception while trying to send a request.", exception.getMessage());
     }
 }

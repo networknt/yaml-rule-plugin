@@ -36,7 +36,7 @@ public class JwtPartialSchema {
 
         if (this.expiryFields != null) {
             for (final var expiryField : this.expiryFields) {
-                jwtMap.put(expiryField, String.valueOf(System.currentTimeMillis()/1000 + ttl));
+                jwtMap.put(expiryField, String.valueOf(System.currentTimeMillis()/1000 + ttl/1000));
             }
         }
 

@@ -26,11 +26,11 @@ public class TokenKeyStoreManager {
     }
 
     /**
-     * Retrieve the keystore
+     * Retrieve the keystore. Load keystore first if not found within the cache.
      *
-     * @param keyStoreName
-     * @param keyStorePass
-     * @return
+     * @param keyStoreName - name of the keystore being retrieved.
+     * @param keyStorePass - char array pass for the keystore.
+     * @return - returns a keystore.
      */
     private KeyStore getKeyStore(final String keyStoreName, final char[] keyStorePass) {
         if (!KEY_STORE_MAP.containsKey(keyStoreName))

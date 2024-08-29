@@ -91,7 +91,7 @@ public class TokenTransformerAction implements IAction {
 
         if (schema != null) {
 
-            if (System.currentTimeMillis() >= schema.getPathPrefixAuth().getExpiration()) {
+            if (System.currentTimeMillis() >= (schema.getPathPrefixAuth().getExpiration() - schema.getTokenRequest().getTokenGracePeriod())) {
 
                 LOG.debug("Cached token is expired. Requesting a new token.");
 
@@ -106,7 +106,7 @@ public class TokenTransformerAction implements IAction {
 
                 } catch (IOException e) {
                     LOG.trace("URI = {}, Headers = {}, Method = {} ", request.uri(), request.headers(), request.method());
-                    throw new RuntimeException("Exception while trying to send a request." + e.getMessage());
+                    throw new RuntimeException("Exception while trying to send a request.");
                 }
 
                 if (response.statusCode() == 200) {
