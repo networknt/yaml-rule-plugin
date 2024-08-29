@@ -110,10 +110,10 @@ This example highlights all options for request, including 2-way-ssl and jwt con
       clientId: "my-example-id"
       clientSecret: "!mY_P@55w0Rd_S3cR37!"                        # It is recommended to use bcrypt if storing in a config file.
       tokenTtl: 300000                                            # You should always define tokenTtl if the response does not contain an expiration field. Always in milliseconds format.
-
+      waitLength: 50000
     # Define the request we are going to make to the token service.
     request:
-      tokenGracePeriod: 50000                                     # Add a 50 second grace period when refreshing a token.
+                                          # Add a 50 second grace period when refreshing a token.
       cacheHttpClient: false                                      # we want to create the client everytime since we are generating a JWT for the request.
       url: "https://test.token-service.com/services/oauth2/token" # the token endpoint we will hit
       type: application/x-www-form-urlencoded                     # the type of request we are making.

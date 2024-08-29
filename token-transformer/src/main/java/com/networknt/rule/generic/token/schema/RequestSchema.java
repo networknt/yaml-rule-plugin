@@ -35,9 +35,6 @@ public class RequestSchema extends PathPrefixAuthReadSchema {
     private SSLContextSchema sslContextSchema;
     @JsonProperty("jwtSchema")
     private JWTSchema jwtSchema;
-    @JsonProperty("tokenGracePeriod")
-    @JsonSetter(nulls = Nulls.SKIP)
-    private long tokenGracePeriod = 0L;
 
     public Map<String, String> getHeaders() {
         return headers;
@@ -65,9 +62,6 @@ public class RequestSchema extends PathPrefixAuthReadSchema {
 
     public String getUrl() {
         return url;
-    }
-    public long getTokenGracePeriod() {
-        return tokenGracePeriod;
     }
     public SSLContextSchema getSslContextSchema() {
         return sslContextSchema;

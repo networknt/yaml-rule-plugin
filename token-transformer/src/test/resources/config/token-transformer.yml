@@ -5,9 +5,9 @@ tokenSchemas:
   gracePeriodTest:
     pathPrefixAuth:
       accessToken: abc-123
-      expiration: 9999999999999
+      expiration: 2724957439
+      waitLength: 2147483647
     request:
-      tokenGracePeriod: 9999999999998
       url: "https://fake.token.com/services/oauth2/token"
       type: application/json
       headers:

@@ -91,7 +91,7 @@ public class TokenTransformerAction implements IAction {
 
         if (schema != null) {
 
-            if (System.currentTimeMillis() >= (schema.getPathPrefixAuth().getExpiration() - schema.getTokenRequest().getTokenGracePeriod())) {
+            if (System.currentTimeMillis() >= (schema.getPathPrefixAuth().getExpiration() - schema.getPathPrefixAuth().getWaitLength())) {
 
                 LOG.debug("Cached token is expired. Requesting a new token.");
 
@@ -109,7 +109,7 @@ public class TokenTransformerAction implements IAction {
                     throw new RuntimeException("Exception while trying to send a request.");
                 }
 
-                if (response.statusCode() == 200) {
+                if (response.statusCode() >= 200 && response.statusCode() <= 299) {
 
                     /* update pathPrefix from http response */
                     schema.getTokenSource().writeResponseToPathPrefix(schema.getPathPrefixAuth(), response);
