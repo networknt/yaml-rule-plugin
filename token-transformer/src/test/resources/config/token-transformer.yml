@@ -2,6 +2,27 @@ proxyHost: ""
 proxyPort: ""
 enableHttp2: false
 tokenSchemas:
+  gracePeriodTest:
+    pathPrefixAuth:
+      accessToken: abc-123
+      expiration: 2724957439
+      waitLength: 2147483647
+    request:
+      url: "https://fake.token.com/services/oauth2/token"
+      type: application/json
+      headers:
+        Content-Type: application/json
+      body:
+        test: test
+    source:
+      body:
+        - source: access_token
+          destination: "!ref(pathPrefixAuth.accessToken)"
+    update:
+      direction: REQUEST
+      headers:
+        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
+
   expirationTest:
     pathPrefixAuth:
       accessToken: abc-123

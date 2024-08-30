@@ -2,6 +2,8 @@ package com.networknt.rule.generic.token.schema;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.networknt.config.PathPrefixAuth;
 import com.networknt.rule.generic.token.schema.cert.SSLContextSchema;
 import com.networknt.rule.generic.token.schema.jwt.JWTSchema;
@@ -61,7 +63,6 @@ public class RequestSchema extends PathPrefixAuthReadSchema {
     public String getUrl() {
         return url;
     }
-
     public SSLContextSchema getSslContextSchema() {
         return sslContextSchema;
     }
