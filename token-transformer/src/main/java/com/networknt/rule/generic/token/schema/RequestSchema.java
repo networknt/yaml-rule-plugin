@@ -2,19 +2,17 @@ package com.networknt.rule.generic.token.schema;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
-import com.networknt.config.PathPrefixAuth;
 import com.networknt.rule.generic.token.schema.cert.SSLContextSchema;
 import com.networknt.rule.generic.token.schema.jwt.JWTSchema;
 
 import javax.net.ssl.SSLContext;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.util.Map;
 
 
-@JsonIgnoreProperties(value={ "sslContext", "httpRequest" }, allowGetters=true)
-public class RequestSchema extends PathPrefixAuthReadSchema {
+@JsonIgnoreProperties(value={ "sslContext", "httpRequest", "httpClient" }, allowGetters=true)
+public class RequestSchema extends SharedVariableRead {
     @JsonProperty("url")
     private String url;
     @JsonProperty("headers")
@@ -29,6 +27,8 @@ public class RequestSchema extends PathPrefixAuthReadSchema {
     private boolean cacheSSLContext;
     @JsonProperty("httpRequest")
     private HttpRequest httpRequest;
+    @JsonProperty("httpClient")
+    private HttpClient httpClient;
     @JsonProperty("sslContext")
     private SSLContext sslContext;
     @JsonProperty("sslContextSchema")
@@ -83,8 +83,16 @@ public class RequestSchema extends PathPrefixAuthReadSchema {
         return httpRequest;
     }
 
+    public HttpClient getHttpClient() {
+        return httpClient;
+    }
+
     public void setHttpRequest(HttpRequest httpRequest) {
         this.httpRequest = httpRequest;
+    }
+
+    public void setHttpClient(HttpClient httpClient) {
+        this.httpClient = httpClient;
     }
 
     public void setSslContext(SSLContext sslContext) {
@@ -92,8 +100,8 @@ public class RequestSchema extends PathPrefixAuthReadSchema {
     }
 
     @Override
-    public void writeSchemaFromPathPrefix(PathPrefixAuth pathPrefixAuth) {
-        PathPrefixAuthReadSchema.updateMapFromPathPrefix(this.headers, pathPrefixAuth);
-        PathPrefixAuthReadSchema.updateMapFromPathPrefix(this.body, pathPrefixAuth);
+    public void writeSchemaFromSharedVariables(final SharedVariableSchema sharedVariableSchema) {
+        SharedVariableRead.updateMapFromSharedVariables(this.headers, sharedVariableSchema);
+        SharedVariableRead.updateMapFromSharedVariables(this.body, sharedVariableSchema);
     }
 }

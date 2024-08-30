@@ -1,13 +1,19 @@
 package com.networknt.rule.generic.token.schema.jwt;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
+import com.networknt.rule.generic.token.schema.TtlUnit;
 import com.networknt.rule.generic.token.schema.cert.KeyStoreSchema;
-import com.networknt.rule.generic.token.schema.jwt.JwtPartialSchema;
 
 public class JWTSchema {
 
     @JsonProperty("jwtTtl")
     private long jwtTtl;
+
+    @JsonProperty("ttlUnit")
+    @JsonSetter(nulls = Nulls.SKIP)
+    private TtlUnit ttlUnit = TtlUnit.SECOND;
 
     @JsonProperty("keyStore")
     private KeyStoreSchema keyStore;
@@ -23,6 +29,10 @@ public class JWTSchema {
 
     public long getJwtTtl() {
         return jwtTtl;
+    }
+
+    public TtlUnit getTtlUnit() {
+        return ttlUnit;
     }
 
     public KeyStoreSchema getKeyStore() {

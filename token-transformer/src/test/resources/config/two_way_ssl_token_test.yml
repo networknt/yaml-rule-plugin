@@ -3,7 +3,7 @@ proxyPort: ""
 enableHttp2: false
 tokenSchemas:
   mrasSSL:
-    pathPrefixAuth:
+    sharedVariables:
       username: "my-basic-username"
       password: "my-basic-password"
       tokenTtl: 300
@@ -30,11 +30,11 @@ tokenSchemas:
     source:
       body:
         - source: access_token
-          destination: "!ref(pathPrefixAuth.accessToken)"
+          destination: "!ref(sharedVariables.accessToken)"
         - source: scope
-          destination: "!ref(pathPrefixAuth.scope)"
+          destination: "!ref(sharedVariables.scope)"
 
     update:
       direction: REQUEST
       headers:
-        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
+        Authorization: "Bearer !ref(sharedVariables.accessToken)"

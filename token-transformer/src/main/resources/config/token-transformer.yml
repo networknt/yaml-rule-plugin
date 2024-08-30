@@ -7,7 +7,7 @@ tokenSchemas: ${token-transformer.tokenSchemas:}
 #*---------< mras two-way SSL example >------------*#
 #*-------------------------------------------------*#
 #  mrasSSL:
-#    pathPrefixAuth:
+#    sharedVariables:
 #      username: "my-basic-username"
 #      password: "my-basic-password"
 #      tokenTtl: 300000
@@ -34,20 +34,20 @@ tokenSchemas: ${token-transformer.tokenSchemas:}
 #    source:
 #      body:
 #        - source: access_token
-#          destination: "!ref(pathPrefixAuth.accessToken)"
+#          destination: "!ref(sharedVariables.accessToken)"
 #        - source: scope
-#          destination: "!ref(pathPrefixAuth.scope)"
+#          destination: "!ref(sharedVariables.scope)"
 #
 #    update:
 #      direction: REQUEST
 #      headers:
-#        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
+#        Authorization: "Bearer !ref(sharedVariables.accessToken)"
 
 #*-------------------------------------------------*#
 #*----------< mras microsoft example >-------------*#
 #*-------------------------------------------------*#
 #  mrasMicrosoft:
-#    pathPrefixAuth:
+#    sharedVariables:
 #      clientId: "my-microsoft-client-id"
 #      clientSecret: "my-microsoft-client-secret"
 #    request:
@@ -59,26 +59,26 @@ tokenSchemas: ${token-transformer.tokenSchemas:}
 #      body:
 #        grant_type: "client_credentials"
 #        resource: "9bcadce-3312-4c2b-9a5d-0e90e8b92c67"
-#        client_id: "!ref(pathPrefixAuth.clientId)"
-#        client_secret: "!ref(pathPrefixAuth.clientSecret)"
+#        client_id: "!ref(sharedVariables.clientId)"
+#        client_secret: "!ref(sharedVariables.clientSecret)"
 #
 #    source:
 #      body:
 #        - source: access_token
-#          destination: "!ref(pathPrefixAuth.accessToken)"
+#          destination: "!ref(sharedVariables.accessToken)"
 #        - source: expires_in
-#          destination: "!ref(pathPrefixAuth.tokenTtl)"
+#          destination: "!ref(sharedVariables.tokenTtl)"
 #
 #    update:
 #      direction: REQUEST
 #      headers:
-#        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
+#        Authorization: "Bearer !ref(sharedVariables.accessToken)"
 
 #*-------------------------------------------------*#
 #*-------------< lifeware example >----------------*#
 #*-------------------------------------------------*#
 #  lifeware:
-#    pathPrefixAuth:
+#    sharedVariables:
 #      clientId: "my-id"
 #      clientSecret: "abc-123"
 #    request:
@@ -89,22 +89,22 @@ tokenSchemas: ${token-transformer.tokenSchemas:}
 #        Content-Type: application/json
 #        Accept: application/json
 #      body:
-#        client_id: "!ref(pathPrefixAuth.clientId)"
-#        client_secret: "!ref(pathPrefixAuth.clientSecret)"
+#        client_id: "!ref(sharedVariables.clientId)"
+#        client_secret: "!ref(sharedVariables.clientSecret)"
 #    source:
 #      body:
 #        - source: access_token
-#          destination: "!ref(pathPrefixAuth.accessToken)"
+#          destination: "!ref(sharedVariables.accessToken)"
 #    update:
 #      direction: REQUEST
 #      headers:
-#        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
+#        Authorization: "Bearer !ref(sharedVariables.accessToken)"
 
 #*-------------------------------------------------*#
 #*------------< Salesforce example >---------------*#
 #*-------------------------------------------------*#
 #  salesforce:
-#    pathPrefixAuth:
+#    sharedVariables:
 #      grantType: urn:ietf:params:oauth:grant-type:jwt-bearer
 #      tokenTtl: 60000
 #    request:
@@ -132,15 +132,15 @@ tokenSchemas: ${token-transformer.tokenSchemas:}
 #      headers:
 #        Content-Type: application/x-www-form-urlencoded
 #      body:
-#        grant_type: "!ref(pathPrefixAuth.grantType)"
+#        grant_type: "!ref(sharedVariables.grantType)"
 #
 #        # accessToken is populated by configured jwtSchema
-#        assertion: "!ref(pathPrefixAuth.accessToken)"
+#        assertion: "!ref(sharedVariables.accessToken)"
 #    source:
 #      body:
 #        - source: access_token
-#          destination: "!ref(pathPrefixAuth.accessToken)"
+#          destination: "!ref(sharedVariables.accessToken)"
 #    update:
 #      direction: REQUEST
 #      headers:
-#        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
+#        Authorization: "Bearer !ref(sharedVariables.accessToken)"

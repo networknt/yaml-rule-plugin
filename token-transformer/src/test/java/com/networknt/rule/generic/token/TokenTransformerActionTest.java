@@ -1,81 +1,53 @@
 package com.networknt.rule.generic.token;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.networknt.config.PathPrefixAuth;
 import com.networknt.rule.RuleActionValue;
+import com.networknt.rule.generic.token.schema.SharedVariableSchema;
 import com.networknt.rule.generic.token.schema.SourceSchema;
 import com.networknt.rule.generic.token.schema.UpdateSchema;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 public class TokenTransformerActionTest {
 
     @Test
-    @Ignore
-    public void basic() {
-        try {
-            final var transformerAction = new TokenTransformerAction();
-            final var actionValues = new ArrayList<RuleActionValue>();
-
-            final var tokenSchemaKey = "tokenSchemas";
-            final var tokenSchemaValue = "mrasSSL";
-            final var tokenSchemaActionValue = new RuleActionValue();
-            tokenSchemaActionValue.setActionValueId(tokenSchemaKey);
-            tokenSchemaActionValue.setValue(tokenSchemaValue);
-            actionValues.add(tokenSchemaActionValue);
-
-            final var resultMap = new HashMap<String, Object>();
-            transformerAction.performAction(new HashMap<>(), resultMap, actionValues);
-            System.out.println(resultMap);
-
-            //action
-        } catch (URISyntaxException | JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        Assert.assertEquals(1,1);
-    }
-
-    @Test
     public void tokenParseTest() {
         /* blank path prefix */
-        var testPathPrefixAuth = new PathPrefixAuth();
+        var testSharedVariable = new SharedVariableSchema();
 
         /* configure source to grab data from response body */
         var testSource = new SourceSchema();
         var testSourceAndDestinationDefinition = new SourceSchema.SourceDestinationDefinition();
         testSourceAndDestinationDefinition.setSource("access_token");
-        testSourceAndDestinationDefinition.setDestination("!ref(pathPrefix.accessToken)");
+        testSourceAndDestinationDefinition.setDestination("!ref(sharedVariables.accessToken)");
 
         String jsonString = "{\"access_token\": \"abc123\"}";
         testSource.setHeaders(Collections.singletonList(testSourceAndDestinationDefinition));
-        testSource.writeJsonStringToPathPrefix(testPathPrefixAuth, jsonString, testSource.getHeaders());
+        testSource.writeJsonStringToSharedVariables(testSharedVariable, jsonString, testSource.getHeaders());
 
-        Assert.assertEquals("abc123", testPathPrefixAuth.getAccessToken());
+        Assert.assertEquals("abc123", testSharedVariable.getAccessToken());
     }
 
     @Test
     public void updateTest() {
 
         /* test access token */
-        var testPathPrefixAuth = new PathPrefixAuth();
-        testPathPrefixAuth.setAccessToken("abc123");
+        var testSharedVariable = new SharedVariableSchema();
+        testSharedVariable.setAccessToken("abc123");
 
         /* create test update schema */
         var testUpdateSchema = new UpdateSchema();
         Map<String, String> myUpdateHeaders = new HashMap<>();
-        myUpdateHeaders.put("Authorization", "Bearer !ref(pathPrefixAuth.accessToken)");
+        myUpdateHeaders.put("Authorization", "Bearer !ref(sharedVariables.accessToken)");
         testUpdateSchema.setHeaders(myUpdateHeaders);
 
         /* testing update */
-        testUpdateSchema.writeSchemaFromPathPrefix(testPathPrefixAuth);
+        testUpdateSchema.writeSchemaFromSharedVariables(testSharedVariable);
 
         Assert.assertEquals("Bearer abc123", testUpdateSchema.getHeaders().get("Authorization"));
 
@@ -121,6 +93,71 @@ public class TokenTransformerActionTest {
 
         /* Since grace period will make us refresh the stored token, we will get an exception when trying to reach out to our fake token service. */
         RuntimeException exception = Assert.assertThrows(RuntimeException.class, () -> action.performAction(new HashMap<>(), resultMap, actionValues));
-        Assert.assertEquals("Exception while trying to send a request.", exception.getMessage());
+        Assert.assertEquals("Request failed trying to send a request to: https://fake.token.com/services/oauth2/token", exception.getMessage());
+    }
+
+    @Test
+    public void multiThreadTest() throws URISyntaxException, JsonProcessingException, BrokenBarrierException, InterruptedException {
+        TokenTransformerAction action = new TokenTransformerAction();
+        final var actionValues = new ArrayList<RuleActionValue>();
+        final var tokenSchemaKey = "tokenSchemas";
+        final var tokenSchemaValue = "multiThreadTest";
+        final var tokenSchemaActionValue = new RuleActionValue();
+        tokenSchemaActionValue.setActionValueId(tokenSchemaKey);
+        tokenSchemaActionValue.setValue(tokenSchemaValue);
+        actionValues.add(tokenSchemaActionValue);
+
+        /* create barrier with 3 awaits. */
+        final var gate = new CyclicBarrier(3);
+        final var resultMap1 = new HashMap<String, Object>();
+        final var t1 = new Thread(() -> {
+            try {
+                gate.await();
+            } catch (InterruptedException | BrokenBarrierException e) {
+                throw new RuntimeException(e);
+            }
+            action.performAction(new HashMap<>(), resultMap1, actionValues);
+        });
+        final var resultMap2 = new HashMap<String, Object>();
+        final var t2 = new Thread(() -> {
+            try {
+                gate.await();
+            } catch (InterruptedException | BrokenBarrierException e) {
+                throw new RuntimeException(e);
+            }
+
+            action.performAction(new HashMap<>(), resultMap2, actionValues);
+        });
+
+        /* prep-threads */
+        t1.start();
+        t2.start();
+
+        /* start at the same time */
+        gate.await();
+        t1.join();
+        t2.join();
+
+        final var requestHeaderMap1 = (Map<String, Object>)resultMap1.get("requestHeaders");
+        Assert.assertNotNull(requestHeaderMap1);
+
+        final var updateMap1 = (Map<String, Object>) requestHeaderMap1.get("update");
+        Assert.assertNotNull(updateMap1);
+
+        final var authHeader1 = updateMap1.get("Authorization");
+        Assert.assertNotNull(authHeader1);
+        Assert.assertEquals("Bearer abc-123", authHeader1);
+
+        final var requestHeaderMap2 = (Map<String, Object>)resultMap1.get("requestHeaders");
+        Assert.assertNotNull(requestHeaderMap2);
+
+        final var updateMap2 = (Map<String, Object>) requestHeaderMap1.get("update");
+        Assert.assertNotNull(updateMap2);
+
+        final var authHeader2 = updateMap1.get("Authorization");
+        Assert.assertNotNull(authHeader2);
+        Assert.assertEquals("Bearer abc-123", authHeader2);
+
+
     }
 }

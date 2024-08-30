@@ -3,7 +3,7 @@ proxyPort: ""
 enableHttp2: false
 tokenSchemas:
   salesforce:
-    pathPrefixAuth:
+    sharedVariables:
       grantType: urn:ietf:params:oauth:grant-type:jwt-bearer
       tokenTtl: 60
     request:
@@ -30,7 +30,7 @@ tokenSchemas:
       headers:
         Content-Type: application/x-www-form-urlencoded
       body:
-        grant_type: "!ref(pathPrefixAuth.grantType)"
+        grant_type: "!ref(sharedVariables.grantType)"
 
         # accessToken is populated by configured jwtSchema
-        assertion: "!ref(pathPrefixAuth.accessToken)"
+        assertion: "!ref(sharedVariables.accessToken)"

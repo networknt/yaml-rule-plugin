@@ -1,11 +1,10 @@
 package com.networknt.rule.generic.token.schema;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.networknt.config.PathPrefixAuth;
 
 public class TokenSchema {
-    @JsonProperty("pathPrefixAuth")
-    private PathPrefixAuth pathPrefixAuth;
+    @JsonProperty("sharedVariables")
+    private SharedVariableSchema sharedVariables;
 
     @JsonProperty("request")
     private RequestSchema tokenRequest;
@@ -16,8 +15,8 @@ public class TokenSchema {
     @JsonProperty("update")
     private UpdateSchema tokenUpdate;
 
-    public PathPrefixAuth getPathPrefixAuth() {
-        return pathPrefixAuth;
+    public SharedVariableSchema getSharedVariables() {
+        return sharedVariables;
     }
 
     public RequestSchema getTokenRequest() {
