@@ -110,7 +110,7 @@ This example highlights all options for request, including 2-way-ssl and jwt con
       clientId: "my-example-id"
       clientSecret: "!mY_P@55w0Rd_S3cR37!"                        # It is recommended to use bcrypt if storing in a config file.
       tokenTtl: 300000                                            # You should always define tokenTtl if the response does not contain an expiration field.
-      
+
       waitLength: 50000
     # Define the request we are going to make to the token service.
     request:
