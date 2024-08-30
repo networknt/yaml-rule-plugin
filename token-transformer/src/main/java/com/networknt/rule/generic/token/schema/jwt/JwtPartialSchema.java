@@ -46,7 +46,6 @@ public class JwtPartialSchema {
             LOG.debug("Token TTL is {}", jwtTtl);
             for (final var expiryField : this.expiryFields)
                 jwtMap.put(expiryField, String.valueOf(System.currentTimeMillis()/1000 + jwtTtl));
-
         }
 
         if (this.currentTimeFields != null)

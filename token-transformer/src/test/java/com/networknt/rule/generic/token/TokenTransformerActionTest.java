@@ -8,6 +8,7 @@ import com.networknt.rule.generic.token.schema.UpdateSchema;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
