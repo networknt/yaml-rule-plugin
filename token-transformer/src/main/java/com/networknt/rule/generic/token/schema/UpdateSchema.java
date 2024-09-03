@@ -1,5 +1,6 @@
 package com.networknt.rule.generic.token.schema;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
@@ -11,9 +12,11 @@ public class UpdateSchema extends SharedVariableRead {
     public enum UpdateDirection {
 
         @JsonProperty("REQUEST")
+        @JsonAlias({"request", "Request"})
         REQUEST,
 
         @JsonProperty("RESPONSE")
+        @JsonAlias({"response", "Response"})
         RESPONSE
     }
 

@@ -3,6 +3,8 @@ package com.networknt.rule.generic.token.schema;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.regex.Pattern;
 
@@ -10,6 +12,8 @@ import java.util.regex.Pattern;
  * Shared variable object used to store and read different variables used in the request, source and update schemas.
  */
 public class SharedVariableSchema {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SharedVariableSchema.class);
     protected static final Pattern VARIABLE_PATTERN = Pattern.compile("\\!ref\\((.*?)\\)");
 
     @JsonProperty("grantType")
@@ -227,6 +231,10 @@ public class SharedVariableSchema {
      * Converts ttl to milliseconds first before storing.
      */
     public void updateExpiration() {
+
+        if (this.getTokenTtl() == 0)
+            LOG.warn("Token ttl is either not defined or is set to 0, a new token will be requested every time!");
+
         final var ttlInMillis = this.tokenTtlUnit.unitToMillis(this.tokenTtl);
         final var newExpiration = System.currentTimeMillis() + ttlInMillis;
         this.setExpiration(newExpiration);

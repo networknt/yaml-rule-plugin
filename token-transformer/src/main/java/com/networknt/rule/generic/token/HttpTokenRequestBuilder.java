@@ -31,6 +31,7 @@ public class HttpTokenRequestBuilder {
     }
 
     public HttpTokenRequestBuilder withHeaders(final Map<String, String> headers) {
+
         if (!headers.isEmpty()) {
 
             LOG.trace("Adding headers to token request.");

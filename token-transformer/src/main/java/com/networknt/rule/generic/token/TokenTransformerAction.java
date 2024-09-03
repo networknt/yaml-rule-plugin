@@ -42,7 +42,7 @@ public class TokenTransformerAction implements IAction {
     private static final TokenTransformerConfig CONFIG = TokenTransformerConfig.load();
     private final TokenKeyStoreManager keyStoreManager = new TokenKeyStoreManager();
 
-    public TokenTransformerAction() throws URISyntaxException, JsonProcessingException {
+    public TokenTransformerAction() {
         LOG.trace("Constructing token-transformer plugin");
         ModuleRegistry.registerPlugin(
                 TokenTransformerAction.class.getPackage().getImplementationTitle(),
@@ -94,7 +94,7 @@ public class TokenTransformerAction implements IAction {
 
         if (schema != null) {
 
-            if (System.currentTimeMillis() >= (schema.getSharedVariables().getExpiration() - schema.getSharedVariables().getWaitLength())) {
+            if (this.isExpired(schema)) {
 
                 LOG.debug("Cached token is expired. Requesting a new token.");
 
@@ -112,13 +112,8 @@ public class TokenTransformerAction implements IAction {
                     /* update sharedVariables from http response */
                     schema.getTokenSource().writeResponseToSharedVariables(schema.getSharedVariables(), response);
 
-                    if (schema.getTokenUpdate().isUpdateExpirationFromTtl()) {
-
-                        if (schema.getSharedVariables().getTokenTtl() == 0)
-                            LOG.warn("Token ttl is either not defined or is set to 0, a new token will be requested every time!");
-
+                    if (schema.getTokenUpdate().isUpdateExpirationFromTtl())
                         schema.getSharedVariables().updateExpiration();
-                    }
 
                     /* write new values to 'update' section of the tokenSchema */
                     schema.getTokenUpdate().writeSchemaFromSharedVariables(schema.getSharedVariables());
@@ -138,6 +133,15 @@ public class TokenTransformerAction implements IAction {
 
     }
 
+    /**
+     * Sends the token request based on the constructed client and request.
+     *
+     * @param client - created client for the schema.
+     * @param request - created request for the schema.
+     * @return - returns a response from the token service.
+     *
+     * @throws InterruptedException - if the request is interrupted on the thread.
+     */
     public HttpResponse<String> sendRequest(final HttpClient client, final HttpRequest request) throws InterruptedException {
 
         try {
@@ -214,14 +218,20 @@ public class TokenTransformerAction implements IAction {
 
             else clientBuilder.version(HttpClient.Version.HTTP_1_1);
 
-            // this a workaround to bypass the hostname verification in jdk11 http client.
-            var tlsMap = (Map<String, Object>) ClientConfig.get().getMappedConfig().get(ClientConfig.TLS);
 
-            if (tlsMap != null && !Boolean.TRUE.equals(tlsMap.get(TLSConfig.VERIFY_HOSTNAME))) {
-                final Properties props = System.getProperties();
-                props.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
-            }
-            schema.setHttpClient(clientBuilder.build());
+            if (ClientConfig.get().getMappedConfig().get(ClientConfig.TLS) instanceof Map) {
+
+                // this a workaround to bypass the hostname verification in jdk11 http client.
+                var tlsMap = (Map<String, Object>) ClientConfig.get().getMappedConfig().get(ClientConfig.TLS);
+                if (tlsMap != null && !Boolean.TRUE.equals(tlsMap.get(TLSConfig.VERIFY_HOSTNAME))) {
+                    final Properties props = System.getProperties();
+                    props.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
+                }
+                schema.setHttpClient(clientBuilder.build());
+
+            } else throw new RuntimeException("Invalid client configuration provided.");
+
+
         }
         return schema.getHttpClient();
     }
@@ -258,12 +268,14 @@ public class TokenTransformerAction implements IAction {
         final Signature signature;
         try {
             signature = Signature.getInstance(schema.getJwtSchema().getAlgorithm());
+
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalArgumentException("Algorithm '" + schema.getJwtSchema().getAlgorithm() + "' is invalid.");
         }
 
         try {
             signature.initSign(privateKey);
+
         } catch (InvalidKeyException e) {
             throw new IllegalArgumentException("Invalid key for selected algorithm '" + schema.getJwtSchema().getAlgorithm() +"'.");
         }
@@ -272,6 +284,7 @@ public class TokenTransformerAction implements IAction {
         try {
             signature.update(tokenBuilder.toString().getBytes(StandardCharsets.UTF_8));
             signedPayload = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(signature.sign());
+
         } catch (SignatureException e) {
             throw new IllegalArgumentException("Invalid signature for JWT.");
         }
@@ -335,8 +348,10 @@ public class TokenTransformerAction implements IAction {
 
             } else {
                 TrustManager[] extendedTrustManagers = { new ClientX509ExtendedTrustManager(Arrays.asList(trustManagers)) };
+
                 try {
                     sslContext.init(keyManagers, extendedTrustManagers, null);
+
                 } catch (KeyManagementException e) {
                     throw new RuntimeException("Exception occurred when initializing ssl context. " + e.getMessage());
                 }

@@ -2,6 +2,30 @@ proxyHost: ""
 proxyPort: ""
 enableHttp2: false
 tokenSchemas:
+  aliasConfigTest:
+    sharedVariables:
+      accessToken: abc-123
+      expiration: 9999999999999
+      tokenTtlUnit: sec
+    request:
+      url: "https://fake.token.com/services/oauth2/token"
+      type: application/json
+      headers:
+        Content-Type: application/json
+      body:
+        test: test
+    source:
+      expirationSchema:
+        location: Header
+        field: test_header
+        ttlUnit: Minute
+      body:
+        - source: access_token
+          destination: "!ref(sharedVariables.accessToken)"
+    update:
+      direction: request
+      headers:
+        Authorization: "Bearer !ref(sharedVariables.accessToken)"
   multiThreadTest:
     sharedVariables:
       accessToken: abc-123

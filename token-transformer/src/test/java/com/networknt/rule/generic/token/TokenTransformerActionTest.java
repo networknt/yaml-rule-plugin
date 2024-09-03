@@ -1,6 +1,5 @@
 package com.networknt.rule.generic.token;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.generic.token.schema.SharedVariableSchema;
 import com.networknt.rule.generic.token.schema.SourceSchema;
@@ -8,8 +7,6 @@ import com.networknt.rule.generic.token.schema.UpdateSchema;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -55,8 +52,8 @@ public class TokenTransformerActionTest {
     }
 
     @Test
-    public void expirationTest() throws URISyntaxException, JsonProcessingException {
-        TokenTransformerAction action = new TokenTransformerAction();
+    public void expirationTest() {
+        final var action = new TokenTransformerAction();
         final var actionValues = new ArrayList<RuleActionValue>();
         final var tokenSchemaKey = "tokenSchemas";
         final var tokenSchemaValue = "expirationTest";
@@ -80,8 +77,8 @@ public class TokenTransformerActionTest {
     }
 
     @Test
-    public void gracePeriodTest() throws URISyntaxException, JsonProcessingException {
-        TokenTransformerAction action = new TokenTransformerAction();
+    public void gracePeriodTest() {
+        final var action = new TokenTransformerAction();
         final var actionValues = new ArrayList<RuleActionValue>();
         final var tokenSchemaKey = "tokenSchemas";
         final var tokenSchemaValue = "gracePeriodTest";
@@ -98,8 +95,8 @@ public class TokenTransformerActionTest {
     }
 
     @Test
-    public void multiThreadTest() throws URISyntaxException, JsonProcessingException, BrokenBarrierException, InterruptedException {
-        TokenTransformerAction action = new TokenTransformerAction();
+    public void multiThreadTest() throws BrokenBarrierException, InterruptedException {
+        final var action = new TokenTransformerAction();
         final var actionValues = new ArrayList<RuleActionValue>();
         final var tokenSchemaKey = "tokenSchemas";
         final var tokenSchemaValue = "multiThreadTest";
@@ -158,7 +155,18 @@ public class TokenTransformerActionTest {
         final var authHeader2 = updateMap1.get("Authorization");
         Assert.assertNotNull(authHeader2);
         Assert.assertEquals("Bearer abc-123", authHeader2);
+    }
 
+    @Test
+    public void ttlUnitTest() {
+        final var testConfig = TokenTransformerConfig.load();
+        final var schema = testConfig.getTokenSchemas().get("aliasConfigTest");
+        final var sharedTtlUnit = schema.getSharedVariables().getTokenTtlUnit();
 
+        Assert.assertEquals(3, sharedTtlUnit.millisToUnit(3000));
+
+        final var expirationSchemaTtlUnit = schema.getTokenSource().getExpirationSchema().getTtlUnit();
+
+        Assert.assertEquals(1, expirationSchemaTtlUnit.millisToUnit(60000));
     }
 }
