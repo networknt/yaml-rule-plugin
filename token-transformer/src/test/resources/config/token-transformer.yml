@@ -2,8 +2,52 @@ proxyHost: ""
 proxyPort: ""
 enableHttp2: false
 tokenSchemas:
+  aliasConfigTest:
+    sharedVariables:
+      accessToken: abc-123
+      expiration: 9999999999999
+      tokenTtlUnit: sec
+    request:
+      url: "https://fake.token.com/services/oauth2/token"
+      type: application/json
+      headers:
+        Content-Type: application/json
+      body:
+        test: test
+    source:
+      expirationSchema:
+        location: Header
+        field: test_header
+        ttlUnit: Minute
+      body:
+        - source: access_token
+          destination: "!ref(sharedVariables.accessToken)"
+    update:
+      direction: request
+      headers:
+        Authorization: "Bearer !ref(sharedVariables.accessToken)"
+  multiThreadTest:
+    sharedVariables:
+      accessToken: abc-123
+      expiration: 9999999999999
+    request:
+      url: "https://fake.token.com/services/oauth2/token"
+      type: application/json
+      headers:
+        Content-Type: application/json
+      body:
+        test: test
+    source:
+      body:
+        - source: access_token
+          destination: "!ref(sharedVariables.accessToken)"
+    update:
+      direction: REQUEST
+      headers:
+        Authorization: "Bearer !ref(sharedVariables.accessToken)"
+
   gracePeriodTest:
-    pathPrefixAuth:
+    sharedVariables:
       accessToken: abc-123
       expiration: 2724957439
       waitLength: 2147483647
@@ -17,14 +61,14 @@ tokenSchemas:
     source:
       body:
         - source: access_token
-          destination: "!ref(pathPrefixAuth.accessToken)"
+          destination: "!ref(sharedVariables.accessToken)"
     update:
       direction: REQUEST
       headers:
-        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
+        Authorization: "Bearer !ref(sharedVariables.accessToken)"
 
   expirationTest:
-    pathPrefixAuth:
+    sharedVariables:
       accessToken: abc-123
       expiration: 9999999999999
     request:
@@ -37,14 +81,14 @@ tokenSchemas:
     source:
       body:
         - source: access_token
-          destination: "!ref(pathPrefixAuth.accessToken)"
+          destination: "!ref(sharedVariables.accessToken)"
     update:
       direction: REQUEST
       headers:
-        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
+        Authorization: "Bearer !ref(sharedVariables.accessToken)"
 
   mrasMicrosoft:
-    pathPrefixAuth:
+    sharedVariables:
       clientId: "my-microsoft-client-id"
       clientSecret: "my-microsoft-client-secret"
     request:
@@ -56,22 +100,22 @@ tokenSchemas:
       body:
         grant_type: "client_credentials"
         resource: "9bcadce-3312-4c2b-9a5d-0e90e8b92c67"
-        client_id: "!ref(pathPrefixAuth.clientId)"
-        client_secret: "!ref(pathPrefixAuth.clientSecret)"
+        client_id: "!ref(sharedVariables.clientId)"
+        client_secret: "!ref(sharedVariables.clientSecret)"
 
     source:
       body:
         - source: access_token
-          destination: "!ref(pathPrefixAuth.accessToken)"
+          destination: "!ref(sharedVariables.accessToken)"
         - source: expires_in
-          destination: "!ref(pathPrefixAuth.tokenTtl)"
+          destination: "!ref(sharedVariables.tokenTtl)"
 
     update:
       direction: REQUEST
       headers:
-        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
+        Authorization: "Bearer !ref(sharedVariables.accessToken)"
   lifeware:
-    pathPrefixAuth:
+    sharedVariables:
       clientId: "my-id"
       clientSecret: "abc-123"
     request:
@@ -82,18 +126,18 @@ tokenSchemas:
         Content-Type: application/json
         Accept: application/json
       body:
-        client_id: "!ref(pathPrefixAuth.clientId)"
-        client_secret: "!ref(pathPrefixAuth.clientSecret)"
+        client_id: "!ref(sharedVariables.clientId)"
+        client_secret: "!ref(sharedVariables.clientSecret)"
     source:
       body:
         - source: access_key
-          destination: "!ref(pathPrefixAuth.accessToken)"
+          destination: "!ref(sharedVariables.accessToken)"
     update:
       direction: REQUEST
       headers:
-        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
+        Authorization: "Bearer !ref(sharedVariables.accessToken)"
   salesforce:
-    pathPrefixAuth:
+    sharedVariables:
       grantType: urn:ietf:params:oauth:grant-type:jwt-bearer
       tokenTtl: 60
     request:
@@ -120,12 +164,12 @@ tokenSchemas:
       headers:
         Content-Type: application/x-www-form-urlencoded
       body:
-        grant_type: "!ref(pathPrefixAuth.grantType)"
+        grant_type: "!ref(sharedVariables.grantType)"
 
         # accessToken is populated by configured jwtSchema
-        assertion: "!ref(pathPrefixAuth.accessToken)"
+        assertion: "!ref(sharedVariables.accessToken)"
   mrasSSL:
-    pathPrefixAuth:
+    sharedVariables:
       username: "my-basic-username"
       password: "my-basic-password"
       tokenTtl: 300
@@ -151,10 +195,10 @@ tokenSchemas:
     source:
       body:
         - source: access_token
-          destination: "!ref(pathPrefixAuth.accessToken)"
+          destination: "!ref(sharedVariables.accessToken)"
         - source: scope
-          destination: "!ref(pathPrefixAuth.scope)"
+          destination: "!ref(sharedVariables.scope)"
     update:
       direction: REQUEST
       headers:
-        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
+        Authorization: "Bearer !ref(sharedVariables.accessToken)"

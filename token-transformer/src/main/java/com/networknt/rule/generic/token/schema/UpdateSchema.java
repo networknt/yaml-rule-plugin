@@ -1,20 +1,22 @@
 package com.networknt.rule.generic.token.schema;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
-import com.networknt.config.PathPrefixAuth;
 
 import java.util.Map;
 
-public class UpdateSchema extends PathPrefixAuthReadSchema {
+public class UpdateSchema extends SharedVariableRead {
 
     public enum UpdateDirection {
 
         @JsonProperty("REQUEST")
+        @JsonAlias({"request", "Request"})
         REQUEST,
 
         @JsonProperty("RESPONSE")
+        @JsonAlias({"response", "Response"})
         RESPONSE
     }
 
@@ -52,13 +54,13 @@ public class UpdateSchema extends PathPrefixAuthReadSchema {
     }
 
     /**
-     * Takes in the a pathPrefix object and populates the header and body fields that use the !ref keyword.
+     * Takes in a sharedVariableSchema object and populates the header and body fields that use the !ref keyword.
      *
-     * @param pathPrefixAuth - the provided pathPrefixAuth containing the data.
+     * @param sharedVariableSchema - the provided SharedVariableSchema containing the data.
      */
     @Override
-    public void writeSchemaFromPathPrefix(PathPrefixAuth pathPrefixAuth) {
-        PathPrefixAuthReadSchema.updateMapFromPathPrefix(this.headers, pathPrefixAuth);
-        PathPrefixAuthReadSchema.updateMapFromPathPrefix(this.body, pathPrefixAuth);
+    public void writeSchemaFromSharedVariables(final SharedVariableSchema sharedVariableSchema) {
+        SharedVariableRead.updateMapFromSharedVariables(this.headers, sharedVariableSchema);
+        SharedVariableRead.updateMapFromSharedVariables(this.body, sharedVariableSchema);
     }
 }

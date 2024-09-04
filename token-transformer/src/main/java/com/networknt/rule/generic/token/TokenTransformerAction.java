@@ -9,7 +9,10 @@ import com.networknt.http.client.ssl.TLSConfig;
 import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
+import com.networknt.rule.generic.token.exception.TokenRequestException;
+import com.networknt.rule.generic.token.exception.TokenRequestInterruptedException;
 import com.networknt.rule.generic.token.schema.RequestSchema;
+import com.networknt.rule.generic.token.schema.SharedVariableSchema;
 import com.networknt.rule.generic.token.schema.TokenSchema;
 import com.networknt.rule.generic.token.schema.UpdateSchema;
 import com.networknt.utility.ModuleRegistry;
@@ -39,7 +42,7 @@ public class TokenTransformerAction implements IAction {
     private static final TokenTransformerConfig CONFIG = TokenTransformerConfig.load();
     private final TokenKeyStoreManager keyStoreManager = new TokenKeyStoreManager();
 
-    public TokenTransformerAction() throws URISyntaxException, JsonProcessingException {
+    public TokenTransformerAction() {
         LOG.trace("Constructing token-transformer plugin");
         ModuleRegistry.registerPlugin(
                 TokenTransformerAction.class.getPackage().getImplementationTitle(),
@@ -91,40 +94,29 @@ public class TokenTransformerAction implements IAction {
 
         if (schema != null) {
 
-            if (System.currentTimeMillis() >= (schema.getPathPrefixAuth().getExpiration() - schema.getPathPrefixAuth().getWaitLength())) {
+            if (this.isExpired(schema)) {
 
                 LOG.debug("Cached token is expired. Requesting a new token.");
 
-                final var client = this.getTokenSchemaHttpClient(schema);
-                final var request = this.getTokenSchemaHttpRequest(schema);
-
-                final HttpResponse<?> response;
-                try {
-                    response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-                    LOG.trace("Status = {}, ResponseBody = {}", response.statusCode(), response.body());
-
-                } catch (IOException e) {
-                    LOG.trace("URI = {}, Headers = {}, Method = {} ", request.uri(), request.headers(), request.method());
-                    throw new RuntimeException("Exception while trying to send a request.");
+                if (schema.getTokenRequest().getJwtSchema() != null) {
+                    final var constructedJwt = this.buildJwtToken(schema.getTokenRequest());
+                    schema.getSharedVariables().setConstructedJwt(constructedJwt);
                 }
+
+                final var client = this.getTokenSchemaHttpClient(schema.getTokenRequest());
+                final var request = this.getTokenSchemaHttpRequest(schema.getTokenRequest(), schema.getSharedVariables());
+                final var response = this.sendRequest(client, request);
 
                 if (response.statusCode() >= 200 && response.statusCode() <= 299) {
 
-                    /* update pathPrefix from http response */
-                    schema.getTokenSource().writeResponseToPathPrefix(schema.getPathPrefixAuth(), response);
+                    /* update sharedVariables from http response */
+                    schema.getTokenSource().writeResponseToSharedVariables(schema.getSharedVariables(), response);
 
-                    if (schema.getTokenUpdate().isUpdateExpirationFromTtl()) {
-
-                        if (schema.getPathPrefixAuth().getTokenTtl() == 0)
-                            LOG.warn("Token ttl is either not defined or is set to 0, a new token will be requested every time!");
-
-                        final var newExpiration = System.currentTimeMillis() + schema.getPathPrefixAuth().getTokenTtl();
-                        schema.getPathPrefixAuth().setExpiration(newExpiration);
-                    }
+                    if (schema.getTokenUpdate().isUpdateExpirationFromTtl())
+                        schema.getSharedVariables().updateExpiration();
 
                     /* write new values to 'update' section of the tokenSchema */
-                    schema.getTokenUpdate().writeSchemaFromPathPrefix(schema.getPathPrefixAuth());
+                    schema.getTokenUpdate().writeSchemaFromSharedVariables(schema.getSharedVariables());
                     updateResultMapFromSchema(schema.getTokenUpdate(), resultMap);
 
                 } else LOG.error("The token request returned statusCode: '{}'", response.statusCode());
@@ -133,12 +125,44 @@ public class TokenTransformerAction implements IAction {
 
                 LOG.debug("Cached token is not expired. Updating result map from cached token data.");
 
-                schema.getTokenUpdate().writeSchemaFromPathPrefix(schema.getPathPrefixAuth());
+                schema.getTokenUpdate().writeSchemaFromSharedVariables(schema.getSharedVariables());
                 updateResultMapFromSchema(schema.getTokenUpdate(), resultMap);
             }
 
         } else throw new IllegalArgumentException("Provided token schema '" + tokenSchema + "' does not exist!");
 
+    }
+
+    /**
+     * Sends the token request based on the constructed client and request.
+     *
+     * @param client - created client for the schema.
+     * @param request - created request for the schema.
+     * @return - returns a response from the token service.
+     *
+     * @throws InterruptedException - if the request is interrupted on the thread.
+     */
+    public HttpResponse<String> sendRequest(final HttpClient client, final HttpRequest request) throws InterruptedException {
+
+        try {
+            final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (LOG.isTraceEnabled())
+                LOG.trace("Status = {}, ResponseBody = {}", response.statusCode(), response.body());
+
+            return response;
+
+        } catch (IOException e) {
+            LOG.trace("URI = {}, Headers = {}, Method = {} ", request.uri(), request.headers(), request.method());
+            throw new TokenRequestException(request);
+
+        } catch (InterruptedException e) {
+
+            if (Thread.interrupted())
+                throw new InterruptedException();
+
+            else throw new TokenRequestInterruptedException(request);
+        }
     }
 
     /**
@@ -148,29 +172,22 @@ public class TokenTransformerAction implements IAction {
      * @param schema - token schema for in-flight request/response.
      * @return - HttpRequest for the token service.
      */
-    private HttpRequest getTokenSchemaHttpRequest(final TokenSchema schema) {
+    private HttpRequest getTokenSchemaHttpRequest(final RequestSchema schema, final SharedVariableSchema sharedVariableSchema) {
 
         /* Use the same request if it already exists and if we do not have a defined JWT schema. */
         if (this.shouldBuildHttpRequest(schema)) {
-
-            /* if we have a JWT schema defined, create one and save it under accessToken temporarily. */
-            if (schema.getTokenRequest().getJwtSchema() != null) {
-                final var constructedJwt = this.buildJwtToken(schema.getTokenRequest());
-                schema.getPathPrefixAuth().setAccessToken(constructedJwt);
-            }
-
-            /* populate the request schema with our pathPrefixAuth data. */
-            schema.getTokenRequest().writeSchemaFromPathPrefix(schema.getPathPrefixAuth());
+            /* populate the request schema with our sharedVariable data. */
+            schema.writeSchemaFromSharedVariables(sharedVariableSchema);
 
             /* build our request, and cache it for later. */
-            final var httpRequestBuilder = new HttpTokenRequestBuilder(schema.getTokenRequest().getUrl())
-                    .withHeaders(schema.getTokenRequest().getHeaders())
-                    .withBody(schema.getTokenRequest().getBody(), schema.getTokenRequest().getType());
+            final var httpRequestBuilder = new HttpTokenRequestBuilder(schema.getUrl())
+                    .withHeaders(schema.getHeaders())
+                    .withBody(schema.getBody(), schema.getType());
 
-            schema.getTokenRequest().setHttpRequest(httpRequestBuilder.build());
+            schema.setHttpRequest(httpRequestBuilder.build());
         }
 
-        return schema.getTokenRequest().getHttpRequest();
+        return schema.getHttpRequest();
     }
 
     /**
@@ -179,12 +196,12 @@ public class TokenTransformerAction implements IAction {
      * @param schema - the token schema
      * @return - returns HttpClient for the request.
      */
-    private HttpClient getTokenSchemaHttpClient(final TokenSchema schema) {
+    private HttpClient getTokenSchemaHttpClient(final RequestSchema schema) {
 
         if (this.shouldCreateHttpClient(schema)) {
 
             /* Use SSL configuration if we have one, otherwise create a default context */
-            final var sslContext = this.createSSLContext(schema.getTokenRequest());
+            final var sslContext = this.createSSLContext(schema);
             final var clientBuilder = HttpClient.newBuilder()
                     .followRedirects(HttpClient.Redirect.NORMAL)
                     .connectTimeout(Duration.ofMillis(ClientConfig.get().getTimeout()))
@@ -201,16 +218,22 @@ public class TokenTransformerAction implements IAction {
 
             else clientBuilder.version(HttpClient.Version.HTTP_1_1);
 
-            // this a workaround to bypass the hostname verification in jdk11 http client.
-            var tlsMap = (Map<String, Object>) ClientConfig.get().getMappedConfig().get(ClientConfig.TLS);
 
-            if (tlsMap != null && !Boolean.TRUE.equals(tlsMap.get(TLSConfig.VERIFY_HOSTNAME))) {
-                final Properties props = System.getProperties();
-                props.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
-            }
-            schema.getPathPrefixAuth().setHttpClient(clientBuilder.build());
+            if (ClientConfig.get().getMappedConfig().get(ClientConfig.TLS) instanceof Map) {
+
+                // this a workaround to bypass the hostname verification in jdk11 http client.
+                var tlsMap = (Map<String, Object>) ClientConfig.get().getMappedConfig().get(ClientConfig.TLS);
+                if (tlsMap != null && !Boolean.TRUE.equals(tlsMap.get(TLSConfig.VERIFY_HOSTNAME))) {
+                    final Properties props = System.getProperties();
+                    props.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
+                }
+                schema.setHttpClient(clientBuilder.build());
+
+            } else throw new RuntimeException("Invalid client configuration provided.");
+
+
         }
-        return schema.getPathPrefixAuth().getHttpClient();
+        return schema.getHttpClient();
     }
 
     /**
@@ -224,13 +247,13 @@ public class TokenTransformerAction implements IAction {
         final var tokenBuilder = new StringBuilder();
 
         /* create JWT payload header */
-        final var jwtHeaderMap = schema.getJwtSchema().getJwtHeader().buildJwtMap(schema.getJwtSchema().getJwtTtl());
+        final var jwtHeaderMap = schema.getJwtSchema().getJwtHeader().buildJwtMap(schema.getJwtSchema().getJwtTtl(), schema.getJwtSchema().getTtlUnit());
         final var jwtHeaderString = JsonMapper.toJson(jwtHeaderMap);
         tokenBuilder.append(org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(jwtHeaderString.getBytes(StandardCharsets.UTF_8)));
         tokenBuilder.append(".");
 
         /* create JWT payload body */
-        final var jwtBodyMap = schema.getJwtSchema().getJwtBody().buildJwtMap(schema.getJwtSchema().getJwtTtl());
+        final var jwtBodyMap = schema.getJwtSchema().getJwtBody().buildJwtMap(schema.getJwtSchema().getJwtTtl(), schema.getJwtSchema().getTtlUnit());
         final var jwtBodyString = JsonMapper.toJson(jwtBodyMap);
         tokenBuilder.append(org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(jwtBodyString.getBytes(StandardCharsets.UTF_8)));
 
@@ -245,12 +268,14 @@ public class TokenTransformerAction implements IAction {
         final Signature signature;
         try {
             signature = Signature.getInstance(schema.getJwtSchema().getAlgorithm());
+
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalArgumentException("Algorithm '" + schema.getJwtSchema().getAlgorithm() + "' is invalid.");
         }
 
         try {
             signature.initSign(privateKey);
+
         } catch (InvalidKeyException e) {
             throw new IllegalArgumentException("Invalid key for selected algorithm '" + schema.getJwtSchema().getAlgorithm() +"'.");
         }
@@ -259,6 +284,7 @@ public class TokenTransformerAction implements IAction {
         try {
             signature.update(tokenBuilder.toString().getBytes(StandardCharsets.UTF_8));
             signedPayload = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(signature.sign());
+
         } catch (SignatureException e) {
             throw new IllegalArgumentException("Invalid signature for JWT.");
         }
@@ -322,8 +348,10 @@ public class TokenTransformerAction implements IAction {
 
             } else {
                 TrustManager[] extendedTrustManagers = { new ClientX509ExtendedTrustManager(Arrays.asList(trustManagers)) };
+
                 try {
                     sslContext.init(keyManagers, extendedTrustManagers, null);
+
                 } catch (KeyManagementException e) {
                     throw new RuntimeException("Exception occurred when initializing ssl context. " + e.getMessage());
                 }
@@ -384,9 +412,9 @@ public class TokenTransformerAction implements IAction {
      * @param schema - the schema containing both the client and cache configuration.
      * @return - true if client should be created.
      */
-    private boolean shouldCreateHttpClient(final TokenSchema schema) {
-        return schema.getPathPrefixAuth().getHttpClient() == null
-                || !schema.getTokenRequest().isCacheHttpClient();
+    private boolean shouldCreateHttpClient(final RequestSchema schema) {
+        return schema.getHttpClient() == null
+                || !schema.isCacheHttpClient();
     }
 
     /**
@@ -396,9 +424,21 @@ public class TokenTransformerAction implements IAction {
      * @param schema - the schema containing the http request and possible jwt configuration.
      * @return - true if request should be created.
      */
-    private boolean shouldBuildHttpRequest(final TokenSchema schema) {
-        return schema.getTokenRequest().getHttpRequest() == null
-                || schema.getTokenRequest().getJwtSchema() != null;
+    private boolean shouldBuildHttpRequest(final RequestSchema schema) {
+        return schema.getHttpRequest() == null
+                || schema.getJwtSchema() != null;
+    }
+
+    /**
+     * Checks to see if the token is expired including the waitLength grace period.
+     *
+     * @param schema - token configuration
+     * @return - true if token is not expired
+     */
+    private boolean isExpired(final TokenSchema schema) {
+        final var waitLengthUnit = schema.getSharedVariables().getTokenTtlUnit();
+        final var waitLengthAsMillis = waitLengthUnit.unitToMillis(schema.getSharedVariables().getWaitLength());
+        return System.currentTimeMillis() >= (schema.getSharedVariables().getExpiration() - waitLengthAsMillis);
     }
 
 

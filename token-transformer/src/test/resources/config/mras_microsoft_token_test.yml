@@ -3,7 +3,7 @@ proxyPort: ""
 enableHttp2: false
 tokenSchemas:
   mrasMicrosoft:
-    pathPrefixAuth:
+    sharedVariables:
       clientId: "my-microsoft-client-id"
       clientSecret: "my-microsoft-client-secret"
     request:
@@ -15,17 +15,17 @@ tokenSchemas:
       body:
         grant_type: "client_credentials"
         resource: "9bcadce-3312-4c2b-9a5d-0e90e8b92c67"
-        client_id: "!ref(pathPrefixAuth.clientId)"
-        client_secret: "!ref(pathPrefixAuth.clientSecret)"
+        client_id: "!ref(sharedVariables.clientId)"
+        client_secret: "!ref(sharedVariables.clientSecret)"
 
     source:
       body:
         - source: access_token
-          destination: "!ref(pathPrefixAuth.accessToken)"
+          destination: "!ref(sharedVariables.accessToken)"
         - source: expires_in
-          destination: "!ref(pathPrefixAuth.tokenTtl)"
+          destination: "!ref(sharedVariables.tokenTtl)"
 
     update:
       direction: REQUEST
       headers:
-        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
+        Authorization: "Bearer !ref(sharedVariables.accessToken)"

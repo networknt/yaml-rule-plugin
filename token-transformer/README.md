@@ -25,20 +25,20 @@ The ```tokenSchema``` field contains all definitions for different types of toke
 
 As for the structure of each schema, they can be split into 3 different sections.
 
-- pathPrefixAuth - Defines the auth settings for this schema, and acts as both a cache and variable store for the full plugin action.
+- sharedVariables - Defines the variables used in this schema, and acts as both a cache and variable store for the full plugin action.
 - request - For defining how the request to the token service is made. It can also include more specific configurations for JWT construction and 2-Way-SSL.
 - source - For defining how the token response gets read and where we want to save the data.
 - update - For defining how the newly saved data gets used with the in-flight request/response. Most of the time, the plugin is used to update the authentication header for an in-flight request.
 
 More detail on each section can be found below.
 
-#### pathPrefixAuth
-A Light4J configuration object that contains a number of different fields. They can be found at this link [here](https://github.com/networknt/light-4j/blob/master/config/src/main/java/com/networknt/config/PathPrefixAuth.java)
+#### sharedVariables
+A configuration object that contains a number of different variable fields.
 ```yaml
 tokenSchema:
   <tokenSchemaName>:
-    pathPrefixAuth:
-      <any PathPrefixAuth.class field>
+    sharedVariables:
+      <any SharedVariableSchema.class field>
     # ...
 ```
 #### request
@@ -62,7 +62,7 @@ tokenSchemas:
 
 ```
 
-**NOTE:** Anything marked as SOLVABLE means that is can use the ```!ref(pathPrefixAuth.*)``` variables.
+**NOTE:** Anything marked as SOLVABLE means that is can use the ```!ref(sharedVariables.*)``` variables.
 
 #### source
 Source simply picks out the data needed from the token response.
@@ -81,7 +81,7 @@ tokenSchemas:
       # ...
 ```
 
-**NOTE:** Destinations have to use the ```!ref(pathPrefixAuth.*)``` field name.
+**NOTE:** Destinations have to use the ```!ref(sharedVariables.*)``` field name.
 
 #### update
 Define what fields you want to update in the in-flight request/response.
@@ -105,11 +105,12 @@ This example highlights all options for request, including 2-way-ssl and jwt con
 ```yaml
   exampleSchema:
 
-    # Our pathPrefix variables that contains some pre-defined data.
-    pathPrefixAuth:
+    # Our sharedVariables object that contains some pre-defined data.
+    sharedVariables:
       clientId: "my-example-id"
       clientSecret: "!mY_P@55w0Rd_S3cR37!"                        # It is recommended to use bcrypt if storing in a config file.
-      tokenTtl: 300000                                            # You should always define tokenTtl if the response does not contain an expiration field. Always in milliseconds format.
+      tokenTtl: 300000                                            # You should always define tokenTtl if the response does not contain an expiration field.
+
       waitLength: 50000
     # Define the request we are going to make to the token service.
     request:
@@ -180,25 +181,25 @@ This example highlights all options for request, including 2-way-ssl and jwt con
         Content-Type: application/x-www-form-urlencoded
         Accept: application/json
 
-        # NOTE: The constructed JWT is always stored under pathPrefix access token.
+        # NOTE: The constructed JWT is always stored under sharedVariables.constructedJwt.
         # It will get overwritten by the new access token retrieved from the token service.
-        Authorization: "!ref(pathPrefixAuth.accessToken)"
+        Authorization: "!ref(sharedVariables.constructedJwt)"
 
       # define the body for our request.
       body:
         grant_type: "client_credentials"
         resource: "1abcabc-123123cccbbb-99d99d99"
-        client_id: "!ref(pathPrefixAuth.clientId)"              # this means we will grab the clientId from pathPrefixAuth.
-        client_secret: "!ref(pathPrefixAuth.clientSecret)"      # this means we will grab the client secret from pathPrefixAith.
+        client_id: "!ref(sharedVariables.clientId)"              # this means we will grab the clientId from sharedVariables.
+        client_secret: "!ref(sharedVariables.clientSecret)"      # this means we will grab the client secret from sharedVariables.
 
     # Define how we grab the data from the token response
     source:
 
-      # we are grabbing the new token and putting it into the accessToken pathPrefixAuth field.
-      # a new expiration is calculated from the defined ttl in pathPrefixAuth.
+      # we are grabbing the new token and putting it into the accessToken sharedVariables field.
+      # a new expiration is calculated from the defined ttl in sharedVariables.
       body:
         - source: access_token
-          destination: "!ref(pathPrefixAuth.accessToken)"
+          destination: "!ref(sharedVariables.accessToken)"
 
     # Define how we are going to update the in-flight request/response.
     # In this case we are updating the request.
@@ -207,14 +208,14 @@ This example highlights all options for request, including 2-way-ssl and jwt con
 
       # Add/Update the Authorization header with the new or cached token.
       headers:
-        Authorization: "Bearer !ref(pathPrefixAuth.accessToken)"
+        Authorization: "Bearer !ref(sharedVariables.accessToken)"
 ```
 
 ## TODO
 This section outlines the outstanding tasks left in this plugin.
 - Support reading response headers from the token service.
-- Allow for custom fields to be defined as variables instead of pathPrefixAuth.
-- Change how we save constructed JWTs to be more intuitive rather than re-using pathPrefixAuth fields as temp storage.
+- Allow for custom fields to be defined as variables instead of sharedVariables.
 - Move SSL context creation and JWT construction to HttpTokenRequestBuilder.class
 - Change generic Runtime exceptions to be more specific.
 - Allow more customization on time units used for ttl, grace period, expiration from token responses, etc.
+- Test to see if BeanInfo is causing any noticeable performance hiccups.
