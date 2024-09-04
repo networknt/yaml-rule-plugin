@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.1.0 - 2024-09-04
+
+### Added
+- TTL time unit configuration (#108) @KalevGonvick
+- Token Grace Period (#107) Thanks @KalevGonvick
+- fixes #104 getBytes defaults to UTF-8 encoding (#105)
+
 ## 1.0.30 - 2024-08-23
 
 ### Added
