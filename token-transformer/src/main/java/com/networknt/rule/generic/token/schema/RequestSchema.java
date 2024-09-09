@@ -4,15 +4,21 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.networknt.rule.generic.token.schema.cert.SSLContextSchema;
 import com.networknt.rule.generic.token.schema.jwt.JWTSchema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.util.HashMap;
 import java.util.Map;
 
 
 @JsonIgnoreProperties(value={ "sslContext", "httpRequest", "httpClient" }, allowGetters=true)
 public class RequestSchema extends SharedVariableRead {
+
+    private static final Logger LOG = LoggerFactory.getLogger(RequestSchema.class);
+
     @JsonProperty("url")
     private String url;
     @JsonProperty("headers")
@@ -99,9 +105,27 @@ public class RequestSchema extends SharedVariableRead {
         this.sslContext = sslContext;
     }
 
-    @Override
-    public void writeSchemaFromSharedVariables(final SharedVariableSchema sharedVariableSchema) {
-        SharedVariableRead.updateMapFromSharedVariables(this.headers, sharedVariableSchema);
-        SharedVariableRead.updateMapFromSharedVariables(this.body, sharedVariableSchema);
+    public Map<String, String> getResolvedHeaders(final SharedVariableSchema sharedVariableSchema) {
+
+        if (this.headers == null) {
+            LOG.trace("No headers defined in request schema.");
+            return new HashMap<>();
+        }
+
+        final var resolvedHeaders = new HashMap<>(this.headers);
+        SharedVariableRead.updateMapFromSharedVariables(resolvedHeaders, sharedVariableSchema);
+        return resolvedHeaders;
+    }
+
+    public Map<String, String> getResolvedBody(final SharedVariableSchema sharedVariableSchema) {
+
+        if (this.body == null) {
+            LOG.trace("No body defined in request schema.");
+            return  new HashMap<>();
+        }
+
+        final var resolvedBody = new HashMap<>(this.body);
+        SharedVariableRead.updateMapFromSharedVariables(resolvedBody, sharedVariableSchema);
+        return resolvedBody;
     }
 }

@@ -32,8 +32,7 @@ public class TokenTransformerActionTest {
     }
 
     @Test
-    public void updateTest() {
-
+    public void updateHeaderTest() {
         /* test access token */
         var testSharedVariable = new SharedVariableSchema();
         testSharedVariable.setAccessToken("abc123");
@@ -45,9 +44,7 @@ public class TokenTransformerActionTest {
         testUpdateSchema.setHeaders(myUpdateHeaders);
 
         /* testing update */
-        testUpdateSchema.writeSchemaFromSharedVariables(testSharedVariable);
-
-        Assert.assertEquals("Bearer abc123", testUpdateSchema.getHeaders().get("Authorization"));
+        Assert.assertEquals("Bearer abc123", testUpdateSchema.getResolvedHeaders(testSharedVariable).get("Authorization"));
 
     }
 
@@ -168,5 +165,25 @@ public class TokenTransformerActionTest {
         final var expirationSchemaTtlUnit = schema.getTokenSource().getExpirationSchema().getTtlUnit();
 
         Assert.assertEquals(1, expirationSchemaTtlUnit.millisToUnit(60000));
+    }
+
+    @Test
+    public void resolvedVariableCachingTest() {
+        /* test access token */
+        var testSharedVariable = new SharedVariableSchema();
+        testSharedVariable.setAccessToken("abc123");
+
+        /* create test update schema */
+        var testUpdateSchema = new UpdateSchema();
+        Map<String, String> myUpdateHeaders = new HashMap<>();
+        myUpdateHeaders.put("Authorization", "Bearer !ref(sharedVariables.accessToken)");
+        testUpdateSchema.setHeaders(myUpdateHeaders);
+
+        /* testing update */
+        Assert.assertEquals("Bearer abc123", testUpdateSchema.getResolvedHeaders(testSharedVariable).get("Authorization"));
+
+        /* testing second update */
+        testSharedVariable.setAccessToken("abc124");
+        Assert.assertEquals("Bearer abc124", testUpdateSchema.getResolvedHeaders(testSharedVariable).get("Authorization"));
     }
 }

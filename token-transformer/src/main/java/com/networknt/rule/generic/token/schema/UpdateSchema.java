@@ -4,10 +4,15 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class UpdateSchema extends SharedVariableRead {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UpdateSchema.class);
 
     public enum UpdateDirection {
 
@@ -53,14 +58,27 @@ public class UpdateSchema extends SharedVariableRead {
         return updateExpirationFromTtl;
     }
 
-    /**
-     * Takes in a sharedVariableSchema object and populates the header and body fields that use the !ref keyword.
-     *
-     * @param sharedVariableSchema - the provided SharedVariableSchema containing the data.
-     */
-    @Override
-    public void writeSchemaFromSharedVariables(final SharedVariableSchema sharedVariableSchema) {
-        SharedVariableRead.updateMapFromSharedVariables(this.headers, sharedVariableSchema);
-        SharedVariableRead.updateMapFromSharedVariables(this.body, sharedVariableSchema);
+    public Map<String, String> getResolvedHeaders(final SharedVariableSchema sharedVariableSchema) {
+
+        if (this.headers == null) {
+            LOG.trace("No headers defined in update schema.");
+            return  new HashMap<>();
+        }
+
+        final var resolvedHeaders = new HashMap<>(this.headers);
+        SharedVariableRead.updateMapFromSharedVariables(resolvedHeaders, sharedVariableSchema);
+        return resolvedHeaders;
+    }
+
+    public Map<String, String> getResolvedBody(final SharedVariableSchema sharedVariableSchema) {
+
+        if (this.body == null) {
+            LOG.trace("No body defined in update schema.");
+            return  new HashMap<>();
+        }
+
+        final var resolvedBody = new HashMap<>(this.body);
+        SharedVariableRead.updateMapFromSharedVariables(resolvedBody, sharedVariableSchema);
+        return resolvedBody;
     }
 }
