@@ -116,17 +116,14 @@ public class TokenTransformerAction implements IAction {
                         schema.getSharedVariables().updateExpiration();
 
                     /* write new values to 'update' section of the tokenSchema */
-                    schema.getTokenUpdate().writeSchemaFromSharedVariables(schema.getSharedVariables());
-                    updateResultMapFromSchema(schema.getTokenUpdate(), resultMap);
+                    updateResultMapFromSchema(schema.getTokenUpdate(), schema.getSharedVariables(), resultMap);
 
                 } else LOG.error("The token request returned statusCode: '{}'", response.statusCode());
 
             } else {
 
                 LOG.debug("Cached token is not expired. Updating result map from cached token data.");
-
-                schema.getTokenUpdate().writeSchemaFromSharedVariables(schema.getSharedVariables());
-                updateResultMapFromSchema(schema.getTokenUpdate(), resultMap);
+                updateResultMapFromSchema(schema.getTokenUpdate(), schema.getSharedVariables(), resultMap);
             }
 
         } else throw new IllegalArgumentException("Provided token schema '" + tokenSchema + "' does not exist!");
@@ -176,13 +173,11 @@ public class TokenTransformerAction implements IAction {
 
         /* Use the same request if it already exists and if we do not have a defined JWT schema. */
         if (this.shouldBuildHttpRequest(schema)) {
-            /* populate the request schema with our sharedVariable data. */
-            schema.writeSchemaFromSharedVariables(sharedVariableSchema);
 
             /* build our request, and cache it for later. */
             final var httpRequestBuilder = new HttpTokenRequestBuilder(schema.getUrl())
-                    .withHeaders(schema.getHeaders())
-                    .withBody(schema.getBody(), schema.getType());
+                    .withHeaders(schema.getResolvedHeaders(sharedVariableSchema))
+                    .withBody(schema.getResolvedBody(sharedVariableSchema), schema.getType());
 
             schema.setHttpRequest(httpRequestBuilder.build());
         }
@@ -368,17 +363,17 @@ public class TokenTransformerAction implements IAction {
      * @param update - the update schema.
      * @param resultMap - the to-be populated result map.
      */
-    private void updateResultMapFromSchema(final UpdateSchema update, final Map<String, Object> resultMap) {
+    private void updateResultMapFromSchema(final UpdateSchema update, final SharedVariableSchema sharedVariables, final Map<String, Object> resultMap) {
         switch (update.getDirection()) {
             case REQUEST:
 
                 if (update.getBody() != null && !update.getBody().isEmpty()) {
-                    final var requestBodyUpdateMap = new HashMap<>(update.getBody());
+                    final var requestBodyUpdateMap = new HashMap<>(update.getResolvedBody(sharedVariables));
                     resultMap.put("requestBody", requestBodyUpdateMap);
                 }
 
                 if (update.getHeaders() != null && !update.getHeaders().isEmpty()) {
-                    final var requestHeaderUpdateMap = new HashMap<>(update.getHeaders());
+                    final var requestHeaderUpdateMap = new HashMap<>(update.getResolvedHeaders(sharedVariables));
                     final var updateHeaderMap = new HashMap<String, Object>();
                     updateHeaderMap.put("update", requestHeaderUpdateMap);
                     resultMap.put("requestHeaders", updateHeaderMap);
@@ -388,12 +383,12 @@ public class TokenTransformerAction implements IAction {
             case RESPONSE:
 
                 if (update.getBody() != null && !update.getBody().isEmpty()) {
-                    final var responseBodyUpdateMap = new HashMap<>(update.getBody());
+                    final var responseBodyUpdateMap = new HashMap<>(update.getResolvedBody(sharedVariables));
                     resultMap.put("responseBody", responseBodyUpdateMap);
                 }
 
                 if (update.getHeaders() != null && !update.getHeaders().isEmpty()) {
-                    final var responseHeaderUpdateMap = new HashMap<>(update.getHeaders());
+                    final var responseHeaderUpdateMap = new HashMap<>(update.getResolvedBody(sharedVariables));
                     final var updateHeaderMap = new HashMap<String, Object>();
                     updateHeaderMap.put("update", responseHeaderUpdateMap);
                     resultMap.put("responseHeaders", updateHeaderMap);

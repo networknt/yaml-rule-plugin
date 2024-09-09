@@ -17,8 +17,6 @@ public abstract class SharedVariableRead extends SharedVariableSchema {
 
     private static final Logger LOG = LoggerFactory.getLogger(SharedVariableRead.class);
 
-    public abstract void writeSchemaFromSharedVariables(final SharedVariableSchema sharedVariableSchema);
-
     protected static void updateMapFromSharedVariables(final Map<String, String> map, final SharedVariableSchema sharedVariableSchema) {
         if (map == null)
             return;

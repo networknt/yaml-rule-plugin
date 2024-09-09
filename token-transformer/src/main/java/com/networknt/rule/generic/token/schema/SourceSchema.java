@@ -45,50 +45,59 @@ public class SourceSchema extends SharedVariableWrite {
 
     private void writeHeadersToSharedVariables(final SharedVariableSchema sharedVariableSchema, final HttpResponse<?> response) {
         final var headerMap = new HashMap<String, Object>();
+
         for (var header : response.headers().map().entrySet()) {
+
             if (!header.getValue().isEmpty()) {
+
                 final var builder = new StringBuilder();
+
                 for (int x = 0; x < header.getValue().size(); x++) {
                     builder.append(header.getValue().get(x));
-                    if (header.getValue().size() > 1 && x < header.getValue().size() - 1) {
+
+                    if (header.getValue().size() > 1 && x < header.getValue().size() - 1)
                         builder.append(",");
-                    }
+
                 }
+
                 final var completeHeaderValue = builder.toString();
+
                 if (!completeHeaderValue.isEmpty())
                     headerMap.put(header.getKey(), completeHeaderValue);
             }
         }
+
         if (!headerMap.isEmpty())
             SharedVariableWrite.writeToSharedVariables(sharedVariableSchema, headerMap, this.headers);
     }
 
     private void writeExpirationToSharedVariables(final SharedVariableSchema sharedVariableSchema, final HttpResponse<?> response) {
-        switch (expirationSchema.location) {
+
+        switch (this.expirationSchema.location) {
 
             case HEADER:
-                final var expirationString = response.headers().map().get(expirationSchema.field).stream().findFirst();
+                final var expirationString = response.headers().map().get(this.expirationSchema.field).stream().findFirst();
 
                 if (expirationString.isPresent()) {
                     final var responseExpiration = Long.parseLong(expirationString.get());
-                    sharedVariableSchema.setExpiration(expirationSchema.ttlUnit.unitToMillis(responseExpiration));
+                    sharedVariableSchema.setExpiration(this.expirationSchema.ttlUnit.unitToMillis(responseExpiration));
 
-                } else LOG.error("Could not find '{}' contained in the headers of the token response.", expirationSchema.field);
+                } else LOG.error("Could not find '{}' contained in the headers of the token response.", this.expirationSchema.field);
 
                 break;
 
             case BODY:
                 final var bodyMap = JsonMapper.string2Map(response.body().toString());
 
-                if (bodyMap.containsKey(expirationSchema.field)) {
-                    final var responseExpiration = Long.parseLong(String.valueOf(bodyMap.get(expirationSchema.field)));
-                    sharedVariableSchema.setExpiration(expirationSchema.ttlUnit.unitToMillis(responseExpiration));
+                if (bodyMap.containsKey(this.expirationSchema.field)) {
+                    final var responseExpiration = Long.parseLong(String.valueOf(bodyMap.get(this.expirationSchema.field)));
+                    sharedVariableSchema.setExpiration(this.expirationSchema.ttlUnit.unitToMillis(responseExpiration));
 
-                } else LOG.error("Could not find '{}' contained in the body of the token response.", expirationSchema.field);
+                } else LOG.error("Could not find '{}' contained in the body of the token response.", this.expirationSchema.field);
 
                 break;
             default:
-                throw new IllegalStateException("Invalid location configured in ./source/expirationSchema: '" + expirationSchema.location + "'.");
+                throw new IllegalStateException("Invalid location configured in ./source/expirationSchema: '" + this.expirationSchema.location + "'.");
         }
     }
 
@@ -106,6 +115,13 @@ public class SourceSchema extends SharedVariableWrite {
 
     }
 
+    /**
+     * Overwrites shared variable values with new ones based on source-destinations mappings.
+     *
+     * @param sharedVariableSchema - object holding our variables.
+     * @param jsonString - raw source of data
+     * @param sourceDestinationMapping - mapping that defines what values we are getting from the raw data source and what shared variable it will be saved to.
+     */
     public void writeJsonStringToSharedVariables(final SharedVariableSchema sharedVariableSchema, final String jsonString, List<SourceDestinationDefinition> sourceDestinationMapping) {
         final var dataSourceMap = JsonMapper.string2Map(jsonString);
         SharedVariableWrite.writeToSharedVariables(sharedVariableSchema, dataSourceMap, sourceDestinationMapping);
