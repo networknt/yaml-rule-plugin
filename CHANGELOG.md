@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.1.1 - 2024-09-09
+
+### Added
+- Shared Variable Resolve Read Fix #110 @KalevGonvick
+
 ## 1.1.0 - 2024-09-04
 
 ### Added
