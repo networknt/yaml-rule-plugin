@@ -29,6 +29,8 @@ import java.security.*;
 import java.time.Duration;
 import java.util.*;
 
+import static com.networknt.utility.Constants.ERROR_MESSAGE;
+
 /**
  * Generic plugin for updating an in-flight request or response with a new/different token.
  * Tokens are either retrieved from a specified token service, or are taken from cache if not expired yet.
@@ -66,10 +68,12 @@ public class TokenTransformerAction implements IAction {
                 try {
                     this.handleTokenAction(actionValue.getValue(), resultMap);
 
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
                     LOG.error("Exception occurred while sending a new token request for schema '{}'", actionValue.getValue());
                     LOG.trace("TokenTransformer plugin ends with error.");
                     Thread.currentThread().interrupt();
+                    resultMap.put(RuleConstants.RESULT, false);
+                    resultMap.put(ERROR_MESSAGE, e.getMessage());
                     return;
                 }
             }
