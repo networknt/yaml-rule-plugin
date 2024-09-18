@@ -4,6 +4,7 @@ import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.generic.token.schema.SharedVariableSchema;
 import com.networknt.rule.generic.token.schema.SourceSchema;
 import com.networknt.rule.generic.token.schema.UpdateSchema;
+import com.networknt.utility.Constants;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -86,9 +87,8 @@ public class TokenTransformerActionTest {
 
         final var resultMap = new HashMap<String, Object>();
 
-        /* Since grace period will make us refresh the stored token, we will get an exception when trying to reach out to our fake token service. */
-        RuntimeException exception = Assert.assertThrows(RuntimeException.class, () -> action.performAction(new HashMap<>(), resultMap, actionValues));
-        Assert.assertEquals("Request failed trying to send a request to: https://fake.token.com/services/oauth2/token", exception.getMessage());
+        action.performAction(new HashMap<>(), resultMap, actionValues);
+        Assert.assertEquals("Request failed trying to send a request to: https://fake.token.com/services/oauth2/token", resultMap.get(Constants.ERROR_MESSAGE));
     }
 
     @Test
