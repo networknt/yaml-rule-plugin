@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.1.2 - 2024-09-19
+
+### Added
+- update token transformer to return false and error message (#112)
+- fixes #111 update a test case to fix the assertion
+
 ## 1.1.1 - 2024-09-09
 
 ### Added
