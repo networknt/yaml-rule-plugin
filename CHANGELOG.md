@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.1.3 - 2024-09-20
+
+### Added
+- fixes #113 upgrade to light-4j 2.1.37 release version
+
 ## 1.1.2 - 2024-09-19
 
 ### Added
