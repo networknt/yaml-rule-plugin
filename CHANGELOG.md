@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.1.4 - 2024-09-25
+
+### Added
+- fixes #114 token-transformer plugin swallow the exception (#115)
+
 ## 1.1.3 - 2024-09-20
 
 ### Added
