@@ -70,7 +70,7 @@ public class TokenTransformerAction implements IAction {
 
                 } catch (Exception e) {
                     LOG.error("Exception occurred while sending a new token request for schema '{}'", actionValue.getValue());
-                    LOG.trace("TokenTransformer plugin ends with error.");
+                    LOG.trace("TokenTransformer plugin ends with error.", e);
                     Thread.currentThread().interrupt();
                     resultMap.put(RuleConstants.RESULT, false);
                     resultMap.put(ERROR_MESSAGE, e.getMessage());
