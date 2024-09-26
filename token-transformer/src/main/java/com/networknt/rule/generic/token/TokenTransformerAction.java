@@ -154,6 +154,7 @@ public class TokenTransformerAction implements IAction {
             return response;
 
         } catch (IOException e) {
+            LOG.error("Exception:", e);
             LOG.trace("URI = {}, Headers = {}, Method = {} ", request.uri(), request.headers(), request.method());
             throw new TokenRequestException(request);
 
