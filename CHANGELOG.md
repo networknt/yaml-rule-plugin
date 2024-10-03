@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 1.1.4 - 2024-09-25
 
 ### Added
+- add an error message with stacktrace
+- fixes #116 update to snapshot version with more trace logging
+- fixes #117 add more debug info for both conquest and token transformers
+
+## 1.1.4 - 2024-09-25
+
+### Added
 - fixes #114 token-transformer plugin swallow the exception (#115)
 
 ## 1.1.3 - 2024-09-20
