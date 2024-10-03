@@ -75,6 +75,7 @@ public class ConquestTokenRequestTransformAction implements IAction {
                     String jwt = null;
                     try {
                         jwt = createJwt(pathPrefixAuth.getCertFilename(), pathPrefixAuth.getCertPassword(), pathPrefixAuth.getAuthIssuer(), pathPrefixAuth.getAuthSubject(), pathPrefixAuth.getAuthAudience(), HashUtil.generateUUID(), pathPrefixAuth.getTokenTtl());
+                        if(logger.isTraceEnabled()) logger.trace("generated jwt = {}", jwt);
                     } catch (Exception e) {
                         logger.error("Exception", e);
                         return;
@@ -126,11 +127,22 @@ public class ConquestTokenRequestTransformAction implements IAction {
         claims = new MessageFormat(claimTemplate);
         String payload = claims.format(claimArray);
 
+        if(logger.isTraceEnabled()) logger.trace("jwtHeaderString = {} jwtBodyString = {}", header, payload);
+
         // Add the encoded claims object
         token.append(org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(payload.getBytes("UTF-8")));
 
         KeyStore keystore = TlsUtil.loadKeyStore(certFilename, certPassword.toCharArray());
         PrivateKey privateKey = (PrivateKey) keystore.getKey(certFilename.substring(0, certFilename.indexOf(".")), certPassword.toCharArray());
+
+        if(logger.isTraceEnabled()) logger.trace("Created PrivateKey with name {} password {} alias {} keyPass {}",
+                certFilename,
+                certPassword,
+                certFilename.substring(0, certFilename.indexOf(".")),
+                certPassword
+        );
+
+        if(logger.isTraceEnabled()) logger.trace("JWT Algorithm = {}", "SHA256withRSA");
 
         // Sign the JWT Header + "." + JWT Claims Object
         Signature signature = Signature.getInstance("SHA256withRSA");

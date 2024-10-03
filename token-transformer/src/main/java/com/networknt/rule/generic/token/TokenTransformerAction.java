@@ -104,6 +104,7 @@ public class TokenTransformerAction implements IAction {
 
                 if (schema.getTokenRequest().getJwtSchema() != null) {
                     final var constructedJwt = this.buildJwtToken(schema.getTokenRequest());
+                    if(LOG.isTraceEnabled()) LOG.trace("Generated jwt = {}", constructedJwt);
                     schema.getSharedVariables().setConstructedJwt(constructedJwt);
                 }
 
@@ -273,6 +274,7 @@ public class TokenTransformerAction implements IAction {
         );
 
         /* create a signed payload from 'jwtHeader' + '.' + 'jwtBody'  */
+        if(LOG.isTraceEnabled()) LOG.trace("JWT Algorithm = {}", schema.getJwtSchema().getAlgorithm());
         final Signature signature;
         try {
             signature = Signature.getInstance(schema.getJwtSchema().getAlgorithm());
@@ -280,6 +282,7 @@ public class TokenTransformerAction implements IAction {
             LOG.error("NoSuchAlgorithmException", e);
             throw new IllegalArgumentException("Algorithm '" + schema.getJwtSchema().getAlgorithm() + "' is invalid.");
         }
+
 
         try {
             signature.initSign(privateKey);
