@@ -70,7 +70,7 @@ public class ConquestTokenRequestTransformAction implements IAction {
             if(requestPath.startsWith(pathPrefixAuth.getPathPrefix())) {
                 if(logger.isTraceEnabled()) logger.trace("found with requestPath = " + requestPath + " prefix = " + pathPrefixAuth.getPathPrefix());
                 if(System.currentTimeMillis() >= (pathPrefixAuth.getExpiration())) {
-                    if(logger.isTraceEnabled()) logger.trace("Cached token {} is expired with current time {} and expired time {}", pathPrefixAuth.getAccessToken() != null ? pathPrefixAuth.getAccessToken().substring(0, 20) : null, System.currentTimeMillis(), pathPrefixAuth.getExpiration());
+                    if(logger.isTraceEnabled()) logger.trace("Cached token {} is expired with current time {} and expired time {}", pathPrefixAuth.getAccessToken(), System.currentTimeMillis(), pathPrefixAuth.getExpiration());
                     // get a new access token.
                     String jwt = null;
                     try {
@@ -85,7 +85,7 @@ public class ConquestTokenRequestTransformAction implements IAction {
                         if(tokenResponse != null) {
                             pathPrefixAuth.setExpiration(System.currentTimeMillis() + tokenResponse.getExpiresIn() * 1000 - 60000);
                             pathPrefixAuth.setAccessToken(tokenResponse.getAccessToken());
-                            if(logger.isTraceEnabled()) logger.trace("Got a new token {} and cached it with expiration time {}", pathPrefixAuth.getAccessToken() != null ? pathPrefixAuth.getAccessToken().substring(0, 20) : null, pathPrefixAuth.getExpiration());
+                            if(logger.isTraceEnabled()) logger.trace("Got a new token {} and cached it with expiration time {}", pathPrefixAuth.getAccessToken(), pathPrefixAuth.getExpiration());
                         } else {
                             return;
                         }

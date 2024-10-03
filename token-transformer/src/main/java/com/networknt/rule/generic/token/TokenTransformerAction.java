@@ -256,8 +256,16 @@ public class TokenTransformerAction implements IAction {
         final var jwtBodyMap = schema.getJwtSchema().getJwtBody().buildJwtMap(schema.getJwtSchema().getJwtTtl(), schema.getJwtSchema().getTtlUnit());
         final var jwtBodyString = JsonMapper.toJson(jwtBodyMap);
         tokenBuilder.append(org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(jwtBodyString.getBytes(StandardCharsets.UTF_8)));
+        if(LOG.isTraceEnabled()) LOG.trace("jwtHeaderString = {} jwtBodyString = {}", jwtHeaderString, jwtBodyString);
 
         final var privateKey = this.keyStoreManager.getPrivateKey(
+                schema.getJwtSchema().getKeyStore().getName(),
+                schema.getJwtSchema().getKeyStore().getPassword(),
+                schema.getJwtSchema().getKeyStore().getAlias(),
+                schema.getJwtSchema().getKeyStore().getKeyPass()
+        );
+
+        if(LOG.isTraceEnabled()) LOG.trace("Created PrivateKey with name {} password {} alias {} keyPass {}",
                 schema.getJwtSchema().getKeyStore().getName(),
                 schema.getJwtSchema().getKeyStore().getPassword(),
                 schema.getJwtSchema().getKeyStore().getAlias(),
@@ -268,8 +276,8 @@ public class TokenTransformerAction implements IAction {
         final Signature signature;
         try {
             signature = Signature.getInstance(schema.getJwtSchema().getAlgorithm());
-
         } catch (NoSuchAlgorithmException e) {
+            LOG.error("NoSuchAlgorithmException", e);
             throw new IllegalArgumentException("Algorithm '" + schema.getJwtSchema().getAlgorithm() + "' is invalid.");
         }
 
@@ -277,6 +285,7 @@ public class TokenTransformerAction implements IAction {
             signature.initSign(privateKey);
 
         } catch (InvalidKeyException e) {
+            LOG.error("InvalidKeyException", e);
             throw new IllegalArgumentException("Invalid key for selected algorithm '" + schema.getJwtSchema().getAlgorithm() +"'.");
         }
 
@@ -286,6 +295,7 @@ public class TokenTransformerAction implements IAction {
             signedPayload = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(signature.sign());
 
         } catch (SignatureException e) {
+            LOG.error("SignatureException", e);
             throw new IllegalArgumentException("Invalid signature for JWT.");
         }
 
