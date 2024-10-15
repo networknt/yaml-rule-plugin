@@ -34,7 +34,7 @@ public class SoapSecurityTransformAction implements IAction {
     private static final String PASSWORD = "password";
     private static final Logger logger = LoggerFactory.getLogger(SoapSecurityTransformAction.class);
     private static final Map<String, Object> config = Config.getInstance().getJsonMapConfigNoCache(CONFIG_NAME);
-    String pattern = "<soapenv:Header>(.*?)</soapenv:Header>";
+    String pattern = (String)config.get("headerTemplate");
 
     public SoapSecurityTransformAction() {
         if(logger.isInfoEnabled()) logger.info("SoapSecurityTransformAction is constructed.");
@@ -58,7 +58,7 @@ public class SoapSecurityTransformAction implements IAction {
         String password = (String)config.get(PASSWORD);
         if(logger.isTraceEnabled()) logger.debug("username = " + username + " password = " + password + " original request body = " + requestBody);
         String modifiedBody = transform(requestBody, username, password);
-        if(logger.isTraceEnabled()) logger.trace("transformed request body = " + modifiedBody);
+        if(logger.isTraceEnabled()) logger.trace("transformed request body = {}", modifiedBody);
         resultMap.put("requestBody", modifiedBody);
     }
 

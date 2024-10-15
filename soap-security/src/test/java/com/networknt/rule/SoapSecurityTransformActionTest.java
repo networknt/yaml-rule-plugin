@@ -42,4 +42,16 @@ public class SoapSecurityTransformActionTest {
 
         System.out.println(modifiedXml);
     }
+
+    @Test
+    public void testActionSimpleHeader() {
+        String xml = "<?xml version='1.0'?><soapenv:Header/>";
+        Map<String, Object> objMap = new HashMap<>();
+        objMap.put("requestBody", xml);
+        SoapSecurityTransformAction action = new SoapSecurityTransformAction();
+        Map<String, Object> resultMap = new HashMap<>();
+        action.performAction(objMap, resultMap, null);
+        System.out.println(resultMap);
+    }
+
 }

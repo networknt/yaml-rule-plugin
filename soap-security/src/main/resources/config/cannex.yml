@@ -4,3 +4,7 @@ username: ${cannex.username:username}
 # The password that is used to create password digest for CANNEX API access. The reason we put it into
 # this config file instead of pass it from the rule is that the config file support encryption by default.
 password: ${cannex.password:password}
+# The template of the soap header. This is the XML header that needs to be replaced. For different API,
+# the header might be different. That is why we have this in the configuration with default value.
+headerTemplate: ${cannex.headerTemplate:<soapenv:Header>(.*?)</soapenv:Header>}
+# headerTemplate: ${cannex.headerTemplate:<soapenv:Header/>}
