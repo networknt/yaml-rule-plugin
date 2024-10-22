@@ -1,6 +1,6 @@
 package com.networknt.rule.validator;
 
-import com.networknt.rule.IAction;
+import com.networknt.rule.RequestTransformAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.utility.ModuleRegistry;
@@ -15,7 +15,7 @@ import java.util.*;
  *
  * @author Steve Hu
  */
-public class ContextValidatorRequestTransformAction implements IAction {
+public class ContextValidatorRequestTransformAction implements RequestTransformAction {
     private static final Logger logger = LoggerFactory.getLogger(ContextValidatorRequestTransformAction.class);
 
     // In the real implementation, this should be put into the configuration file.
@@ -36,13 +36,11 @@ public class ContextValidatorRequestTransformAction implements IAction {
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         Map<String, String> headerMap = (Map<String, String>)objMap.get("requestHeaders");
         String contextValue  = headerMap.get("context");
-        if(logger.isTraceEnabled()) logger.trace("context request header is {}" + contextValue);
-        if(contextValue != null && secretContext.equals(contextValue)) {
+        if(logger.isTraceEnabled()) logger.trace("context request header is {}", contextValue);
+        if(secretContext.equals(contextValue)) {
             // validation passed and don't return anything to the request transformer interceptor
-            resultMap.put(RuleConstants.RESULT, false);
             if(logger.isTraceEnabled()) logger.trace("Context validation is passed and rule result is false");
         } else {
-            resultMap.put(RuleConstants.RESULT, true);
             if(logger.isTraceEnabled()) logger.trace("Context validation is failed and rule result is true");
             // validationError
             String errorMessage = "{\"error\":\"invalid context\"}";

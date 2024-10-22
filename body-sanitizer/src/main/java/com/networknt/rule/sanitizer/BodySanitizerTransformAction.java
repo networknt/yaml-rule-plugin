@@ -1,7 +1,7 @@
 package com.networknt.rule.sanitizer;
 
 import com.networknt.config.JsonMapper;
-import com.networknt.rule.IAction;
+import com.networknt.rule.RequestTransformAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.config.Config;
@@ -20,7 +20,7 @@ import java.util.*;
  *
  * @author Steve Hu
  */
-public class BodySanitizerTransformAction implements IAction {
+public class BodySanitizerTransformAction implements RequestTransformAction {
     private static final Logger logger = LoggerFactory.getLogger(BodySanitizerTransformAction.class);
     private static final SanitizerConfig config = SanitizerConfig.load();
     private static final EncoderWrapper bodyEncoder = new EncoderWrapper(Encoders.forName(config.getBodyEncoder()), config.getBodyAttributesToIgnore(), config.getBodyAttributesToEncode());
@@ -37,7 +37,6 @@ public class BodySanitizerTransformAction implements IAction {
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         // get the body from the objMap and create a new body in the resultMap. Both in string format.
-        resultMap.put(RuleConstants.RESULT, true);
         String requestBody = (String)objMap.get("requestBody");
         if(logger.isTraceEnabled()) logger.debug("original request body = " + requestBody);
         // convert the body from string to json map or list.

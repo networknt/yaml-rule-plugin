@@ -11,8 +11,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.networknt.rule.RuleActionValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Util {
+    private static final Logger logger = LoggerFactory.getLogger(Util.class);
 
     public static String transformRest2Soap(String input, Collection<RuleActionValue> actionValues) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
@@ -25,8 +28,8 @@ public class Util {
             TransformChain transformManager = TransformChain.createNewChain(envelope, actionValues);
             returnString = transformManager.getResultString();
         } catch (JsonProcessingException e) {
-            if(Rest2SoapTransformAction.logger.isDebugEnabled())
-                Rest2SoapTransformAction.logger.debug("Failed to transform response body: {}\n{}", input, e.getMessage());
+            if(logger.isDebugEnabled())
+                logger.debug("Failed to transform response body: {}\n{}", input, e.getMessage());
             return returnString;
         }
         return returnString;
@@ -43,8 +46,8 @@ public class Util {
         } catch (JsonProcessingException e) {
             // if we receive something that is not valid SOAP
             // (i.e. error from proxy) we just return the string.
-            if (Soap2RestTransformAction.logger.isTraceEnabled())
-                Soap2RestTransformAction.logger.trace("Returning original response because conversion failed with exception: {}", e.getMessage());
+            if (logger.isTraceEnabled())
+                logger.trace("Returning original response because conversion failed with exception: {}", e.getMessage());
             return input;
         }
     }

@@ -63,9 +63,9 @@ The above rule will be triggered when the request path is /v1/pets, which is an 
 Here is the piece of code that in the plugin.
 
 ```
-        resultMap.put(RuleConstants.RESULT, true);
         String sourceHeader = null;
         String targetHeader = null;
+        String targetValue = null;
         Boolean removeSourceHeader = null;
         for(RuleActionValue value: actionValues) {
             if("sourceHeader".equals(value.getActionValueId())) {
@@ -76,28 +76,32 @@ Here is the piece of code that in the plugin.
                 targetHeader = value.getValue();
                 continue;
             }
+            if("targetValue".equals(value.getActionValueId())) {
+                targetValue = value.getValue();
+                continue;
+            }
             if("removeSourceHeader".equals(value.getActionValueId())) {
                 removeSourceHeader = "true".equalsIgnoreCase(value.getValue()) ? Boolean.TRUE : Boolean.FALSE;
             }
         }
-        if(logger.isDebugEnabled()) logger.debug("source request header = " + sourceHeader + " target request header = " + targetHeader + " removeSourceHeader = " + removeSourceHeader);
-        HeaderMap headerMap = (HeaderMap)objMap.get("requestHeaders");
-        String sourceValue = null;
-        HeaderValues sourceObject = headerMap.get(sourceHeader);
-        if(sourceObject != null) sourceValue = sourceObject.getFirst();
-        if(logger.isDebugEnabled()) logger.debug("source request header = " + sourceHeader + " value = " + sourceValue);
-        if(sourceValue != null) {
-            Map<String, Object> requestHeaders = new HashMap<>();
-            if(Boolean.TRUE.equals(removeSourceHeader)) {
-                List<String> removeList = new ArrayList<>();
-                removeList.add(sourceHeader);
-                requestHeaders.put("remove", removeList);
+        if(logger.isDebugEnabled()) logger.debug("source request header = " + sourceHeader + " target request header = " + targetHeader + " targetValue = " + targetValue + " removeSourceHeader = " + removeSourceHeader);
+        Map<String, String> headerMap = (Map<String, String>)objMap.get("requestHeaders");
+        // there are two situations to handler. sourceHeader vs targetValue. One of them should not be null.
+        // if both are not null, then only the targetValue will be used.
+        if(targetValue != null) {
+            // the targetValue is passed from the rule definition, and it might be encrypted.
+            targetValue = (String) ConfigInjection.decryptEnvValue(ConfigInjection.getDecryptor(), targetValue);
+            RequestTransformAction.super.updateRequestHeader(resultMap, targetHeader, targetValue);
+        } else {
+            // use the sourceHeader to retrieve the value and replace the targetHeader.
+            String sourceValue = headerMap.get(sourceHeader);
+            if(logger.isDebugEnabled()) logger.debug("source request header = " + sourceHeader + " value = " + sourceValue);
+            if(sourceValue != null) {
+                if(Boolean.TRUE.equals(removeSourceHeader)) {
+                    RequestTransformAction.super.removeRequestHeader(resultMap, sourceHeader);
+                }
+                RequestTransformAction.super.updateRequestHeader(resultMap, targetHeader, sourceValue);
             }
-            Map<String, Object> updateMap = new HashMap<>();
-            updateMap.put(targetHeader, sourceValue);
-            requestHeaders.put("update", updateMap);
-            if(logger.isDebugEnabled()) logger.debug("final requestHeaders = " + requestHeaders);
-            resultMap.put("requestHeaders", requestHeaders);
         }
 
 ```

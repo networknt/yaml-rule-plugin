@@ -26,6 +26,5 @@ tokenSchemas:
           destination: "!ref(sharedVariables.tokenTtl)"
 
     update:
-      direction: REQUEST
       headers:
         Authorization: "Bearer !ref(sharedVariables.accessToken)"

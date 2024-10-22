@@ -6,7 +6,7 @@ import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
 import com.networknt.config.PathPrefixAuth;
 import com.networknt.http.client.ssl.TLSConfig;
-import com.networknt.rule.IAction;
+import com.networknt.rule.RequestTransformAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.status.Status;
@@ -31,7 +31,7 @@ import java.util.*;
  *
  * @author Steve Hu
  */
-public class EpamTokenRequestTransformAction implements IAction {
+public class EpamTokenRequestTransformAction implements RequestTransformAction {
     public static final String GET_TOKEN_ERROR = "ERR10052";
     private static final Logger logger = LoggerFactory.getLogger(EpamTokenRequestTransformAction.class);
     // change the config to static so that it can cache the token retrieved until expiration time.
@@ -53,7 +53,6 @@ public class EpamTokenRequestTransformAction implements IAction {
 
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
-        resultMap.put(RuleConstants.RESULT, true);
         String requestPath = (String)objMap.get("requestPath");
         if(logger.isTraceEnabled()) logger.trace("requestPath = " + requestPath);
 

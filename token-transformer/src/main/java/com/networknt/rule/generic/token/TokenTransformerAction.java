@@ -1,12 +1,11 @@
 package com.networknt.rule.generic.token;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.networknt.client.ClientConfig;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
 import com.networknt.http.client.HttpClientRequest;
 import com.networknt.http.client.ssl.ClientX509ExtendedTrustManager;
 import com.networknt.http.client.ssl.TLSConfig;
-import com.networknt.rule.IAction;
+import com.networknt.rule.RequestTransformAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.rule.generic.token.exception.TokenRequestException;
@@ -38,7 +37,7 @@ import static com.networknt.utility.Constants.ERROR_MESSAGE;
  *
  * @author Kalev Gonvick
  */
-public class TokenTransformerAction implements IAction {
+public class TokenTransformerAction implements RequestTransformAction {
 
     private static final Logger LOG = LoggerFactory.getLogger(TokenTransformerAction.class);
     private static final TokenTransformerConfig CONFIG = TokenTransformerConfig.load();
@@ -72,14 +71,12 @@ public class TokenTransformerAction implements IAction {
                     LOG.error("Exception occurred while sending a new token request for schema '{}'", actionValue.getValue());
                     LOG.trace("TokenTransformer plugin ends with error.", e);
                     Thread.currentThread().interrupt();
-                    resultMap.put(RuleConstants.RESULT, false);
                     resultMap.put(ERROR_MESSAGE, e.getMessage());
                     return;
                 }
             }
         }
         LOG.trace("TokenTransformer plugin ends.");
-        resultMap.put(RuleConstants.RESULT, true);
     }
 
     /**
@@ -382,39 +379,23 @@ public class TokenTransformerAction implements IAction {
      * @param resultMap - the to-be populated result map.
      */
     private void updateResultMapFromSchema(final UpdateSchema update, final SharedVariableSchema sharedVariables, final Map<String, Object> resultMap) {
-        switch (update.getDirection()) {
-            case REQUEST:
+        if (update.getBody() != null && !update.getBody().isEmpty()) {
+            final var requestBodyUpdateMap = new HashMap<>(update.getResolvedBody(sharedVariables));
+            resultMap.put("requestBody", requestBodyUpdateMap);
+        }
 
-                if (update.getBody() != null && !update.getBody().isEmpty()) {
-                    final var requestBodyUpdateMap = new HashMap<>(update.getResolvedBody(sharedVariables));
-                    resultMap.put("requestBody", requestBodyUpdateMap);
-                }
-
-                if (update.getHeaders() != null && !update.getHeaders().isEmpty()) {
-                    final var requestHeaderUpdateMap = new HashMap<>(update.getResolvedHeaders(sharedVariables));
-                    final var updateHeaderMap = new HashMap<String, Object>();
-                    updateHeaderMap.put("update", requestHeaderUpdateMap);
-                    resultMap.put("requestHeaders", updateHeaderMap);
-                }
-                break;
-
-            case RESPONSE:
-
-                if (update.getBody() != null && !update.getBody().isEmpty()) {
-                    final var responseBodyUpdateMap = new HashMap<>(update.getResolvedBody(sharedVariables));
-                    resultMap.put("responseBody", responseBodyUpdateMap);
-                }
-
-                if (update.getHeaders() != null && !update.getHeaders().isEmpty()) {
-                    final var responseHeaderUpdateMap = new HashMap<>(update.getResolvedBody(sharedVariables));
-                    final var updateHeaderMap = new HashMap<String, Object>();
-                    updateHeaderMap.put("update", responseHeaderUpdateMap);
-                    resultMap.put("responseHeaders", updateHeaderMap);
-                }
-                break;
-
-            default:
-                throw new IllegalArgumentException("Invalid update direction '" + update.getDirection().toString() + "'.");
+        Map<String, Object> requestHeaders = (Map)resultMap.get(REQUEST_HEADERS);
+        if(requestHeaders == null) {
+            requestHeaders = new HashMap<>();
+            resultMap.put(REQUEST_HEADERS, requestHeaders);
+        }
+        if (update.getHeaders() != null && !update.getHeaders().isEmpty()) {
+            Map<String, String> updateMap = (Map<String, String>)requestHeaders.get(UPDATE);
+            if(updateMap == null) {
+                updateMap = new HashMap<>();
+                requestHeaders.put(UPDATE, updateMap);
+            }
+            updateMap.putAll(update.getResolvedHeaders(sharedVariables));
         }
     }
 

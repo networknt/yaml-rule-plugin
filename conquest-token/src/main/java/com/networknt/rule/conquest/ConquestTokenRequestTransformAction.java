@@ -8,7 +8,7 @@ import com.networknt.config.PathPrefixAuth;
 import com.networknt.config.TlsUtil;
 import com.networknt.http.client.HttpClientRequest;
 import com.networknt.http.client.ssl.TLSConfig;
-import com.networknt.rule.IAction;
+import com.networknt.rule.RequestTransformAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.utility.HashUtil;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  *
  * @author Steve Hu
  */
-public class ConquestTokenRequestTransformAction implements IAction {
+public class ConquestTokenRequestTransformAction implements RequestTransformAction {
     private static final Logger logger = LoggerFactory.getLogger(ConquestTokenRequestTransformAction.class);
     // change the config to static so that it can cache the token retrieved until expiration time.
     private static final ConquestConfig config = ConquestConfig.load();
@@ -63,7 +63,6 @@ public class ConquestTokenRequestTransformAction implements IAction {
 
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
-        resultMap.put(RuleConstants.RESULT, true);
         String requestPath = (String)objMap.get("requestPath");
         if(logger.isTraceEnabled()) logger.trace("requestPath = " + requestPath);
         for(PathPrefixAuth pathPrefixAuth: config.getPathPrefixAuths()) {
@@ -94,11 +93,7 @@ public class ConquestTokenRequestTransformAction implements IAction {
                 }
                 // either a new token is retrieved or cached token is not expired. Put the token into the Authorization header.
                 if(pathPrefixAuth.getAccessToken() != null) {
-                    Map<String, Object> requestHeaders = new HashMap<>();
-                    Map<String, Object> updateMap = new HashMap<>();
-                    updateMap.put("Authorization", "Bearer " + pathPrefixAuth.getAccessToken());
-                    requestHeaders.put("update", updateMap);
-                    resultMap.put("requestHeaders", requestHeaders);
+                    RequestTransformAction.super.updateRequestHeader(resultMap,"Authorization", "Bearer " + pathPrefixAuth.getAccessToken());
                     return;
                 }
             }

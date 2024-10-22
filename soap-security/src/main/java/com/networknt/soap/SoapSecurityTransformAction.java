@@ -1,6 +1,7 @@
 package com.networknt.soap;
 
 import com.networknt.rule.IAction;
+import com.networknt.rule.RequestTransformAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.config.Config;
@@ -28,7 +29,7 @@ import java.util.*;
  *
  * @author Steve Hu
  */
-public class SoapSecurityTransformAction implements IAction {
+public class SoapSecurityTransformAction implements RequestTransformAction {
     private static final String CONFIG_NAME = "cannex";
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
@@ -52,7 +53,6 @@ public class SoapSecurityTransformAction implements IAction {
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         // get the body from the objMap and create a new body in the resultMap. Both in string format.
-        resultMap.put(RuleConstants.RESULT, true);
         String requestBody = (String)objMap.get("requestBody");
         String username = (String)config.get(USERNAME);
         String password = (String)config.get(PASSWORD);
