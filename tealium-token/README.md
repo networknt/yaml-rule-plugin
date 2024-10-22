@@ -1,4 +1,4 @@
-### NOTE: This plugin is deprecated and replaced by the token-transformer plugin. 
+### NOTE: This plugin is deprecated and replaced by the token-transformer plugin.
 
 Tealium is an external API provided and it has a customized flow to get the JWT token for the authorization. The request and response are not standard. The caller is a Kafka sink connector and this plugin is deployed to the light-gateway to be responsible to get the token, cache the token and renew the token if necessary.
 
