@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public class SnowConfig {
     private static final Logger logger = LoggerFactory.getLogger(SnowConfig.class);
 

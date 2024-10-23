@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
  *
  * @author Steve Hu
  */
+@Deprecated
 public class SnowTokenRequestTransformAction implements IAction {
     private static final Logger logger = LoggerFactory.getLogger(SnowTokenRequestTransformAction.class);
     // change the config to static so that it can cache the token retrieved until expiration time.
@@ -53,9 +54,8 @@ public class SnowTokenRequestTransformAction implements IAction {
 
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
-        resultMap.put(RuleConstants.RESULT, true);
         String requestPath = (String)objMap.get("requestPath");
-        if(logger.isTraceEnabled()) logger.trace("requestPath = " + requestPath);
+        if(logger.isTraceEnabled()) logger.trace("requestPath = {}", requestPath);
 
         for(PathPrefixAuth pathPrefixAuth: config.getPathPrefixAuths()) {
             if(requestPath.startsWith(pathPrefixAuth.getPathPrefix())) {

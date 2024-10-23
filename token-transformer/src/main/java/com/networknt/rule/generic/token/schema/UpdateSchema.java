@@ -14,20 +14,6 @@ public class UpdateSchema extends SharedVariableRead {
 
     private static final Logger LOG = LoggerFactory.getLogger(UpdateSchema.class);
 
-    public enum UpdateDirection {
-
-        @JsonProperty("REQUEST")
-        @JsonAlias({"request", "Request"})
-        REQUEST,
-
-        @JsonProperty("RESPONSE")
-        @JsonAlias({"response", "Response"})
-        RESPONSE
-    }
-
-    @JsonProperty("direction")
-    private UpdateDirection direction;
-
     @JsonProperty("headers")
     protected Map<String, String> headers;
 
@@ -38,9 +24,6 @@ public class UpdateSchema extends SharedVariableRead {
     @JsonSetter(nulls = Nulls.SKIP)
     private boolean updateExpirationFromTtl = true;
 
-    public UpdateDirection getDirection() {
-        return direction;
-    }
     public Map<String, String> getHeaders() {
         return headers;
     }

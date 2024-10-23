@@ -35,6 +35,5 @@ tokenSchemas:
           destination: "!ref(sharedVariables.scope)"
 
     update:
-      direction: REQUEST
       headers:
         Authorization: "Bearer !ref(sharedVariables.accessToken)"

@@ -3,6 +3,7 @@ package com.networknt.rule.header;
 
 import com.networknt.config.ConfigInjection;
 import com.networknt.rule.IAction;
+import com.networknt.rule.RequestTransformAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.utility.ModuleRegistry;
@@ -17,7 +18,7 @@ import java.util.*;
  *
  * @author Steve Hu
  */
-public class HeaderReplaceRequestTransformAction implements IAction {
+public class HeaderReplaceRequestTransformAction implements RequestTransformAction {
     private static final Logger logger = LoggerFactory.getLogger(HeaderReplaceRequestTransformAction.class);
 
     public HeaderReplaceRequestTransformAction() {
@@ -33,7 +34,6 @@ public class HeaderReplaceRequestTransformAction implements IAction {
 
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
-        resultMap.put(RuleConstants.RESULT, true);
         String sourceHeader = null;
         String targetHeader = null;
         String targetValue = null;
@@ -62,28 +62,16 @@ public class HeaderReplaceRequestTransformAction implements IAction {
         if(targetValue != null) {
             // the targetValue is passed from the rule definition, and it might be encrypted.
             targetValue = (String) ConfigInjection.decryptEnvValue(ConfigInjection.getDecryptor(), targetValue);
-            Map<String, Object> requestHeaders = new HashMap<>();
-            Map<String, Object> updateMap = new HashMap<>();
-            updateMap.put(targetHeader, targetValue);
-            requestHeaders.put("update", updateMap);
-            if(logger.isDebugEnabled()) logger.debug("final requestHeaders = " + requestHeaders);
-            resultMap.put("requestHeaders", requestHeaders);
+            RequestTransformAction.super.updateRequestHeader(resultMap, targetHeader, targetValue);
         } else {
             // use the sourceHeader to retrieve the value and replace the targetHeader.
             String sourceValue = headerMap.get(sourceHeader);
             if(logger.isDebugEnabled()) logger.debug("source request header = " + sourceHeader + " value = " + sourceValue);
             if(sourceValue != null) {
-                Map<String, Object> requestHeaders = new HashMap<>();
                 if(Boolean.TRUE.equals(removeSourceHeader)) {
-                    List<String> removeList = new ArrayList<>();
-                    removeList.add(sourceHeader);
-                    requestHeaders.put("remove", removeList);
+                    RequestTransformAction.super.removeRequestHeader(resultMap, sourceHeader);
                 }
-                Map<String, Object> updateMap = new HashMap<>();
-                updateMap.put(targetHeader, sourceValue);
-                requestHeaders.put("update", updateMap);
-                if(logger.isDebugEnabled()) logger.debug("final requestHeaders = " + requestHeaders);
-                resultMap.put("requestHeaders", requestHeaders);
+                RequestTransformAction.super.updateRequestHeader(resultMap, targetHeader, sourceValue);
             }
         }
     }

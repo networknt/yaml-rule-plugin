@@ -1,6 +1,6 @@
 package com.networknt.rule.encoder;
 
-import com.networknt.rule.IAction;
+import com.networknt.rule.RequestTransformAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.RuleConstants;
 import com.networknt.utility.ModuleRegistry;
@@ -17,7 +17,7 @@ import java.util.Map;
  *
  * @author Steve Hu
  */
-public class RequestBodyUtf8EncodingTransformAction implements IAction {
+public class RequestBodyUtf8EncodingTransformAction implements RequestTransformAction {
     private static final Logger logger = LoggerFactory.getLogger(RequestBodyUtf8EncodingTransformAction.class);
     public static final String REQUEST_BODY = "requestBody";
     public static final String UTF8 = "UTF-8";
@@ -36,7 +36,6 @@ public class RequestBodyUtf8EncodingTransformAction implements IAction {
     @Override
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         // get the body from the objMap and create a new body in the resultMap.
-        resultMap.put(RuleConstants.RESULT, true);
         String requestBody = (String)objMap.get(REQUEST_BODY);
         if(logger.isTraceEnabled()) logger.trace("original requestBody = {}", requestBody);
         if(requestBody.startsWith("<?xml")) {

@@ -111,4 +111,41 @@ public class SoapTransformTest {
 		Assert.assertEquals(expected, request);
 
 	}
+
+	@Test
+	public void testFlower_rest2soap() {
+		String xmlTransformerId = "XmlTransformer";
+		String xmlTransformerValue = "Envelope@@@$prefix@@@SOAP-ENV@@@xmlns:SOAP-ENV@@@http://schemas.xmlsoap.org/soap/envelope/,Body@@@$prefix@@@SOAP-ENV,Flower@@@$prefix@@@ea@@@xmlns:ea@@@http://www.w3.org/2001/XMLSchema";
+
+		Collection<RuleActionValue> actionValues = new ArrayList<>();
+
+		RuleActionValue xmlActionValue = new RuleActionValue();
+		xmlActionValue.setActionValueId(xmlTransformerId);
+		xmlActionValue.setValue(xmlTransformerValue);
+
+		actionValues.add(xmlActionValue);
+
+
+		String example = "{\"Flower\":{\"name\":\"Poppy\",\"color\":\"RED\",\"petals\":9}}";
+
+		String expected = "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+				"  <SOAP-ENV:Body>\n" +
+				"    <ea:Flower xmlns:ea=\"http://www.w3.org/2001/XMLSchema\">\n" +
+				"      <name>Poppy</name>\n" +
+				"      <color>RED</color>\n" +
+				"      <petals>9</petals>\n" +
+				"    </ea:Flower>\n" +
+				"  </SOAP-ENV:Body>\n" +
+				"</SOAP-ENV:Envelope>";
+		String request = "";
+		try {
+			request = Util.transformRest2Soap(example, actionValues);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		Assert.assertEquals(expected, request);
+
+	}
+
 }

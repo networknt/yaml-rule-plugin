@@ -23,7 +23,6 @@ tokenSchemas:
         - source: access_token
           destination: "!ref(sharedVariables.accessToken)"
     update:
-      direction: request
       headers:
         Authorization: "Bearer !ref(sharedVariables.accessToken)"
   multiThreadTest:
@@ -42,7 +41,6 @@ tokenSchemas:
         - source: access_token
           destination: "!ref(sharedVariables.accessToken)"
     update:
-      direction: REQUEST
       headers:
         Authorization: "Bearer !ref(sharedVariables.accessToken)"
 
@@ -63,7 +61,6 @@ tokenSchemas:
         - source: access_token
           destination: "!ref(sharedVariables.accessToken)"
     update:
-      direction: REQUEST
       headers:
         Authorization: "Bearer !ref(sharedVariables.accessToken)"
 
@@ -83,7 +80,6 @@ tokenSchemas:
         - source: access_token
           destination: "!ref(sharedVariables.accessToken)"
     update:
-      direction: REQUEST
       headers:
         Authorization: "Bearer !ref(sharedVariables.accessToken)"
 
@@ -111,7 +107,6 @@ tokenSchemas:
           destination: "!ref(sharedVariables.tokenTtl)"
 
     update:
-      direction: REQUEST
       headers:
         Authorization: "Bearer !ref(sharedVariables.accessToken)"
   lifeware:
@@ -133,7 +128,6 @@ tokenSchemas:
         - source: access_key
           destination: "!ref(sharedVariables.accessToken)"
     update:
-      direction: REQUEST
       headers:
         Authorization: "Bearer !ref(sharedVariables.accessToken)"
   salesforce:
@@ -199,6 +193,5 @@ tokenSchemas:
         - source: scope
           destination: "!ref(sharedVariables.scope)"
     update:
-      direction: REQUEST
       headers:
         Authorization: "Bearer !ref(sharedVariables.accessToken)"
