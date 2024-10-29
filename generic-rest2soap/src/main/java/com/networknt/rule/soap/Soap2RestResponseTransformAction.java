@@ -1,11 +1,9 @@
 package com.networknt.rule.soap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.networknt.rule.ResponseTransformAction;
 import com.networknt.rule.RuleActionValue;
-import com.networknt.rule.RuleConstants;
-import com.networknt.rule.TransformAction;
 import com.networknt.rule.soap.exception.InvalidSoapBodyException;
+import com.networknt.utility.MapUtil;
 import com.networknt.utility.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Transform a response body from the XML to JSON in order to access Soap API from Rest client. This can be used in
@@ -39,7 +38,7 @@ public class Soap2RestResponseTransformAction implements ResponseTransformAction
     public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         // get the response body from the objMap and create a new response body in the resultMap. Both in string format.
         logger.info("actionValues: {}", actionValues);
-        if(actionValues == null || actionValues.isEmpty()) {
+        if (actionValues == null || actionValues.isEmpty()) {
             logger.error("Rules.yml does not contain ActionValues section. Please fix config");
             return;
         }
@@ -66,21 +65,22 @@ public class Soap2RestResponseTransformAction implements ResponseTransformAction
 
         // transform the content type header.
         Map<String, String> headerMap = (Map<String, String>) objMap.get("responseHeaders");
-
-        String contentType = headerMap.get("Content-Type");
-
-        if (logger.isTraceEnabled())
-            logger.trace("response header contentType = " + contentType);
-
-
-        if (contentType != null && (contentType.startsWith("text/xml") || contentType.startsWith("application/xml"))) {
-            // transform the content type header.
-            ResponseTransformAction.super.updateResponseHeader(resultMap, "Content-Type", "application/json");
+        Optional<String> contentTypeOptional = MapUtil.getValueIgnoreCase(headerMap, Constants.CONTENT_TYPE);
+        if (contentTypeOptional.isPresent()) {
+            String contentType = contentTypeOptional.get();
             if (logger.isTraceEnabled())
-                logger.trace("response contentType has been changed from */xml to application/json");
+                logger.trace("response header contentType = {}", contentType);
+
+            if (contentType.contains("/xml")) {
+                // transform the content type header.
+                ResponseTransformAction.super.updateResponseHeader(resultMap, "Content-Type", "application/json");
+                if (logger.isTraceEnabled())
+                    logger.trace("response contentType has been changed from */xml to application/json");
+            } else {
+                throw new InvalidSoapBodyException("Missing Content-Type header text/xml or application/xml in response.");
+            }
         } else {
-            throw new InvalidSoapBodyException("Missing Content-Type header text/xml or application/xml in response.");
+            if(logger.isDebugEnabled()) logger.debug("header Content-Type doesn't exist.");
         }
     }
-
 }

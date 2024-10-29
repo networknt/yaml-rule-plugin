@@ -4,11 +4,11 @@ import com.networknt.rule.soap.Constants;
 
 import java.util.*;
 
-public class XmlAttributeManager {
+public class TransformerAttributeManager {
     private final Map<String, AttributeInfo> attributesMap;
 
-    public XmlAttributeManager(String raw) {
-        this.attributesMap = XmlAttributeManager.parseAttributeRuleString(raw);
+    public TransformerAttributeManager(String raw) {
+        this.attributesMap = TransformerAttributeManager.parseAttributeRuleString(raw);
     }
 
     public String getPrefix(String field) {
@@ -26,6 +26,25 @@ public class XmlAttributeManager {
 
     public AttributeInfo getInfo(String f) {
         return this.attributesMap.get(f);
+    }
+
+    public boolean isRootNode(String f) {
+        var ai = this.attributesMap.get(f);
+        if (ai != null) {
+            return ai.hasRootNode();
+        } else {
+            return false;
+        }
+
+    }
+
+    public boolean hasRootNode() {
+        for (var e : this.attributesMap.entrySet()) {
+            if (e.getValue().hasRootNode()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean hasXmlHeader() {
@@ -75,11 +94,9 @@ public class XmlAttributeManager {
 
     public static class AttributeInfo {
         private final List<Attribute> al = new ArrayList<>();
-
         public void add(String k, String v) {
             this.al.add(new Attribute(k, v));
         }
-
         public void pop() {
             this.al.remove(this.al.size() - 1);
         }
@@ -96,6 +113,11 @@ public class XmlAttributeManager {
 
         public List<Attribute> getAttributeList() {
             return al;
+        }
+
+        private boolean hasRootNode() {
+            Attribute att = this.getAttribute(Attribute.ATTRIBUTE_TYPE.ROOT_NODE);
+            return att != null;
         }
 
         private boolean hasXmlHeader() {
@@ -145,6 +167,7 @@ public class XmlAttributeManager {
             XML_DECLARE,
             XML_VERSION,
             XML_ENCODING,
+            ROOT_NODE,
             ATTRIBUTE
         }
 
@@ -165,6 +188,8 @@ public class XmlAttributeManager {
                 return ATTRIBUTE_TYPE.XML_VERSION;
             } else if (in.equalsIgnoreCase("$xmlEncoding")) {
                 return ATTRIBUTE_TYPE.XML_ENCODING;
+            } else if (in.equalsIgnoreCase("$rootNode")) {
+                return ATTRIBUTE_TYPE.ROOT_NODE;
             } else {
                 return ATTRIBUTE_TYPE.ATTRIBUTE;
             }

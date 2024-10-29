@@ -2,8 +2,8 @@ package com.networknt.rule.soap;
 
 import com.networknt.rule.RequestTransformAction;
 import com.networknt.rule.RuleActionValue;
-import com.networknt.rule.RuleConstants;
 import com.networknt.rule.soap.exception.InvalidJsonBodyException;
+import com.networknt.utility.MapUtil;
 import com.networknt.utility.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Transform a request body from the JSON to XML in order to access SOAP API from rest client. This can be used in
@@ -60,19 +61,23 @@ public class Rest2SoapRequestTransformAction implements RequestTransformAction {
         }
 
         Map<String, String> headerMap = (Map<String, String>)objMap.get("requestHeaders");
-        String contentType = headerMap.get("Content-Type");
+        Optional<String> contentOptional = MapUtil.getValueIgnoreCase(headerMap, Constants.CONTENT_TYPE);
+        if(contentOptional.isPresent()) {
+            String contentType = contentOptional.get();
 
-        if(logger.isTraceEnabled())
-            logger.trace("header contentType = " + contentType);
-
-        if(contentType != null && contentType.startsWith("application/json")) {
-            // transform the content type header.
-            RequestTransformAction.super.updateRequestHeader(resultMap, "Content-Type", "text/xml");
             if(logger.isTraceEnabled())
-                logger.trace("request contentType has been changed from application/json to text/xml");
-        } else {
-            throw new InvalidJsonBodyException("Missing Content-Type header application/json in request");
-        }
+                logger.trace("header contentType = {}", contentType);
 
+            if(contentType.startsWith("application/json")) {
+                // transform the content type header.
+                RequestTransformAction.super.updateRequestHeader(resultMap, "Content-Type", "text/xml");
+                if(logger.isTraceEnabled())
+                    logger.trace("request contentType has been changed from application/json to text/xml");
+            } else {
+                throw new InvalidJsonBodyException("Missing Content-Type header application/json in request");
+            }
+        } else {
+            if(logger.isDebugEnabled()) logger.debug("header Content-Type doesn't exist.");
+        }
     }
 }

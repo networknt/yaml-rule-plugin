@@ -1,17 +1,24 @@
 package com.networknt.rule.soap.transformer;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.networknt.rule.soap.Constants;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.*;
 
 public class EncodeTransformer extends Transformer {
+    private static final int NODE_INDEX = 0;
+    private static final int ENCODE_INDEX = 1;
+    private static final int FORMAT_INDEX = 2;
     Map<String, EncodeInfo> encodeInfo;
     public EncodeTransformer(LinkedHashMap<String, Object> baseMap, String encodeRaw) {
         super(baseMap);
@@ -21,12 +28,13 @@ public class EncodeTransformer extends Transformer {
 
     private static Map<String, EncodeInfo> parseEncodeRuleString(String in) {
         Map<String, EncodeInfo> encodeMap = new HashMap<>();
-        List<String> split = List.of(in.split(","));
+        List<String> split = List.of(in.split(Constants.PROPERTY_SEPARATOR));
+
         for (String splitStr : split) {
             String[] pair = splitStr.split(Constants.ATTRIBUTE_SEPARATOR);
-            String nodeKey = pair[0];
-            String encodeType = pair[1];
-            String dataFormat = pair[2];
+            String nodeKey = pair[NODE_INDEX].toLowerCase();
+            String encodeType = pair[ENCODE_INDEX];
+            String dataFormat = pair[FORMAT_INDEX];
             encodeMap.put(nodeKey, new EncodeInfo(encodeType, dataFormat));
         }
         return encodeMap;
@@ -64,8 +72,9 @@ public class EncodeTransformer extends Transformer {
             if (pojoMap_currentValue instanceof LinkedHashMap) {
                 this.encodeSubStruct((LinkedHashMap<String, Object>) pojoMap_currentValue, (LinkedHashMap<String, Object>) newMap_currentValue);
                 newMap.remove(pojoMap_currentKey);
+
                 if (this.isEncodingRequired(pojoMap_currentKey)) {
-                    String newVal = this.getEncodedValue(pojoMap_currentKey, newMap_currentValue);
+                    Object newVal = this.getEncodedValue(pojoMap_currentKey, newMap_currentValue);
                     newMap.put(pojoMap_currentKey, newVal);
                 } else {
                     newMap.put(pojoMap_currentKey, newMap_currentValue);
@@ -77,16 +86,16 @@ public class EncodeTransformer extends Transformer {
         }
     }
 
-    private String getEncodedValue(String key, Object val) {
+    private Object getEncodedValue(String key, Object val) {
         try {
-            return this.encodeInfo.get(key).encode(val);
+            return this.encodeInfo.get(key.toLowerCase()).applyEncode(val);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
     private boolean isEncodingRequired(String key) {
-        return this.encodeInfo.containsKey(key);
+        return this.encodeInfo.containsKey(key.toLowerCase());
     }
 
     @Override
@@ -103,6 +112,7 @@ public class EncodeTransformer extends Transformer {
             HTML,
             URL,
             UNICODE,
+            ACCENT_STRIP,
             BASE64,
             HEX,
             ASCII,
@@ -140,55 +150,92 @@ public class EncodeTransformer extends Transformer {
             }
         }
 
-        private String encode(Object val) throws JsonProcessingException {
-            String returnString;
+        private Object applyEncode(Object val) throws JsonProcessingException {
+            Object returnObj;
             switch (this.dataFormat) {
                 case XML:
                     Transformer.XML_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, false);
                     ObjectNode xmlNode = (ObjectNode) Transformer.XML_MAPPER.convertValue(val, JsonNode.class);
-                    returnString = Transformer.XML_MAPPER.writeValueAsString(xmlNode);
+                    returnObj = Transformer.XML_MAPPER.writeValueAsString(xmlNode);
                     Transformer.XML_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
                     break;
                 case JSON:
                     Transformer.JSON_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, false);
                     ObjectNode jsonNode = (ObjectNode) Transformer.JSON_MAPPER.convertValue(val, JsonNode.class);
-                    returnString = Transformer.JSON_MAPPER.writeValueAsString(jsonNode);
+                    returnObj = Transformer.JSON_MAPPER.writeValueAsString(jsonNode);
                     Transformer.JSON_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
                     break;
                 case YAML:
-                    // TODO
+                    Transformer.YAML_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, false);
+                    ObjectNode yamlNode = (ObjectNode) Transformer.YAML_MAPPER.convertValue(val, JsonNode.class);
+                    returnObj = Transformer.YAML_MAPPER.writeValueAsString(yamlNode);
+                    Transformer.YAML_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
+                    break;
                 case NONE:
-                    // TODO
+                    Map<String, Object> noneNode = Transformer.JSON_MAPPER.convertValue(val, new TypeReference<Map<String, Object>>() {
+                    });
+                    return encodeObject(noneNode);
                 default:
                     return null;
             }
-            return this.encode(returnString);
+            return this.encodeString((String)returnObj);
         }
 
-        private String encode(String in) {
-            String returnString = in;
-            switch (this.encodeType) {
-                case HTML:
-                    returnString = StringEscapeUtils.escapeHtml4(returnString);
-                    break;
-                case BASE64:
-                    returnString = Base64.getEncoder().encodeToString(returnString.getBytes(StandardCharsets.UTF_8));
-                    break;
-                case HEX:
-                    returnString = String.valueOf(Hex.encodeHex(returnString.getBytes(StandardCharsets.UTF_8)));
-                    break;
-                case URL:
-                    // TODO
-                case UNICODE:
-                    // TODO
-                case ASCII:
-                    // TODO
-                case NONE:
-                    // TODO
-                default:
-                    return null;
+        @SuppressWarnings("unchecked")
+        private Object encodeObject(Map<String, Object> map) {
+            for(var entry: map.entrySet()) {
+                if(entry.getValue() instanceof String)
+                    entry.setValue(this.encodeString((String)entry.getValue()));
+                else if (entry.getValue() instanceof Map)
+                    entry.setValue(encodeObject((Map<String, Object>)entry.getValue()));
+                else if (entry.getValue() instanceof List)
+                    entry.setValue(this.encodeArr((List<Object>)entry.getValue()));
             }
-            return returnString;
+            return map;
+        }
+
+        @SuppressWarnings("unchecked")
+        private Object encodeArr(List<Object> list) {
+            for(int x = 0; x < list.size(); x++) {
+                if(list.get(x) instanceof String)
+                    list.set(x, this.encodeString((String) list.get(x)));
+                else if (list.get(x) instanceof Map)
+                    list.set(x, encodeObject((Map<String, Object>)list.get(x)));
+                else if (list.get(x) instanceof List)
+                    list.set(x, encodeArr((List<Object>)list.get(x)));
+            }
+            return list;
+        }
+
+        private String encodeString(String in) {
+            switch (this.encodeType) {
+                /* html encodes string */
+                case HTML:
+                    in = StringEscapeUtils.escapeHtml4(in);
+                    break;
+                /* converts string into base64 */
+                case BASE64:
+                    in = Base64.getEncoder().encodeToString(in.getBytes(StandardCharsets.UTF_8));
+                    break;
+                /* converts array of byte characters into hex codes */
+                case HEX:
+                    in = String.valueOf(Hex.encodeHex(in.getBytes(StandardCharsets.UTF_8)));
+                    break;
+                /* java standard url encoder translates string into application/x-www-urlencoded format */
+                case URL:
+                    in = URLEncoder.encode(in, StandardCharsets.UTF_8);
+                    break;
+                /* apache common strip accent replaces accented characters to non-accented equivalent */
+                case ACCENT_STRIP:
+                    in = StringUtils.stripAccents(in);
+                    break;
+                case UNICODE:
+                case ASCII:
+                case NONE:
+                default:
+                    return in;
+            }
+            return in;
         }
     }
 }

@@ -2,6 +2,7 @@ package com.networknt.rule.soap;
 
 import com.networknt.rule.*;
 import com.networknt.rule.soap.exception.InvalidJsonBodyException;
+import com.networknt.utility.MapUtil;
 import com.networknt.utility.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Transform a response body from the JSON to XML in order to access JSON API from soap client. This can be used in
@@ -61,19 +63,23 @@ public class Rest2SoapResponseTransformAction implements ResponseTransformAction
 
         // transform the content type header.
         Map<String, String> headerMap = (Map<String, String>)objMap.get("responseHeaders");
-        String contentType = headerMap.get("Content-Type");
+        Optional<String> contentTypeOptional = MapUtil.getValueIgnoreCase(headerMap, Constants.CONTENT_TYPE);
+        if(contentTypeOptional.isPresent()) {
+            String contentType = contentTypeOptional.get();
 
-        if(logger.isTraceEnabled())
-            logger.trace("header contentType = " + contentType);
-
-        if(contentType != null && contentType.startsWith("application/json")) {
-            // transform the content type header.
-            ResponseTransformAction.super.updateResponseHeader(resultMap, "Content-Type", "text/xml");
             if(logger.isTraceEnabled())
-                logger.trace("response contentType has been changed from application/json to text/xml");
+                logger.trace("header contentType = {}", contentType);
+
+            if(contentType.startsWith("application/json")) {
+                // transform the content type header.
+                ResponseTransformAction.super.updateResponseHeader(resultMap, "Content-Type", "text/xml");
+                if(logger.isTraceEnabled())
+                    logger.trace("response contentType has been changed from application/json to text/xml");
+            } else {
+                throw new InvalidJsonBodyException("Missing Content-Type header application/json in response");
+            }
         } else {
-            throw new InvalidJsonBodyException("Missing Content-Type header application/json in response");
+            if(logger.isDebugEnabled()) logger.debug("header Content-Type doesn't exist.");
         }
     }
-
 }

@@ -17,7 +17,7 @@ public final class TransformChain {
     Transformer h, t, f = null;
 
     private TransformChain() {
-       // only create transform managers through static builder.
+       // only create transform chains through static builder.
     }
 
     /**
