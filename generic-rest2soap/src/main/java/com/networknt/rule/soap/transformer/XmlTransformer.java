@@ -23,14 +23,14 @@ public class XmlTransformer extends Transformer {
     private final static String XML_DECLARE_END = "?>\n";
     private final static String XML_DECLARE_VERSION = "version=";
     private final static String XML_DECLARE_ENCODING = "encoding=";
-    private final XmlAttributeManager xmlAttributeManager;
+    private final TransformerAttributeManager attributeManager;
     private boolean addXmlDeclare = false;
     private String xmlVersion = XML_VERSION_DEFAULT;
     private String xmlEncoding = XML_ENCODING_DEFAULT;
 
     public XmlTransformer(LinkedHashMap<String, Object> baseMap, String rawAttrString) {
         super(baseMap);
-        this.xmlAttributeManager = new XmlAttributeManager(rawAttrString);
+        this.attributeManager = new TransformerAttributeManager(rawAttrString);
         this.finalizedObjectRequired = true;
     }
 
@@ -41,8 +41,8 @@ public class XmlTransformer extends Transformer {
     @Override
     @SuppressWarnings("unchecked")
     public void init() {
-        this.addXmlDeclare = this.xmlAttributeManager.hasXmlDeclare();
-        if (!this.xmlAttributeManager.hasXmlHeader()) {
+        this.addXmlDeclare = this.attributeManager.hasXmlDeclare();
+        if (!this.attributeManager.hasXmlHeader()) {
            LinkedHashMap<String, Object> map = ((LinkedHashMap<String, Object>) this.base.get(Constants.SOAP_ENVELOPE));
            if (map != null) {
                map.remove(Constants.SOAP_HEADER);
@@ -136,8 +136,7 @@ public class XmlTransformer extends Transformer {
             Object copyMap_currentValue = newMap.get(pojoMap_currentKey);
             Object pojoMap_currentValue = member.getValue();
 
-            XmlAttributeManager.AttributeInfo attributes = this.getAttributesFromField(pojoMap_currentKey);
-            //String formattedKey = pojoMap_currentKey.substring(0, 1).toUpperCase() + pojoMap_currentKey.substring(1);
+            TransformerAttributeManager.AttributeInfo attributes = this.getAttributesFromField(pojoMap_currentKey);
 
             /* recursively parse sub elements if the value is of type map. */
             if (pojoMap_currentValue instanceof LinkedHashMap) {
@@ -158,7 +157,7 @@ public class XmlTransformer extends Transformer {
     }
 
     private String checkPrefix(String field) {
-        return this.xmlAttributeManager.getPrefix(field);
+        return this.attributeManager.getPrefix(field);
     }
 
     /**
@@ -167,15 +166,19 @@ public class XmlTransformer extends Transformer {
      * @param k - current key that contains all attributes.
      * @return - returns a Map of attributes (name & value)
      */
-    private XmlAttributeManager.AttributeInfo getAttributesFromField(String k) {
-        return this.xmlAttributeManager.getInfo(k);
+    private TransformerAttributeManager.AttributeInfo getAttributesFromField(String k) {
+        return this.attributeManager.getInfo(k);
     }
 
-    private SoapSerializable wrap(LinkedHashMap<String, Object> bMap, XmlAttributeManager.AttributeInfo attributes) {
+    private SoapSerializable wrap(LinkedHashMap<String, Object> bMap, TransformerAttributeManager.AttributeInfo attributes) {
         SoapSerializable soapSerializable = new SoapSerializable();
         soapSerializable.setBaseMap(bMap);
         soapSerializable.setAttributes(attributes);
         return soapSerializable;
+    }
+
+    public static LinkedHashMap<String, Object> createBasicSoapHeader(Object header) {
+        return createBasicSoapBody(null, header);
     }
 
     public static LinkedHashMap<String, Object> createBasicSoapBody(Object body) {

@@ -1,6 +1,6 @@
 package com.networknt.rule.soap;
 
-import com.networknt.rule.soap.transformer.XmlAttributeManager;
+import com.networknt.rule.soap.transformer.TransformerAttributeManager;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializable;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class SoapSerializable implements JsonSerializable {
 
     private LinkedHashMap<String, Object> baseMap;
-    private XmlAttributeManager.AttributeInfo attributes;
+    private TransformerAttributeManager.AttributeInfo attributes;
 
     @Override
     public void serialize(JsonGenerator gen, SerializerProvider serializers) throws IOException {
@@ -38,7 +38,7 @@ public class SoapSerializable implements JsonSerializable {
      */
     private void writeAttributes(ToXmlGenerator toXmlGenerator) throws IOException {
         if (this.attributes != null) {
-            for(XmlAttributeManager.Attribute a : this.attributes.getAttributeList()) {
+            for(TransformerAttributeManager.Attribute a : this.attributes.getAttributeList()) {
                 switch (a.getAttributeType()) {
                     case ATTRIBUTE:
                         toXmlGenerator.setNextIsAttribute(true);
@@ -78,7 +78,7 @@ public class SoapSerializable implements JsonSerializable {
         this.baseMap = baseMap;
     }
 
-    public void setAttributes(XmlAttributeManager.AttributeInfo attributes) {
+    public void setAttributes(TransformerAttributeManager.AttributeInfo attributes) {
         this.attributes = attributes;
     }
 }

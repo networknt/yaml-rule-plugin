@@ -101,6 +101,8 @@ public abstract class Transformer {
            return new EncodeTransformer(baseMap, actionValue.getValue());
        } else if (tid.equalsIgnoreCase(JsonTransformer.getId())) {
            return new JsonTransformer(baseMap, actionValue.getValue());
+       } else if (tid.equalsIgnoreCase(StringTransformer.getId())) {
+           return new StringTransformer(baseMap, actionValue.getValue());
        } else {
            return null;
        }
