@@ -75,7 +75,7 @@
         <version.encoder>1.2.1</version.encoder>
         <version.logback>1.5.16</version.logback>
         <version.junit>4.13.1</version.junit>
-        <version.yaml-rule>2.0.0</version.yaml-rule>
+        <version.yaml-rule>2.0.1</version.yaml-rule>
         <version.snakeyaml>2.3</version.snakeyaml>
         <version.commons-codec>1.15</version.commons-codec>
         <version.commons-text>1.10.0</version.commons-text>
