@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.1.6 - 2024-09-25
+
+### Added
+- fixes #125 upgrade to yaml-rule 2.0.1
+
 ## 1.1.4 - 2024-09-25
 
 ### Added
