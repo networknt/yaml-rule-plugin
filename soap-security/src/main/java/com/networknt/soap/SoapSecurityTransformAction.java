@@ -51,12 +51,13 @@ public class SoapSecurityTransformAction implements RequestTransformAction {
     }
 
     @Override
-    public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
+    public void performAction(String ruleId, String actionId, Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         // get the body from the objMap and create a new body in the resultMap. Both in string format.
         String requestBody = (String)objMap.get("requestBody");
         String username = (String)config.get(USERNAME);
         String password = (String)config.get(PASSWORD);
-        if(logger.isTraceEnabled()) logger.debug("username = " + username + " password = " + password + " original request body = " + requestBody);
+        if(logger.isTraceEnabled())
+            logger.debug("ruleId = {}, actionId = {} username = {} password = {} original request body = {}", ruleId, actionId, username, password, requestBody);
         String modifiedBody = transform(requestBody, username, password);
         if(logger.isTraceEnabled()) logger.trace("transformed request body = {}", modifiedBody);
         resultMap.put("requestBody", modifiedBody);
@@ -70,7 +71,7 @@ public class SoapSecurityTransformAction implements RequestTransformAction {
 
     private String generateSecurity(String username, String password) {
         String nonce = generateNonce();
-        if(logger.isTraceEnabled()) logger.trace("Nonce = " + nonce);
+        if(logger.isTraceEnabled()) logger.trace("Nonce = {}", nonce);
         System.out.println("Nonce = " + nonce);
 
         // created date/time in UTC format
@@ -78,11 +79,11 @@ public class SoapSecurityTransformAction implements RequestTransformAction {
         dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date today = Calendar.getInstance().getTime();
         String created = dateFormatter.format(today);
-        if(logger.isTraceEnabled()) logger.trace("Created = " + created);
+        if(logger.isTraceEnabled()) logger.trace("Created = {}", created);
 
         // generate the password digest from the nonce + created + fixed password
         String passwordDigest = createPasswordDigest(nonce, created, password);
-        if(logger.isTraceEnabled()) logger.trace("Password Digest = " + passwordDigest);
+        if(logger.isTraceEnabled()) logger.trace("Password Digest = {}", passwordDigest);
 
         // SOAP header security section.
         String security =

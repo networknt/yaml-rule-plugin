@@ -52,9 +52,9 @@ public class TealiumTokenRequestTransformAction implements IAction {
     }
 
     @Override
-    public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
+    public void performAction(String ruleId, String actionId, Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         String requestPath = (String)objMap.get("requestPath");
-        if(logger.isTraceEnabled()) logger.trace("requestPath = " + requestPath);
+        if(logger.isTraceEnabled()) logger.trace("ruleId: {} actionId: {} requestPath = {}", ruleId, actionId);
 
         for(PathPrefixAuth pathPrefixAuth: config.getPathPrefixAuths()) {
             if(requestPath.startsWith(pathPrefixAuth.getPathPrefix())) {

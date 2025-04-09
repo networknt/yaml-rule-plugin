@@ -15,7 +15,7 @@ public class RequestBodyUtf8EncodingTransformActionTest {
         objMap.put("requestBody", originalBody);
         RequestBodyUtf8EncodingTransformAction action = new RequestBodyUtf8EncodingTransformAction();
         Map<String, Object> resultMap = new HashMap<>();
-        action.performAction(objMap, resultMap, null);
+        action.performAction("ruleId", "actionId", objMap, resultMap, null);
         String updatedBody = (String) resultMap.get("requestBody");
         Assert.assertEquals(expectedBody, updatedBody);
     }
@@ -28,7 +28,7 @@ public class RequestBodyUtf8EncodingTransformActionTest {
         objMap.put("requestBody", originalBody);
         RequestBodyUtf8EncodingTransformAction action = new RequestBodyUtf8EncodingTransformAction();
         Map<String, Object> resultMap = new HashMap<>();
-        action.performAction(objMap, resultMap, null);
+        action.performAction("ruleId", "actionId", objMap, resultMap, null);
         String updatedBody = (String) resultMap.get("requestBody");
         Assert.assertEquals(expectedBody, updatedBody);
     }

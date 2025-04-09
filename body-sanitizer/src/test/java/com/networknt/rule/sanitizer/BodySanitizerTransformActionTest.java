@@ -13,7 +13,7 @@ public class BodySanitizerTransformActionTest {
         objMap.put("requestBody", json);
         BodySanitizerTransformAction action = new BodySanitizerTransformAction();
         Map<String, Object> resultMap = new HashMap<>();
-        action.performAction(objMap, resultMap, null);
+        action.performAction("ruleId", "actionId", objMap, resultMap, null);
         System.out.println(resultMap);
     }
 
@@ -25,7 +25,7 @@ public class BodySanitizerTransformActionTest {
         objMap.put("requestBody", json);
         BodySanitizerTransformAction action = new BodySanitizerTransformAction();
         Map<String, Object> resultMap = new HashMap<>();
-        action.performAction(objMap, resultMap, null);
+        action.performAction("ruleId", "actionId", objMap, resultMap, null);
         System.out.println(resultMap);
     }
 }

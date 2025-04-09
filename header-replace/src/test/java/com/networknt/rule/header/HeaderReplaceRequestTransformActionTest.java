@@ -39,7 +39,7 @@ public class HeaderReplaceRequestTransformActionTest {
         ruleActionValue3.setValue("true");
         actionValues.add(ruleActionValue3);
 
-        action.performAction(objMap, resultMap, actionValues);
+        action.performAction("ruleId", "actionId", objMap, resultMap, actionValues);
 
         Assert.assertNotNull(resultMap);
         Map<String, Object> requestHeaders = (Map)resultMap.get("requestHeaders");
@@ -81,7 +81,7 @@ public class HeaderReplaceRequestTransformActionTest {
         ruleActionValue2.setValue("newToken");
         actionValues.add(ruleActionValue2);
 
-        action.performAction(objMap, resultMap, actionValues);
+        action.performAction("ruleId", "actionId", objMap, resultMap, actionValues);
 
         Assert.assertNotNull(resultMap);
         Map<String, Object> requestHeaders = (Map)resultMap.get("requestHeaders");
@@ -119,7 +119,7 @@ public class HeaderReplaceRequestTransformActionTest {
         ruleActionValue2.setValue("CRYPT:94069ad2905ea7a0a62bfdb0b7d1c590:c21c5c0980fc12c01a99fbc29ea40b2f");
         actionValues.add(ruleActionValue2);
 
-        action.performAction(objMap, resultMap, actionValues);
+        action.performAction("ruleId", "actionId", objMap, resultMap, actionValues);
 
         Assert.assertNotNull(resultMap);
         Map<String, Object> requestHeaders = (Map)resultMap.get("requestHeaders");

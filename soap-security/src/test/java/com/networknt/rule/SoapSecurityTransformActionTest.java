@@ -14,7 +14,7 @@ public class SoapSecurityTransformActionTest {
         objMap.put("requestBody", xml);
         SoapSecurityTransformAction action = new SoapSecurityTransformAction();
         Map<String, Object> resultMap = new HashMap<>();
-        action.performAction(objMap, resultMap, null);
+        action.performAction("ruleId", "actionId", objMap, resultMap, null);
         System.out.println(resultMap);
     }
 
@@ -25,7 +25,7 @@ public class SoapSecurityTransformActionTest {
         objMap.put("requestBody", xml);
         SoapSecurityTransformAction action = new SoapSecurityTransformAction();
         Map<String, Object> resultMap = new HashMap<>();
-        action.performAction(objMap, resultMap, null);
+        action.performAction("ruleId", "actionId", objMap, resultMap, null);
         System.out.println(resultMap);
     }
 
@@ -50,7 +50,7 @@ public class SoapSecurityTransformActionTest {
         objMap.put("requestBody", xml);
         SoapSecurityTransformAction action = new SoapSecurityTransformAction();
         Map<String, Object> resultMap = new HashMap<>();
-        action.performAction(objMap, resultMap, null);
+        action.performAction("ruleId", "actionId", objMap, resultMap, null);
         System.out.println(resultMap);
     }
 

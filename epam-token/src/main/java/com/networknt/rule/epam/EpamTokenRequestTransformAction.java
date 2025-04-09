@@ -52,18 +52,19 @@ public class EpamTokenRequestTransformAction implements RequestTransformAction {
     }
 
     @Override
-    public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
+    public void performAction(String ruleId, String actionId, Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         String requestPath = (String)objMap.get("requestPath");
-        if(logger.isTraceEnabled()) logger.trace("requestPath = " + requestPath);
+        if(logger.isTraceEnabled()) logger.trace("ruleId = {} actionId = {} requestPath = {}", ruleId, actionId, requestPath);
 
 
         for(PathPrefixAuth pathPrefixAuth: config.getPathPrefixAuths()) {
             if(requestPath.startsWith(pathPrefixAuth.getPathPrefix())) {
-                if(logger.isTraceEnabled()) logger.trace("found with requestPath = " + requestPath + " prefix = " + pathPrefixAuth.getPathPrefix());
+                if(logger.isTraceEnabled())
+                    logger.trace("found with requestPath = {} prefix = {}", requestPath, pathPrefixAuth.getPathPrefix());
                 if(System.currentTimeMillis() >= pathPrefixAuth.getExpiration()) {
                     if(logger.isTraceEnabled()) logger.trace("Cached token {} is expired with current time {} and expired time {}", pathPrefixAuth.getAccessToken() != null ? pathPrefixAuth.getAccessToken().substring(0, 20) : null, System.currentTimeMillis(), pathPrefixAuth.getExpiration());
                     String requestBody = (String)objMap.get("requestBody");
-                    if(logger.isTraceEnabled()) logger.trace("requestBody = " + requestBody);
+                    if(logger.isTraceEnabled()) logger.trace("requestBody = {}", requestBody);
                     TokenResponse tokenResponse = getAccessToken(pathPrefixAuth.getTokenUrl(), requestBody);
                     if(tokenResponse != null) {
                         pathPrefixAuth.setExpiration(System.currentTimeMillis() + tokenResponse.getExpiresIn() * 1000 - 60000);
@@ -97,7 +98,7 @@ public class EpamTokenRequestTransformAction implements RequestTransformAction {
 
     private TokenResponse getAccessToken(String serverUrl, String requestBody) {
         String certFileName = config.getCertFilename(); // PKCS12 format
-        if(logger.isTraceEnabled()) logger.trace("certFileName = " + certFileName + " serverUrl = " + serverUrl);
+        if(logger.isTraceEnabled()) logger.trace("certFileName = {} serverUrl = {}", certFileName, serverUrl);
         String certPassword = config.getCertPassword();
         TokenResponse tokenResponse = null;
         if(client == null) {
@@ -115,7 +116,8 @@ public class EpamTokenRequestTransformAction implements RequestTransformAction {
                         .connectTimeout(Duration.ofMillis(ClientConfig.get().getTimeout()))
                         .sslContext(sslContext);
                 if(config.getProxyHost() != null) {
-                    if(logger.isTraceEnabled()) logger.trace("use proxy " + config.getProxyHost() + ":" + config.getProxyPort());
+                    if(logger.isTraceEnabled())
+                        logger.trace("use proxy {}:{}", config.getProxyHost(), config.getProxyPort());
                     clientBuilder.proxy(ProxySelector.of(new InetSocketAddress(config.getProxyHost(), config.getProxyPort() == 0 ? 443 : config.getProxyPort())));
                 }
                 if(config.isEnableHttp2()) {
@@ -154,21 +156,21 @@ public class EpamTokenRequestTransformAction implements RequestTransformAction {
             HttpResponse<?> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if(response.statusCode() == 200) {
                 // construct a token response and return it.
-                if(logger.isTraceEnabled()) logger.trace("response body " + response.body().toString());
+                if(logger.isTraceEnabled()) logger.trace("response body {}", response.body().toString());
                 Map<String, Object> map = JsonMapper.string2Map(response.body().toString());
                 if(map != null) {
                     tokenResponse = new TokenResponse();
                     tokenResponse.setAccessToken((String)map.get("access_token"));
                     tokenResponse.setTokenType((String)map.get("token_type"));
                     tokenResponse.setExpiresIn((Integer)map.get("expires_in"));
-                    if(logger.isTraceEnabled()) logger.trace("tokenResponse = " + tokenResponse.toString());
+                    if(logger.isTraceEnabled()) logger.trace("tokenResponse = {}", tokenResponse.toString());
                     return tokenResponse;
                 } else {
-                    logger.error("response body cannot be parsed as a JSON " + response.body());
+                    logger.error("response body cannot be parsed as a JSON {}", response.body());
                     return null;
                 }
             } else {
-                logger.error("Error in getting the token with status code " + response.statusCode() + " and body " + response.body().toString());
+                logger.error("Error in getting the token with status code {} and body {}", response.statusCode(), response.body().toString());
                 return null;
             }
         } catch (Exception e) {

@@ -61,7 +61,7 @@ public class TokenTransformerActionTest {
         actionValues.add(tokenSchemaActionValue);
 
         final var resultMap = new HashMap<String, Object>();
-        action.performAction(new HashMap<>(), resultMap, actionValues);
+        action.performAction("ruleId", "actionId", new HashMap<>(), resultMap, actionValues);
 
         final var requestHeaderMap = (Map<String, Object>)resultMap.get("requestHeaders");
         Assert.assertNotNull(requestHeaderMap);
@@ -87,7 +87,7 @@ public class TokenTransformerActionTest {
 
         final var resultMap = new HashMap<String, Object>();
 
-        action.performAction(new HashMap<>(), resultMap, actionValues);
+        action.performAction("ruleId", "actionId", new HashMap<>(), resultMap, actionValues);
         Assert.assertEquals("Request failed trying to send a request to: https://fake.token.com/services/oauth2/token", resultMap.get(Constants.ERROR_MESSAGE));
     }
 
@@ -111,7 +111,7 @@ public class TokenTransformerActionTest {
             } catch (InterruptedException | BrokenBarrierException e) {
                 throw new RuntimeException(e);
             }
-            action.performAction(new HashMap<>(), resultMap1, actionValues);
+            action.performAction("ruleId", "actionId", new HashMap<>(), resultMap1, actionValues);
         });
         final var resultMap2 = new HashMap<String, Object>();
         final var t2 = new Thread(() -> {
@@ -121,7 +121,7 @@ public class TokenTransformerActionTest {
                 throw new RuntimeException(e);
             }
 
-            action.performAction(new HashMap<>(), resultMap2, actionValues);
+            action.performAction("ruleId", "actionId", new HashMap<>(), resultMap2, actionValues);
         });
 
         /* prep-threads */

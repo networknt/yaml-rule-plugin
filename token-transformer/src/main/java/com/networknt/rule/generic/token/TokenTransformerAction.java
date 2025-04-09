@@ -56,9 +56,9 @@ public class TokenTransformerAction implements RequestTransformAction {
     }
 
     @Override
-    public void performAction(final Map<String, Object> objMap, final Map<String, Object> resultMap, final Collection<RuleActionValue> actionValues) {
+    public void performAction(String ruleId, String actionId, final Map<String, Object> objMap, final Map<String, Object> resultMap, final Collection<RuleActionValue> actionValues) {
 
-        LOG.trace("TokenTransformer plugin starts.");
+        LOG.trace("TokenTransformer plugin starts with ruleId: {} actionId: {}.", ruleId, actionId);
 
         for (final var actionValue : actionValues) {
 

@@ -35,10 +35,10 @@ public class BodySanitizerTransformAction implements RequestTransformAction {
                 null);
     }
     @Override
-    public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
+    public void performAction(String ruleId, String actionId, Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         // get the body from the objMap and create a new body in the resultMap. Both in string format.
         String requestBody = (String)objMap.get("requestBody");
-        if(logger.isTraceEnabled()) logger.debug("original request body = " + requestBody);
+        if(logger.isTraceEnabled()) logger.debug("ruleId: {} actionId: {}original request body: ", ruleId, actionId, requestBody);
         // convert the body from string to json map or list.
         try {
             Object body = Config.getInstance().getMapper().readValue(requestBody, Object.class);
@@ -57,7 +57,7 @@ public class BodySanitizerTransformAction implements RequestTransformAction {
         } catch (Exception e) {
             logger.error("Exception:", e);
         }
-        if(logger.isTraceEnabled()) logger.trace("encoded request body = " + requestBody);
+        if(logger.isTraceEnabled()) logger.trace("encoded request body = {}", requestBody);
         resultMap.put("requestBody", requestBody);
     }
 }

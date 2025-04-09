@@ -33,8 +33,8 @@ public class Rest2SoapRequestTransformAction implements RequestTransformAction {
     }
 
     @Override
-    public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
-        logger.info("actionValues: {}", actionValues);
+    public void performAction(String ruleId, String actionId, Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
+        logger.info("ruleId: {} actionId: {} actionValues: {}", ruleId, actionId, actionValues);
         if(actionValues == null || actionValues.isEmpty()) {
             logger.error("Rules.yml does not contain ActionValues section. Please fix config");
             return;

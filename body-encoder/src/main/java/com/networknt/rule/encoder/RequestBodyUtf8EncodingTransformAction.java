@@ -34,10 +34,10 @@ public class RequestBodyUtf8EncodingTransformAction implements RequestTransformA
     }
 
     @Override
-    public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
+    public void performAction(String ruleId, String actionId, Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         // get the body from the objMap and create a new body in the resultMap.
         String requestBody = (String)objMap.get(REQUEST_BODY);
-        if(logger.isTraceEnabled()) logger.trace("original requestBody = {}", requestBody);
+        if(logger.isTraceEnabled()) logger.trace("ruleId: {} actionId: {} original requestBody: {}", ruleId, actionId, requestBody);
         if(requestBody.startsWith("<?xml")) {
             requestBody = requestBody.replaceFirst("encoding=\"[^\"]*\"", "encoding=\"" + UTF8 + "\"");
         }

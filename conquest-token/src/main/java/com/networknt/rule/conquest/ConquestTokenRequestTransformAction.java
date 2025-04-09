@@ -62,12 +62,13 @@ public class ConquestTokenRequestTransformAction implements RequestTransformActi
     }
 
     @Override
-    public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
+    public void performAction(String ruleId, String actionId, Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         String requestPath = (String)objMap.get("requestPath");
-        if(logger.isTraceEnabled()) logger.trace("requestPath = " + requestPath);
+        if(logger.isTraceEnabled()) logger.trace("ruleId = {} actionId = {} requestPath = {}", ruleId, actionId, requestPath);
         for(PathPrefixAuth pathPrefixAuth: config.getPathPrefixAuths()) {
             if(requestPath.startsWith(pathPrefixAuth.getPathPrefix())) {
-                if(logger.isTraceEnabled()) logger.trace("found with requestPath = " + requestPath + " prefix = " + pathPrefixAuth.getPathPrefix());
+                if(logger.isTraceEnabled())
+                    logger.trace("found with requestPath = {} prefix = {}", requestPath, pathPrefixAuth.getPathPrefix());
                 if(System.currentTimeMillis() >= (pathPrefixAuth.getExpiration())) {
                     if(logger.isTraceEnabled()) logger.trace("Cached token {} is expired with current time {} and expired time {}", pathPrefixAuth.getAccessToken(), System.currentTimeMillis(), pathPrefixAuth.getExpiration());
                     // get a new access token.

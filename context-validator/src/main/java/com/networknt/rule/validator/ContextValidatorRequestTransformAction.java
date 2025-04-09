@@ -33,10 +33,10 @@ public class ContextValidatorRequestTransformAction implements RequestTransformA
     }
 
     @Override
-    public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
+    public void performAction(String ruleId, String actionId, Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         Map<String, String> headerMap = (Map<String, String>)objMap.get("requestHeaders");
         String contextValue  = headerMap.get("context");
-        if(logger.isTraceEnabled()) logger.trace("context request header is {}", contextValue);
+        if(logger.isTraceEnabled()) logger.trace("ruleId = {} actionId = {} context request header is {}", ruleId, actionId, contextValue);
         if(secretContext.equals(contextValue)) {
             // validation passed and don't return anything to the request transformer interceptor
             if(logger.isTraceEnabled()) logger.trace("Context validation is passed and rule result is false");
@@ -46,7 +46,7 @@ public class ContextValidatorRequestTransformAction implements RequestTransformA
             String errorMessage = "{\"error\":\"invalid context\"}";
             String contentType = "application/json";
             int statusCode = 401;
-            if(logger.isTraceEnabled()) logger.trace("Return values: errorMessage {} contentType {} statusCode", errorMessage, contentType, statusCode);
+            if(logger.isTraceEnabled()) logger.trace("Return values: errorMessage {} contentType {} statusCode {}", errorMessage, contentType, statusCode);
             resultMap.put("errorMessage", errorMessage);
             resultMap.put("contentType", contentType);
             resultMap.put("statusCode", statusCode);

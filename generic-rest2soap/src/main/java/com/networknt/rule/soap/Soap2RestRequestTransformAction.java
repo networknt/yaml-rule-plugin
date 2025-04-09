@@ -35,9 +35,9 @@ public class Soap2RestRequestTransformAction implements RequestTransformAction {
     }
 
     @Override
-    public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
+    public void performAction(String ruleId, String actionId, Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         // get the response body from the objMap and create a new response body in the resultMap. Both in string format.
-        logger.info("actionValues: {}", actionValues);
+        logger.info("ruleId: {} actionId: {} actionValues: {}", ruleId, actionId, actionValues);
         if(actionValues == null || actionValues.isEmpty()) {
             logger.error("Rules.yml does not contain ActionValues section. Please fix config");
             return;
@@ -49,7 +49,7 @@ public class Soap2RestRequestTransformAction implements RequestTransformAction {
         String body = (String) objMap.get("requestBody");
 
         if (logger.isTraceEnabled())
-            logger.trace("original request body = " + body);
+            logger.trace("original request body = {}", body);
 
         String output = "";
         try {

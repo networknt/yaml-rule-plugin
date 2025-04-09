@@ -35,10 +35,10 @@ public class ResponseBodyUtf8EncodingTransformAction implements ResponseTransfor
     }
 
     @Override
-    public void performAction(Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
+    public void performAction(String ruleId, String actionId, Map<String, Object> objMap, Map<String, Object> resultMap, Collection<RuleActionValue> actionValues) {
         // get the body from the objMap and create a new body in the resultMap. Both in string format.
         String responseBody = (String)objMap.get(RESPONSE_BODY);
-        if(logger.isTraceEnabled()) logger.debug("original response body = {}", responseBody);
+        if(logger.isTraceEnabled()) logger.debug("ruleId: {} actionId {} original response body = {}", ruleId, actionId, responseBody);
         // replace XML encoding declaration if it is for XML strings.
         if(responseBody.startsWith("<?xml")) {
             responseBody = responseBody.replaceFirst("encoding=\"[^\"]*\"", "encoding=\"" + UTF8 + "\"");
