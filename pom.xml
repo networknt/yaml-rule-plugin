@@ -89,7 +89,7 @@
         <version.maven-compiler>3.8.1</version.maven-compiler>
         <version.build-helper-maven>3.0.0</version.build-helper-maven>
         <version.lifecycle-mapping>1.0.0</version.lifecycle-mapping>
-        <version.maven-gpg>1.6</version.maven-gpg>
+        <version.maven-gpg>3.2.7</version.maven-gpg>
         <skipTests>false</skipTests>
         <matched.test.resources>**/*</matched.test.resources>
         <version.javadoc-packagelist-plugin>1.0.0</version.javadoc-packagelist-plugin>
