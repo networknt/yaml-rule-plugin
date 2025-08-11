@@ -218,4 +218,3 @@ public class Rest2SoapRequestTransformAction implements RequestTransformAction {
 * For header manipulation, the default methods from the `TransformAction` interface can be utilized. For instance, the plugin in the example calls `RequestTransformAction.super.updateRequestHeader` to change the `Content-Type` to `text/xml`.
 
 * Other request attributes can be updated within the plugin, and the relevant lists of attributes are available in the respective [request](https://github.com/networknt/light-4j/blob/master/request-transformer/src/main/java/com/networknt/reqtrans/RequestTransformerInterceptor.java#L178) and [response](https://github.com/networknt/light-4j/blob/master/response-transformer/src/main/java/com/networknt/restrans/ResponseTransformerInterceptor.java#L176) transformer interceptors.
-
