@@ -27,6 +27,7 @@
 
     <artifactId>body-sanitizer</artifactId>
     <packaging>jar</packaging>
+    <name>body-sanitizer</name>
     <description>A yaml rule action implementation to sanitize the request body in http-sidecar and light-gateway in the request transform interceptor.</description>
 
     <dependencies>

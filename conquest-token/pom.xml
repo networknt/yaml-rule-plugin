@@ -27,6 +27,7 @@
 
     <artifactId>conquest-token</artifactId>
     <packaging>jar</packaging>
+    <name>conquest-token</name>
     <description>A yaml rule action implementation to get the conquest authorization token and inject into the Authorization header for any external conquest API request.</description>
 
     <dependencies>

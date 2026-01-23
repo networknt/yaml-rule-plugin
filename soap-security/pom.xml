@@ -27,6 +27,7 @@
 
     <artifactId>soap-security</artifactId>
     <packaging>jar</packaging>
+    <name>soap-security</name>
     <description>A yaml rule action implementation to inject a soap security section on the light-gateway to access Cannex API in the request transform interceptor.</description>
 
     <dependencies>

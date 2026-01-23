@@ -13,6 +13,7 @@
 
     <artifactId>token-transformer</artifactId>
     <packaging>jar</packaging>
+    <name>token-transformer</name>
     <description>A generic token transformer plugin.</description>
 
     <dependencies>

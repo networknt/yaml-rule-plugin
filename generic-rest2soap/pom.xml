@@ -27,6 +27,7 @@
 
     <artifactId>generic-rest2soap</artifactId>
     <packaging>jar</packaging>
+    <name>generic-rest2soap</name>
     <description>A generic yaml rule action implementation to transform REST to SOAP in the request/response transform interceptor.</description>
 
     <dependencies>

@@ -27,6 +27,7 @@
 
     <artifactId>context-validator</artifactId>
     <packaging>jar</packaging>
+    <name>context-validator</name>
     <description>A yaml rule action implementation to validate the context against a constant string and return an error message to the caller if not matched..</description>
 
     <dependencies>

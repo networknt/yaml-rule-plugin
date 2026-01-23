@@ -27,6 +27,7 @@
 
     <artifactId>tealium-token</artifactId>
     <packaging>jar</packaging>
+    <name>tealium-token</name>
     <description>A yaml rule action implementation to get the tealium authorization token and inject into the Authorization header for any external Tealium API request.</description>
 
     <dependencies>

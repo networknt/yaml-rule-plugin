@@ -27,6 +27,7 @@
 
     <artifactId>header-replace</artifactId>
     <packaging>jar</packaging>
+    <name>header-replace</name>
     <description>A yaml rule action implementation to replace one header value with another header value in the request transformer.</description>
 
     <dependencies>

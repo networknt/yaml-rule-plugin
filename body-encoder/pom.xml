@@ -27,6 +27,7 @@
 
     <artifactId>body-encoder</artifactId>
     <packaging>jar</packaging>
+    <name>body-encoder</name>
     <description>A yaml rule action implementation to change the encoding from one to another for request body and response body.</description>
 
     <dependencies>

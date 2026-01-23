@@ -27,6 +27,7 @@
 
     <artifactId>epam-token</artifactId>
     <packaging>jar</packaging>
+    <name>epam-token</name>
     <description>A yaml rule action implementation to get the epam authorization token and inject into the Authorization header for any external epam API request.</description>
 
     <dependencies>
