@@ -10,6 +10,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.1.7 - 2026-01-23
+
+### Added
+
+### Changed
+- update http-client to 1.0.16
+- upgrade to java 21
+- upgrade maven-gpg to 3.2.7
+- update http-client to 1.0.14
+
+
 ## 1.1.6 - 2025-04-09
 
 ### Added
