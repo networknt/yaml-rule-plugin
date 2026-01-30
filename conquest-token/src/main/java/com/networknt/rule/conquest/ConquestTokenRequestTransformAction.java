@@ -10,7 +10,6 @@ import com.networknt.http.client.HttpClientRequest;
 import com.networknt.http.client.ssl.TLSConfig;
 import com.networknt.rule.RequestTransformAction;
 import com.networknt.rule.RuleActionValue;
-import com.networknt.utility.HashUtil;
 import com.networknt.server.ModuleRegistry;
 import com.networknt.utility.StringUtils;
 import com.networknt.utility.UuidUtil;
