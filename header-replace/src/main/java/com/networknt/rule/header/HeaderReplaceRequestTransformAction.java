@@ -4,7 +4,7 @@ package com.networknt.rule.header;
 import com.networknt.config.ConfigInjection;
 import com.networknt.rule.RequestTransformAction;
 import com.networknt.rule.RuleActionValue;
-import com.networknt.utility.ModuleRegistry;
+import com.networknt.server.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,11 +1,9 @@
 package com.networknt.soap;
 
-import com.networknt.rule.IAction;
 import com.networknt.rule.RequestTransformAction;
 import com.networknt.rule.RuleActionValue;
-import com.networknt.rule.RuleConstants;
 import com.networknt.config.Config;
-import com.networknt.utility.ModuleRegistry;
+import com.networknt.server.ModuleRegistry;
 import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

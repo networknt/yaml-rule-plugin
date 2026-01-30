@@ -9,8 +9,7 @@ import com.networknt.http.client.HttpClientRequest;
 import com.networknt.http.client.ssl.TLSConfig;
 import com.networknt.rule.IAction;
 import com.networknt.rule.RuleActionValue;
-import com.networknt.rule.RuleConstants;
-import com.networknt.utility.ModuleRegistry;
+import com.networknt.server.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
