@@ -10,11 +10,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.1.8 - 2026-01-30
+
+### Added
+
+### Changed
+- upgrade to light-4j 2.3.2-SNAPSHOT
+- update logback to 1.5.26
+
 ## 1.1.7 - 2026-01-23
 
 ### Added
 
 ### Changed
+- fixes #130 add project name to each sub repo
+- fixes #128 add maven publish plugin
+- fixes #127 update oss repos and upgrade jacoco to 0.8.12
 - update http-client to 1.0.16
 - upgrade to java 21
 - upgrade maven-gpg to 3.2.7
