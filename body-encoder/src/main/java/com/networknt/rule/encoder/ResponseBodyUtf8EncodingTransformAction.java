@@ -2,8 +2,7 @@ package com.networknt.rule.encoder;
 
 import com.networknt.rule.ResponseTransformAction;
 import com.networknt.rule.RuleActionValue;
-import com.networknt.rule.RuleConstants;
-import com.networknt.utility.ModuleRegistry;
+import com.networknt.server.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

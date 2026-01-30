@@ -10,10 +10,10 @@ import com.networknt.http.client.HttpClientRequest;
 import com.networknt.http.client.ssl.TLSConfig;
 import com.networknt.rule.RequestTransformAction;
 import com.networknt.rule.RuleActionValue;
-import com.networknt.rule.RuleConstants;
 import com.networknt.utility.HashUtil;
-import com.networknt.utility.ModuleRegistry;
+import com.networknt.server.ModuleRegistry;
 import com.networknt.utility.StringUtils;
+import com.networknt.utility.UuidUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +74,7 @@ public class ConquestTokenRequestTransformAction implements RequestTransformActi
                     // get a new access token.
                     String jwt = null;
                     try {
-                        jwt = createJwt(pathPrefixAuth.getCertFilename(), pathPrefixAuth.getCertPassword(), pathPrefixAuth.getAuthIssuer(), pathPrefixAuth.getAuthSubject(), pathPrefixAuth.getAuthAudience(), HashUtil.generateUUID(), pathPrefixAuth.getTokenTtl());
+                        jwt = createJwt(pathPrefixAuth.getCertFilename(), pathPrefixAuth.getCertPassword(), pathPrefixAuth.getAuthIssuer(), pathPrefixAuth.getAuthSubject(), pathPrefixAuth.getAuthAudience(), UuidUtil.uuidToBase64(UuidUtil.getUUID()), pathPrefixAuth.getTokenTtl());
                         if(logger.isTraceEnabled()) logger.trace("generated jwt = {}", jwt);
                     } catch (Exception e) {
                         logger.error("Exception", e);
