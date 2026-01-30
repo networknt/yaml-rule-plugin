@@ -1,7 +1,6 @@
 package com.networknt.rule.generic.token.schema.jwt;
 
 import com.networknt.rule.generic.token.schema.TtlUnit;
-import com.networknt.utility.HashUtil;
 import com.networknt.utility.UuidUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
