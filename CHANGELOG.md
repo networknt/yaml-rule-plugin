@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 ### Changed
-- upgrade to light-4j 2.3.2-SNAPSHOT
+- upgrade to http-client 1.0.17
+- upgrade to light-4j 2.3.2
 - update logback to 1.5.26
 
 ## 1.1.7 - 2026-01-23
