@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.1.10 - 2026-02-20
+
+### Added
+
+### Changed
+- upgrade to light-4j 2.3.3
+
+
 ## 1.1.9 - 2026-02-05
 
 ### Added
