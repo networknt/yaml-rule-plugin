@@ -1,8 +1,8 @@
 package com.networknt.rule.soap;
 
 import com.networknt.rule.RuleActionValue;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 import java.io.IOException;
@@ -66,7 +66,7 @@ public class SoapTransformTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	Assert.assertEquals(this.fixSystemIndents(expectedSoapResponse), this.fixSystemIndents(response));
+    	Assertions.assertEquals(this.fixSystemIndents(expectedSoapResponse), this.fixSystemIndents(response));
     }
 
 	@Test
@@ -108,7 +108,7 @@ public class SoapTransformTest {
 			throw new RuntimeException(e);
 		}
 
-		Assert.assertEquals(expected, request);
+		Assertions.assertEquals(expected, request);
 
 	}
 
@@ -144,7 +144,7 @@ public class SoapTransformTest {
 			throw new RuntimeException(e);
 		}
 
-		Assert.assertEquals(expected, request);
+		Assertions.assertEquals(expected, request);
 
 	}
 

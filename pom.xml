@@ -103,7 +103,7 @@
         <version.commons.codec>1.13</version.commons.codec>
         <version.encoder>1.2.1</version.encoder>
         <version.logback>1.5.26</version.logback>
-        <version.junit>4.13.2</version.junit>
+        <version.junit>5.11.4</version.junit>
         <version.yaml-rule>2.0.1</version.yaml-rule>
         <version.snakeyaml>2.4</version.snakeyaml>
         <version.commons-codec>1.18.0</version.commons-codec>
@@ -111,9 +111,9 @@
         <version.maven-version>2.7</version.maven-version>
         <version.nexus-staging-maven>1.7.0</version.nexus-staging-maven>
         <version.maven-source>3.0.1</version.maven-source>
-        <version.maven-surefire>2.19.1</version.maven-surefire>
+        <version.maven-surefire>3.5.2</version.maven-surefire>
         <version.maven-jar>3.1.2</version.maven-jar>
-        <version.maven-failsafe>2.22.0</version.maven-failsafe>
+        <version.maven-failsafe>3.5.2</version.maven-failsafe>
         <version.jacoco>0.8.12</version.jacoco>
         <version.maven-compiler>3.8.1</version.maven-compiler>
         <version.build-helper-maven>3.0.0</version.build-helper-maven>
@@ -313,8 +313,8 @@
 
             <!-- Test dependencies -->
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
                 <version>${version.junit}</version>
                 <scope>test</scope>
             </dependency>
@@ -413,13 +413,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${version.maven-surefire}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.surefire</groupId>
-                        <artifactId>surefire-junit47</artifactId>
-                        <version>${version.maven-surefire}</version>
-                    </dependency>
-                </dependencies>
+
                 <configuration>
                     <!-- Skips unit tests if the value of skipTests property is true -->
                     <skipTests>${skipTests}</skipTests>

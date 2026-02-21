@@ -1,9 +1,9 @@
 package com.networknt.rule.header;
 
 import com.networknt.rule.RuleActionValue;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,18 +41,18 @@ public class HeaderReplaceRequestTransformActionTest {
 
         action.performAction("ruleId", "actionId", objMap, resultMap, actionValues);
 
-        Assert.assertNotNull(resultMap);
+        Assertions.assertNotNull(resultMap);
         Map<String, Object> requestHeaders = (Map)resultMap.get("requestHeaders");
-        Assert.assertNotNull(requestHeaders);
+        Assertions.assertNotNull(requestHeaders);
         // there should be two entries in the requestHeaders. One update the Authorization header with value "Token"
-        Assert.assertEquals(2, requestHeaders.size());
+        Assertions.assertEquals(2, requestHeaders.size());
         Map<String, Object> updateMap = (Map)requestHeaders.get("update");
-        Assert.assertEquals("Token", updateMap.get("Authorization"));
+        Assertions.assertEquals("Token", updateMap.get("Authorization"));
 
         // and the other is to remove the header "Flink-Token"
         List<String> removeList = (List)requestHeaders.get("remove");
-        Assert.assertEquals(1, removeList.size());
-        Assert.assertEquals("Flink-Token", removeList.get(0));
+        Assertions.assertEquals(1, removeList.size());
+        Assertions.assertEquals("Flink-Token", removeList.get(0));
     }
 
     /**
@@ -83,13 +83,13 @@ public class HeaderReplaceRequestTransformActionTest {
 
         action.performAction("ruleId", "actionId", objMap, resultMap, actionValues);
 
-        Assert.assertNotNull(resultMap);
+        Assertions.assertNotNull(resultMap);
         Map<String, Object> requestHeaders = (Map)resultMap.get("requestHeaders");
-        Assert.assertNotNull(requestHeaders);
+        Assertions.assertNotNull(requestHeaders);
         // there should be two entries in the requestHeaders. One update the Authorization header with value "Token"
-        Assert.assertEquals(1, requestHeaders.size());
+        Assertions.assertEquals(1, requestHeaders.size());
         Map<String, Object> updateMap = (Map)requestHeaders.get("update");
-        Assert.assertEquals("newToken", updateMap.get("Authorization"));
+        Assertions.assertEquals("newToken", updateMap.get("Authorization"));
     }
 
     /**
@@ -97,7 +97,7 @@ public class HeaderReplaceRequestTransformActionTest {
      * and put into the targetHeader.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testEncryptedValue() {
         HeaderReplaceRequestTransformAction action = new HeaderReplaceRequestTransformAction();
         Map<String, Object> objMap = new HashMap<>();
@@ -121,13 +121,13 @@ public class HeaderReplaceRequestTransformActionTest {
 
         action.performAction("ruleId", "actionId", objMap, resultMap, actionValues);
 
-        Assert.assertNotNull(resultMap);
+        Assertions.assertNotNull(resultMap);
         Map<String, Object> requestHeaders = (Map)resultMap.get("requestHeaders");
-        Assert.assertNotNull(requestHeaders);
+        Assertions.assertNotNull(requestHeaders);
         // there should be two entries in the requestHeaders. One update the Authorization header with value "Token"
-        Assert.assertEquals(1, requestHeaders.size());
+        Assertions.assertEquals(1, requestHeaders.size());
         Map<String, Object> updateMap = (Map)requestHeaders.get("update");
-        Assert.assertEquals("password", updateMap.get("Authorization"));
+        Assertions.assertEquals("password", updateMap.get("Authorization"));
     }
 
 }

@@ -5,8 +5,8 @@ import com.networknt.rule.generic.token.schema.SharedVariableSchema;
 import com.networknt.rule.generic.token.schema.SourceSchema;
 import com.networknt.rule.generic.token.schema.UpdateSchema;
 import com.networknt.utility.Constants;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
@@ -29,7 +29,7 @@ public class TokenTransformerActionTest {
         testSource.setHeaders(Collections.singletonList(testSourceAndDestinationDefinition));
         testSource.writeJsonStringToSharedVariables(testSharedVariable, jsonString, testSource.getHeaders());
 
-        Assert.assertEquals("abc123", testSharedVariable.getAccessToken());
+        Assertions.assertEquals("abc123", testSharedVariable.getAccessToken());
     }
 
     @Test
@@ -45,7 +45,7 @@ public class TokenTransformerActionTest {
         testUpdateSchema.setHeaders(myUpdateHeaders);
 
         /* testing update */
-        Assert.assertEquals("Bearer abc123", testUpdateSchema.getResolvedHeaders(testSharedVariable).get("Authorization"));
+        Assertions.assertEquals("Bearer abc123", testUpdateSchema.getResolvedHeaders(testSharedVariable).get("Authorization"));
 
     }
 
@@ -64,14 +64,14 @@ public class TokenTransformerActionTest {
         action.performAction("ruleId", "actionId", new HashMap<>(), resultMap, actionValues);
 
         final var requestHeaderMap = (Map<String, Object>)resultMap.get("requestHeaders");
-        Assert.assertNotNull(requestHeaderMap);
+        Assertions.assertNotNull(requestHeaderMap);
 
         final var updateMap = (Map<String, Object>) requestHeaderMap.get("update");
-        Assert.assertNotNull(updateMap);
+        Assertions.assertNotNull(updateMap);
 
         final var authHeader = updateMap.get("Authorization");
-        Assert.assertNotNull(authHeader);
-        Assert.assertEquals("Bearer abc-123", authHeader);
+        Assertions.assertNotNull(authHeader);
+        Assertions.assertEquals("Bearer abc-123", authHeader);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class TokenTransformerActionTest {
         final var resultMap = new HashMap<String, Object>();
 
         action.performAction("ruleId", "actionId", new HashMap<>(), resultMap, actionValues);
-        Assert.assertEquals("Request failed trying to send a request to: https://fake.token.com/services/oauth2/token", resultMap.get(Constants.ERROR_MESSAGE));
+        Assertions.assertEquals("Request failed trying to send a request to: https://fake.token.com/services/oauth2/token", resultMap.get(Constants.ERROR_MESSAGE));
     }
 
     @Test
@@ -134,24 +134,24 @@ public class TokenTransformerActionTest {
         t2.join();
 
         final var requestHeaderMap1 = (Map<String, Object>)resultMap1.get("requestHeaders");
-        Assert.assertNotNull(requestHeaderMap1);
+        Assertions.assertNotNull(requestHeaderMap1);
 
         final var updateMap1 = (Map<String, Object>) requestHeaderMap1.get("update");
-        Assert.assertNotNull(updateMap1);
+        Assertions.assertNotNull(updateMap1);
 
         final var authHeader1 = updateMap1.get("Authorization");
-        Assert.assertNotNull(authHeader1);
-        Assert.assertEquals("Bearer abc-123", authHeader1);
+        Assertions.assertNotNull(authHeader1);
+        Assertions.assertEquals("Bearer abc-123", authHeader1);
 
         final var requestHeaderMap2 = (Map<String, Object>)resultMap1.get("requestHeaders");
-        Assert.assertNotNull(requestHeaderMap2);
+        Assertions.assertNotNull(requestHeaderMap2);
 
         final var updateMap2 = (Map<String, Object>) requestHeaderMap1.get("update");
-        Assert.assertNotNull(updateMap2);
+        Assertions.assertNotNull(updateMap2);
 
         final var authHeader2 = updateMap1.get("Authorization");
-        Assert.assertNotNull(authHeader2);
-        Assert.assertEquals("Bearer abc-123", authHeader2);
+        Assertions.assertNotNull(authHeader2);
+        Assertions.assertEquals("Bearer abc-123", authHeader2);
     }
 
     @Test
@@ -160,11 +160,11 @@ public class TokenTransformerActionTest {
         final var schema = testConfig.getTokenSchemas().get("aliasConfigTest");
         final var sharedTtlUnit = schema.getSharedVariables().getTokenTtlUnit();
 
-        Assert.assertEquals(3, sharedTtlUnit.millisToUnit(3000));
+        Assertions.assertEquals(3, sharedTtlUnit.millisToUnit(3000));
 
         final var expirationSchemaTtlUnit = schema.getTokenSource().getExpirationSchema().getTtlUnit();
 
-        Assert.assertEquals(1, expirationSchemaTtlUnit.millisToUnit(60000));
+        Assertions.assertEquals(1, expirationSchemaTtlUnit.millisToUnit(60000));
     }
 
     @Test
@@ -180,10 +180,10 @@ public class TokenTransformerActionTest {
         testUpdateSchema.setHeaders(myUpdateHeaders);
 
         /* testing update */
-        Assert.assertEquals("Bearer abc123", testUpdateSchema.getResolvedHeaders(testSharedVariable).get("Authorization"));
+        Assertions.assertEquals("Bearer abc123", testUpdateSchema.getResolvedHeaders(testSharedVariable).get("Authorization"));
 
         /* testing second update */
         testSharedVariable.setAccessToken("abc124");
-        Assert.assertEquals("Bearer abc124", testUpdateSchema.getResolvedHeaders(testSharedVariable).get("Authorization"));
+        Assertions.assertEquals("Bearer abc124", testUpdateSchema.getResolvedHeaders(testSharedVariable).get("Authorization"));
     }
 }

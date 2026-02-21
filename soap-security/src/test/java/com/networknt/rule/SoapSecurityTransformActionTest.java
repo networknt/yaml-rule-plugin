@@ -1,7 +1,7 @@
 package com.networknt.rule;
 
 import com.networknt.soap.SoapSecurityTransformAction;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,9 +1,9 @@
 package com.networknt.rule.header;
 
 import com.networknt.rule.RuleActionValue;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,13 +39,13 @@ public class HeaderReplaceResponseTransformActionTest {
 
         action.performAction("ruleId", "actionId", objMap, resultMap, actionValues);
 
-        Assert.assertNotNull(resultMap);
+        Assertions.assertNotNull(resultMap);
         Map<String, Object> responseHeaders = (Map)resultMap.get("responseHeaders");
-        Assert.assertNotNull(responseHeaders);
+        Assertions.assertNotNull(responseHeaders);
         // there should be one entry in the responseHeaders. One update the My-Header header with value "Token"
-        Assert.assertEquals(1, responseHeaders.size());
+        Assertions.assertEquals(1, responseHeaders.size());
         Map<String, Object> updateMap = (Map)responseHeaders.get("update");
-        Assert.assertEquals("Token", updateMap.get("My-Header"));
+        Assertions.assertEquals("Token", updateMap.get("My-Header"));
 
     }
 
@@ -77,20 +77,20 @@ public class HeaderReplaceResponseTransformActionTest {
 
         action.performAction("ruleId", "actionId", objMap, resultMap, actionValues);
 
-        Assert.assertNotNull(resultMap);
+        Assertions.assertNotNull(resultMap);
         Map<String, Object> responseHeaders = (Map)resultMap.get("responseHeaders");
-        Assert.assertNotNull(responseHeaders);
+        Assertions.assertNotNull(responseHeaders);
         // there should be one entry in the responseHeaders. One update the Authorization header with value "Token"
-        Assert.assertEquals(1, responseHeaders.size());
+        Assertions.assertEquals(1, responseHeaders.size());
         Map<String, Object> updateMap = (Map)responseHeaders.get("update");
-        Assert.assertEquals("newToken", updateMap.get("Authorization"));
+        Assertions.assertEquals("newToken", updateMap.get("Authorization"));
     }
 
     /**
      * The test case is similar to the above with the targetValue encrypted.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testEncryptedValue() {
         HeaderReplaceResponseTransformAction action = new HeaderReplaceResponseTransformAction();
         Map<String, Object> objMap = new HashMap<>();
@@ -114,12 +114,12 @@ public class HeaderReplaceResponseTransformActionTest {
 
         action.performAction("ruleId", "actionId", objMap, resultMap, actionValues);
 
-        Assert.assertNotNull(resultMap);
+        Assertions.assertNotNull(resultMap);
         Map<String, Object> responseHeaders = (Map)resultMap.get("responseHeaders");
-        Assert.assertNotNull(responseHeaders);
+        Assertions.assertNotNull(responseHeaders);
         // there should be one entry in the responseHeaders. One update the Authorization header with value "Token"
-        Assert.assertEquals(1, responseHeaders.size());
+        Assertions.assertEquals(1, responseHeaders.size());
         Map<String, Object> updateMap = (Map)responseHeaders.get("update");
-        Assert.assertEquals("password", updateMap.get("Authorization"));
+        Assertions.assertEquals("password", updateMap.get("Authorization"));
     }
 }
