@@ -24,3 +24,7 @@ hs_err_pid*
 .idea/
 target/
 *.iml
+.gitnexus
+.claude/
+AGENTS.md
+CLAUDE.md
