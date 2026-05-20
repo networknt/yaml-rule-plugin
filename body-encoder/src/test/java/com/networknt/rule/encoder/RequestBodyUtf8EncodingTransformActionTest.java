@@ -3,6 +3,7 @@ package com.networknt.rule.encoder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +16,7 @@ public class RequestBodyUtf8EncodingTransformActionTest {
         objMap.put("requestBody", originalBody);
         RequestBodyUtf8EncodingTransformAction action = new RequestBodyUtf8EncodingTransformAction();
         Map<String, Object> resultMap = new HashMap<>();
-        action.performAction("ruleId", "actionId", objMap, resultMap, null);
+        action.performAction("ruleId", "actionId", objMap, resultMap, Collections.emptyList());
         String updatedBody = (String) resultMap.get("requestBody");
         Assertions.assertEquals(expectedBody, updatedBody);
     }
@@ -28,7 +29,7 @@ public class RequestBodyUtf8EncodingTransformActionTest {
         objMap.put("requestBody", originalBody);
         RequestBodyUtf8EncodingTransformAction action = new RequestBodyUtf8EncodingTransformAction();
         Map<String, Object> resultMap = new HashMap<>();
-        action.performAction("ruleId", "actionId", objMap, resultMap, null);
+        action.performAction("ruleId", "actionId", objMap, resultMap, Collections.emptyList());
         String updatedBody = (String) resultMap.get("requestBody");
         Assertions.assertEquals(expectedBody, updatedBody);
     }

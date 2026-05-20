@@ -8,9 +8,9 @@ import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -31,6 +31,13 @@ public class SoapSecurityTransformAction implements RequestTransformAction {
     private static final String CONFIG_NAME = "cannex";
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
+    private static final String DIGEST_ALGORITHM = "digestAlgorithm";
+    private static final String PASSWORD_TYPE = "passwordType";
+    private static final String DEFAULT_DIGEST_ALGORITHM = "SHA-256";
+    private static final String DEFAULT_PASSWORD_TYPE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest";
+    private static final Set<String> SUPPORTED_DIGEST_ALGORITHMS = Set.of("SHA-256", "SHA-384", "SHA-512");
+    private static final int NONCE_BYTE_LENGTH = 32;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final Logger logger = LoggerFactory.getLogger(SoapSecurityTransformAction.class);
     private static final Map<String, Object> config = Config.getInstance().getJsonMapConfigNoCache(CONFIG_NAME);
     String pattern = (String)config.get("headerTemplate");
@@ -54,8 +61,8 @@ public class SoapSecurityTransformAction implements RequestTransformAction {
         String requestBody = (String)objMap.get("requestBody");
         String username = (String)config.get(USERNAME);
         String password = (String)config.get(PASSWORD);
-        if(logger.isTraceEnabled())
-            logger.debug("ruleId = {}, actionId = {} username = {} password = {} original request body = {}", ruleId, actionId, username, password, requestBody);
+        if(logger.isDebugEnabled())
+            logger.debug("ruleId = {}, actionId = {} username = {} original request body = {}", ruleId, actionId, username, requestBody);
         String modifiedBody = transform(requestBody, username, password);
         if(logger.isTraceEnabled()) logger.trace("transformed request body = {}", modifiedBody);
         resultMap.put("requestBody", modifiedBody);
@@ -70,7 +77,6 @@ public class SoapSecurityTransformAction implements RequestTransformAction {
     private String generateSecurity(String username, String password) {
         String nonce = generateNonce();
         if(logger.isTraceEnabled()) logger.trace("Nonce = {}", nonce);
-        System.out.println("Nonce = " + nonce);
 
         // created date/time in UTC format
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -90,39 +96,48 @@ public class SoapSecurityTransformAction implements RequestTransformAction {
                 + "               soapenv:mustUnderstand=\"1\">\n"
                 + "      <wsse:UsernameToken wsu:Id=\"UsernameToken-eab4be46-8374-4492-81c9-502798f4b123\">\n"
                 + "         <wsse:Username>%Username%</wsse:Username>\n"
-                + "         <wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">%PasswordDigest%</wsse:Password>\n"
+                + "         <wsse:Password Type=\"%PasswordType%\">%PasswordDigest%</wsse:Password>\n"
                 + "         <wsse:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">%Nonce%</wsse:Nonce>\n"
                 + "         <wsu:Created>%Created%</wsu:Created>\n"
                 + "      </wsse:UsernameToken>\n"
                 + "   </wsse:Security>\n";
 
 
-        security = security.replaceAll("%Username%", username);
-        security = security.replaceAll("%PasswordDigest%", passwordDigest);
-        security = security.replaceAll("%Nonce%", nonce);
-        security = security.replaceAll("%Created%", created);
+        security = security.replace("%Username%", username);
+        security = security.replace("%PasswordType%", getConfigString(PASSWORD_TYPE, DEFAULT_PASSWORD_TYPE));
+        security = security.replace("%PasswordDigest%", passwordDigest);
+        security = security.replace("%Nonce%", nonce);
+        security = security.replace("%Created%", created);
         return security;
     }
 
     private String createPasswordDigest(String nonce, String created, String password) {
-        MessageDigest sha1;
-        String passwordDigest = null;
-        try {
-            sha1 = MessageDigest.getInstance("SHA-1");
-            sha1.update(Base64.getDecoder().decode(nonce));
-            sha1.update(created.getBytes("UTF-8"));
-            passwordDigest = new String(Base64.getEncoder().encode(sha1.digest(password.getBytes("UTF-8"))));
-            sha1.reset();
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            logger.error("Exception: ", e);
+        String digestAlgorithm = getConfigString(DIGEST_ALGORITHM, DEFAULT_DIGEST_ALGORITHM).trim();
+        if(!SUPPORTED_DIGEST_ALGORITHMS.contains(digestAlgorithm)) {
+            throw new IllegalArgumentException("Unsupported password digest algorithm configured for " + CONFIG_NAME);
         }
-        return passwordDigest;
+        try {
+            MessageDigest digest = MessageDigest.getInstance(digestAlgorithm);
+            digest.update(Base64.getDecoder().decode(nonce));
+            digest.update(created.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(digest.digest(password.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Unsupported password digest algorithm configured for " + CONFIG_NAME, e);
+        }
     }
 
     private String generateNonce() {
-        String dateTimeString = Long.toString(new Date().getTime());
-        byte[] nonceByte = dateTimeString.getBytes(StandardCharsets.UTF_8);
+        byte[] nonceByte = new byte[NONCE_BYTE_LENGTH];
+        SECURE_RANDOM.nextBytes(nonceByte);
         return Base64.getEncoder().encodeToString(nonceByte);
+    }
+
+    private String getConfigString(String key, String defaultValue) {
+        Object value = config.get(key);
+        if(value instanceof String stringValue && !stringValue.isBlank()) {
+            return stringValue;
+        }
+        return defaultValue;
     }
 
 }

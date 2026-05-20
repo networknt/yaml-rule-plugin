@@ -46,6 +46,8 @@ cannex.yml
 ```
 # cannex.yml
 cannex.username: SLUATWS
+cannex.digestAlgorithm: SHA-256
+cannex.passwordType: http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest
 
 ```
 You can also add the cannex.password: real-password into the values.yml file; however, I have added it into an environment variable in .profile file.

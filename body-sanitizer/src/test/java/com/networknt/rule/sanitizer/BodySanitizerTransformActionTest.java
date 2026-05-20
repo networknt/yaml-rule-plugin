@@ -2,6 +2,7 @@ package com.networknt.rule.sanitizer;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +14,7 @@ public class BodySanitizerTransformActionTest {
         objMap.put("requestBody", json);
         BodySanitizerTransformAction action = new BodySanitizerTransformAction();
         Map<String, Object> resultMap = new HashMap<>();
-        action.performAction("ruleId", "actionId", objMap, resultMap, null);
+        action.performAction("ruleId", "actionId", objMap, resultMap, Collections.emptyList());
         System.out.println(resultMap);
     }
 
@@ -25,7 +26,7 @@ public class BodySanitizerTransformActionTest {
         objMap.put("requestBody", json);
         BodySanitizerTransformAction action = new BodySanitizerTransformAction();
         Map<String, Object> resultMap = new HashMap<>();
-        action.performAction("ruleId", "actionId", objMap, resultMap, null);
+        action.performAction("ruleId", "actionId", objMap, resultMap, Collections.emptyList());
         System.out.println(resultMap);
     }
 }
