@@ -12,11 +12,11 @@ enableHttp2: ${tealium.enableHttp2:false}
 # to be created and cache the token per path prefix.
 pathPrefixAuths: ${tealium.pathPrefixAuths:}
 # format with JSON for config server
-#  [{"pathPrefix":"/event","tokenTtl":180,"tokenUrl":"https://platform.tealiumapis.com/v3/auth/accounts/networknt/profiles/main","username":"steve.hu@networknt.com","password":"password}]
+#  [{"pathPrefix":"/event","tokenTtl":180,"tokenUrl":"https://platform.tealiumapis.com/v3/auth/accounts/networknt/profiles/main","username":"steve.hu@networknt.com","password":"<set-by-deployment>"}]
 
 # format with YAML for readability
 #  - pathPrefix: /event
 #    tokenTtl: 180
 #    tokenUrl: https://platform.tealiumapis.com/v3/auth/accounts/networknt/profiles/main
 #    username: steve.hu@networknt.com
-#    password: password
+#    password: <set-by-deployment>

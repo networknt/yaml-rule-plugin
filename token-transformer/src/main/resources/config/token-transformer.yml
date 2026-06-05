@@ -9,7 +9,7 @@ tokenSchemas: ${token-transformer.tokenSchemas:}
 #  mrasSSL:
 #    sharedVariables:
 #      username: "my-basic-username"
-#      password: "my-basic-password"
+#      password: "<set-by-deployment>"
 #      tokenTtl: 300000
 #    request:
 #      cacheHttpClient: true
@@ -20,11 +20,11 @@ tokenSchemas: ${token-transformer.tokenSchemas:}
 #        tlsVersion: TLSv1.2
 #        trustStore:
 #          name: client.truststore
-#          password: password
+#          password: <set-by-deployment>
 #        keyStore:
 #          name: keyStoreName.pk12
-#          password: password
-#          keyPass: password
+#          password: <set-by-deployment>
+#          keyPass: <set-by-deployment>
 #      headers:
 #        Content-Type: application/x-www-form-urlencoded
 #        Authorization: "BASIC <encoded_credentials>"
@@ -49,7 +49,7 @@ tokenSchemas: ${token-transformer.tokenSchemas:}
 #  mrasMicrosoft:
 #    sharedVariables:
 #      clientId: "my-microsoft-client-id"
-#      clientSecret: "my-microsoft-client-secret"
+#      clientSecret: "<set-by-deployment>"
 #    request:
 #      cacheHttpClient: true
 #      url: "https://test.mras.com/services/oauth2/token"
@@ -80,7 +80,7 @@ tokenSchemas: ${token-transformer.tokenSchemas:}
 #  lifeware:
 #    sharedVariables:
 #      clientId: "my-id"
-#      clientSecret: "abc-123"
+#      clientSecret: "<set-by-deployment>"
 #    request:
 #      cacheHttpClient: true
 #      url: "https://networknttest.asp.lifeware.lu/api/v0/token"
@@ -115,9 +115,9 @@ tokenSchemas: ${token-transformer.tokenSchemas:}
 #        jwtTtl: 300
 #        keyStore:
 #          name: apigatewayuat.pfx
-#          password: password01
+#          password: <set-by-deployment>
 #          alias: apigatewayuat
-#          keyPass: password01
+#          keyPass: <set-by-deployment>
 #        algorithm: SHA256withRSA
 #        jwtHeader:
 #          staticFields:

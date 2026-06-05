@@ -12,14 +12,14 @@ enableHttp2: ${snow.enableHttp2:false}
 # to be created and cache the token per path prefix.
 pathPrefixAuths: ${snow.pathPrefixAuths:}
 # format with JSON for config server
-#  [{"pathPrefix":"/snow","tokenTtl":180,"tokenUrl":"https://networknt.service-now.com/oauth_token.do","username":"steve.hu@networknt.com","password":"password","client_id":"b8f2ea8302988f6","client_secret":"lgpass","grant_type":"password"}]
+#  [{"pathPrefix":"/snow","tokenTtl":180,"tokenUrl":"https://networknt.service-now.com/oauth_token.do","username":"steve.hu@networknt.com","password":"<set-by-deployment>","client_id":"b8f2ea8302988f6","client_secret":"<set-by-deployment>","grant_type":"password"}]
 
 # format with YAML for readability
 #  - pathPrefix: /snow
 #    tokenTtl: 180
 #    tokenUrl: https://networknt.service-now.com/oauth_token.do
 #    username: steve.hu@networknt.com
-#    password: password
+#    password: <set-by-deployment>
 #    client_id: b8f2ea8302988f6
-#    client_secret: lgpass
+#    client_secret: <set-by-deployment>
 #    grant_type: password
