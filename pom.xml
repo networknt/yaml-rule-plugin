@@ -97,7 +97,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.light-4j>2.3.3</version.light-4j>
         <version.http-client>1.0.18</version.http-client>
-        <version.jackson>2.19.4</version.jackson>
+        <version.jackson>2.22.1</version.jackson>
+        <version.jackson.annotations>2.22</version.jackson.annotations>
         <version.slf4j>2.0.17</version.slf4j>
         <version.jose4j>0.9.6</version.jose4j>
         <version.commons.codec>1.13</version.commons.codec>
@@ -254,7 +255,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>${version.jackson}</version>
+                <version>${version.jackson.annotations}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
