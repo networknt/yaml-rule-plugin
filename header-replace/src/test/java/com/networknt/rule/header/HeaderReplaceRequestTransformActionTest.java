@@ -1,16 +1,57 @@
 package com.networknt.rule.header;
 
+import com.networknt.rule.Rule;
+import com.networknt.rule.RuleAction;
 import com.networknt.rule.RuleActionValue;
+import com.networknt.rule.RuleConstants;
+import com.networknt.rule.RuleEngine;
+import com.networknt.rule.RuleMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class HeaderReplaceRequestTransformActionTest {
+
+    @Test
+    public void testLegacyYamlActionValuesReachPluginAsCollection() throws Exception {
+        Map<String, Rule> rules = RuleMapper.string2RuleMap(readResource("rules-2.0.1-compat.yml"));
+        Rule rule = rules.get("legacy-header-replace");
+        RuleAction action = rule.getActions().iterator().next();
+
+        Assertions.assertEquals("legacy-header-action", action.getActionId());
+        Assertions.assertEquals(HeaderReplaceRequestTransformAction.class.getName(), action.getActionClassName());
+        Assertions.assertInstanceOf(Collection.class, action.getActionValues());
+        Assertions.assertEquals(List.of("targetHeader", "targetValue"), action.getActionValues().stream()
+                .map(RuleActionValue::getActionValueId)
+                .toList());
+        Assertions.assertEquals(List.of("Authorization", "legacy-token"), action.getActionValues().stream()
+                .map(RuleActionValue::getValue)
+                .toList());
+        Assertions.assertEquals("legacy-yaml", action.getParameters().get("source"));
+
+        RuleEngine engine = new RuleEngine(rules, null);
+        Map<String, Object> input = new HashMap<>();
+        input.put("requestHeaders", new HashMap<>(Map.of("Authorization", "old-token")));
+
+        Map<String, Object> result = engine.executeRule("legacy-header-replace", input);
+
+        Assertions.assertEquals(Boolean.TRUE, result.get(RuleConstants.RESULT));
+        Map<String, Object> requestHeaders = (Map<String, Object>) result.get("requestHeaders");
+        Map<String, Object> updates = (Map<String, Object>) requestHeaders.get("update");
+        Assertions.assertEquals("legacy-token", updates.get("Authorization"));
+        Assertions.assertInstanceOf(HeaderReplaceRequestTransformAction.class,
+                engine.actionClassCache.get(HeaderReplaceRequestTransformAction.class.getName()));
+    }
+
     /**
      * The test case to cover One header replace the other header. The action will pick up the source header
      * value and put it into the targetHeader. The removeSourceHeader is true so that it should be removed.
@@ -128,6 +169,14 @@ public class HeaderReplaceRequestTransformActionTest {
         Assertions.assertEquals(1, requestHeaders.size());
         Map<String, Object> updateMap = (Map)requestHeaders.get("update");
         Assertions.assertEquals("password", updateMap.get("Authorization"));
+    }
+
+    private static String readResource(String resourceName) throws IOException {
+        try (InputStream stream = HeaderReplaceRequestTransformActionTest.class.getClassLoader()
+                .getResourceAsStream(resourceName)) {
+            Assertions.assertNotNull(stream, resourceName);
+            return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+        }
     }
 
 }

@@ -1,0 +1,24 @@
+legacy-header-replace:
+  ruleId: legacy-header-replace
+  hostId: legacy-host
+  ruleType: req-tra
+  ruleName: Legacy header replacement
+  ruleVersion: 2.0.1
+  ruleGroup: compatibility
+  ruleDesc: Verifies legacy action values reach a Java plugin unchanged
+  ruleOwner: yaml-rule-plugin
+  common: Y
+  actions:
+    - actionId: legacy-header-action
+      actionDesc: Replace the authorization header with a configured value
+      actionClassName: com.networknt.rule.header.HeaderReplaceRequestTransformAction
+      conditionResult: true
+      actionValues:
+        - actionValueId: targetHeader
+          valueTypeCode: STRING
+          value: Authorization
+        - actionValueId: targetValue
+          valueTypeCode: STRING
+          value: legacy-token
+      parameters:
+        source: legacy-yaml
