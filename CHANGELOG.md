@@ -10,6 +10,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 3.0.1 - 2026-08-28
+
+### Added
+- Added an integration test proving that legacy 2.0.1 rule bodies and action values execute unchanged through the header-replace plugin ([#138](https://github.com/networknt/yaml-rule-plugin/issues/138)).
+
+### Security
+- Hardened SOAP UsernameToken generation with a cryptographically secure 32-byte nonce and configurable SHA-256, SHA-384, or SHA-512 password digests; SHA-256 is now the default ([#135](https://github.com/networknt/yaml-rule-plugin/issues/135)).
+- Removed password values from debug logging and removed nonce output from standard output.
+- Replaced scanner-sensitive sample passwords in configuration comments with explicit placeholders ([#136](https://github.com/networknt/yaml-rule-plugin/issues/136)).
+
+### Changed
+- Upgraded `yaml-rule` from 2.0.1 to 3.0.1, which restores the legacy Java rule model and `IAction` contract withdrawn by `yaml-rule` 3.0.0.
+- Raised the build target from Java 21 to Java 25.
+- Migrated the test suite from JUnit 4 to JUnit 5 and upgraded Surefire and Failsafe to 3.5.2 and JaCoCo to 0.8.14 ([#134](https://github.com/networknt/yaml-rule-plugin/issues/134)).
+- Upgraded Jackson to 2.22.1, with `jackson-annotations` 2.22 ([#137](https://github.com/networknt/yaml-rule-plugin/issues/137)).
+- Upgraded `http-client` to 1.0.18 and Logback to 1.5.37.
+
 ## 1.1.10 - 2026-02-20
 
 ### Added
