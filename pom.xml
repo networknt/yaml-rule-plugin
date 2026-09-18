@@ -123,7 +123,6 @@
         <version.maven-gpg>3.2.7</version.maven-gpg>
         <skipTests>false</skipTests>
         <matched.test.resources>**/*</matched.test.resources>
-        <version.javadoc-packagelist-plugin>1.0.0</version.javadoc-packagelist-plugin>
         <version.maven-javadoc>3.1.0</version.maven-javadoc>
     </properties>
 
@@ -347,19 +346,6 @@
         </testResources>
 
         <plugins>
-            <plugin>
-                <groupId>com.networknt</groupId>
-                <artifactId>javadoc-packagelist-maven-plugin</artifactId>
-                <version>${version.javadoc-packagelist-plugin}</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>gen-package-list</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
