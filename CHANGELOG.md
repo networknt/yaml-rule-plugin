@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.0](https://github.com/networknt/yaml-rule-plugin/tree/2.4.0) (2026-10-07)
+
+**Commits:**
+
+- upgrade to version 2.4.0 before release in master branch ([37e8f54](https://github.com/networknt/yaml-rule-plugin/commit/37e8f542f65db7f0cccb5af152ad175fd59f3a41)) (by Steve Hu)
+- upgrade maven-javadoc  to 3.12.0 ([b440236](https://github.com/networknt/yaml-rule-plugin/commit/b4402368f5816f6156d30160af72701b4e8dd4d1)) (by Steve Hu)
+- upgrade slf4j to 2.0.20 from 2.0.19 ([cf0dc3f](https://github.com/networknt/yaml-rule-plugin/commit/cf0dc3f1b075dce2704b677d7fdec0f883193ddd)) (by Steve Hu)
+- upgrade jose4j to 0.9.7 from 0.9.6 ([60dfa94](https://github.com/networknt/yaml-rule-plugin/commit/60dfa94193da51874f2ed610fc3c4033e0b36393)) (by Steve Hu)
+- upgrade jackson to 2.22.3 from 2.22.1 ([aa918aa](https://github.com/networknt/yaml-rule-plugin/commit/aa918aacf4703178ef8fa4ce28b3fcd33e389d0f)) (by Steve Hu)
+- upgrade to version 2.3.8-SNAPSHOT after release in master branch ([9a84508](https://github.com/networknt/yaml-rule-plugin/commit/9a84508b95f4a5662b0d2d93a9918cd6bdde39c8)) (by Steve Hu)
+- upgrade slf4j to 2.0.19 from 2.0.17 ([6c22095](https://github.com/networknt/yaml-rule-plugin/commit/6c2209593b07458d61a6cfdf2ceeb7808e77a238)) (by Steve Hu)
+- upgrade maven-surefire to 3.6.0 ([f864234](https://github.com/networknt/yaml-rule-plugin/commit/f86423492c971300f8aca6b7e1752bfec507a1c2)) (by Steve Hu)
+- upgrade logback to 1.6.3 from 1.5.37 ([77ab1d6](https://github.com/networknt/yaml-rule-plugin/commit/77ab1d6995d48ff5f160b2b9f68e68305a7823ae)) (by Steve Hu)
+- Remove obsolete javadoc-packagelist-maven-plugin workaround ([c870166](https://github.com/networknt/yaml-rule-plugin/commit/c870166a9872cb4b8923a5c5d65e7f3940910e10)) (by Steve Hu)
+- upgrade central-publishing-maven to 0.11.0 from 0.7.0 ([c5d75c9](https://github.com/networknt/yaml-rule-plugin/commit/c5d75c9bb52d6e9a4aac3129edf8de4100750965)) (by Steve Hu)
+- upgrade maven-jar to 3.5.1 from 3.1.2 ([832782d](https://github.com/networknt/yaml-rule-plugin/commit/832782d811609a08bb0e4400e62ba312fead029f)) (by Steve Hu)
+- fixes #140 update version and light-4j version to 2.3.8-SNAPSHOT ([fdfbc77](https://github.com/networknt/yaml-rule-plugin/commit/fdfbc77ab29f792a89695b782bd9c916ce20e2a9)) (by Steve Hu)
+
 ## [Unreleased]
 
 ### Added
