@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.1](https://github.com/networknt/yaml-rule-plugin/tree/2.4.1) (2026-10-11)
+
+**Commits:**
+
+- upgrade to version 2.4.1 before release in master branch ([89c0609](https://github.com/networknt/yaml-rule-plugin/commit/89c060924d0db5abdb35722df75c6fba1ca6885b)) (by Steve Hu)
+- upgrade maven-gpg to 3.2.8 from 3.2.7 ([89126fb](https://github.com/networknt/yaml-rule-plugin/commit/89126fbcd315725915a62160461fb1a1d88544eb)) (by Steve Hu)
+- upgrade maven-source to 3.4.0 ([f4b604b](https://github.com/networknt/yaml-rule-plugin/commit/f4b604b7c6cb341454b642fedbbb673e2897a668)) (by Steve Hu)
+- build: upgrade JUnit to 6.1.3 ([2f2a0d4](https://github.com/networknt/yaml-rule-plugin/commit/2f2a0d45858afba526ac6885edf2aff695c4c968)) (by Steve Hu)
+- upgrade commons-codec from 1.18.0 to 1.22.1 ([0838db1](https://github.com/networknt/yaml-rule-plugin/commit/0838db10f37b850cdc7a110737fcec62dfb593a1)) (by Steve Hu)
+- upgrade logback to 1.6.5 from 1.6.3 ([dd840e1](https://github.com/networknt/yaml-rule-plugin/commit/dd840e176f086e449dd25fb4e51b5bf907d1b399)) (by Steve Hu)
+- upgrade snakeyaml to 2.7 from 2.4 ([d2736d0](https://github.com/networknt/yaml-rule-plugin/commit/d2736d051e467327fdd028ee3488b705e75fa155)) (by Steve Hu)
+- upgrade http-client with project version ([c18e4b6](https://github.com/networknt/yaml-rule-plugin/commit/c18e4b6de2442de1084493b1a6155ed9d24a672d)) (by Steve Hu)
+- upgrade encoder to 1.5.0 from 1.2.1 ([69edcaf](https://github.com/networknt/yaml-rule-plugin/commit/69edcaf744a390515ab3e611833e39fa157f2b69)) (by Steve Hu)
+- upgrade to version 2.4.1-SNAPSHOT after release in master branch ([f84320f](https://github.com/networknt/yaml-rule-plugin/commit/f84320f9713d7b2dbfcb17cd3cb554425a3470e1)) (by Steve Hu)
+
 ## [2.4.0](https://github.com/networknt/yaml-rule-plugin/tree/2.4.0) (2026-10-07)
 
 **Commits:**
