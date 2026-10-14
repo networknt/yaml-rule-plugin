@@ -114,7 +114,8 @@ public class SoapSecurityTransformAction implements RequestTransformAction {
     private String createPasswordDigest(String nonce, String created, String password) {
         String digestAlgorithm = getConfigString(DIGEST_ALGORITHM, DEFAULT_DIGEST_ALGORITHM).trim();
         if(!SUPPORTED_DIGEST_ALGORITHMS.contains(digestAlgorithm)) {
-            throw new IllegalArgumentException("Unsupported password digest algorithm configured for " + CONFIG_NAME);
+            if(logger.isDebugEnabled()) logger.debug("Non compliant digest algorithm = {}. Please upgrade", digestAlgorithm);
+            //throw new IllegalArgumentException("Unsupported password digest algorithm configured for " + CONFIG_NAME);
         }
         try {
             MessageDigest digest = MessageDigest.getInstance(digestAlgorithm);
