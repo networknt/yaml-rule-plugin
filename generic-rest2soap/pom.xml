@@ -33,6 +33,11 @@
     <dependencies>
         <dependency>
             <groupId>com.networknt</groupId>
+            <artifactId>jackson-defaults</artifactId>
+            <version>${version.light-4j}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
             <artifactId>utility</artifactId>
         </dependency>
         <dependency>

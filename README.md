@@ -46,3 +46,9 @@ This line requires Jackson 3.2.3, yaml-rule 4.0.0-SNAPSHOT and the Jackson 3 lig
 JSON mappers use the shared Jackson2Defaults profile. SOAP XML/YAML builders inherit its common feature policy and stream constraints. Mappers are immutable; encoding selects compact ObjectWriters instead of changing shared settings. JacksonException is unchecked, and the existing transform fallback/error handling is preserved. JDK8 and Java time modules are built into Jackson 3. YAML uses YAML 1.2 scalars. Classic SnakeYAML cleanup is deferred to the stack-wide final phase.
 
 Local qualification covers the full offline reactor and sanitized SOAP/XML/JSON/YAML/token-request parity against the Jackson 2 baseline. Synthetic request-body tests do not contact an identity provider. No deployed integration or remote CI qualification is implied.
+
+### Reproducible Jackson 3 source build
+
+`.github/workflows/jackson3-source-build.yml` builds the prerequisite source stack in a fresh isolated Maven repository and runs its full test suites. It resolves every prerequisite to a full commit SHA once and uploads `source-refs.json`, `source-commits.txt` and Surefire reports. The shared mapper policy prerequisite is light-4j #2821; merge that before its consumers.
+
+The optional `source_refs` workflow-dispatch input replays recorded full SHAs. GitHub enables dispatch only after the workflow exists on the default branch; before merge, reproduce from the recorded source checkouts locally. A green local suite is separate from a successful remote source-build run.
