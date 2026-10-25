@@ -1,6 +1,6 @@
 package com.networknt.rule.soap.transformer;
 
-import com.networknt.config.Jackson2Defaults;
+import com.networknt.jackson.JacksonDefaults;
 import com.networknt.rule.RuleActionValue;
 import java.util.LinkedHashMap;
 import tools.jackson.core.type.TypeReference;
@@ -29,7 +29,7 @@ public abstract class Transformer {
             .disable(XmlWriteFeature.WRITE_XML_DECLARATION)
             .enable(XmlWriteFeature.UNWRAP_ROOT_OBJECT_NODE).build();
 
-    protected final static ObjectMapper JSON_MAPPER = Jackson2Defaults.builder()
+    protected final static ObjectMapper JSON_MAPPER = JacksonDefaults.builder()
             .enable(SerializationFeature.INDENT_OUTPUT).build();
 
     /**

@@ -1,6 +1,6 @@
 package com.networknt.rule.soap;
 
-import com.networknt.jackson.Jackson2Defaults;
+import com.networknt.jackson.JacksonDefaults;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class SoapMapperPolicyTest {
     @Test
     void formatBuildersRetainCommonFeaturesAndStreamLimits() {
-        var expected = Jackson2Defaults.mapper();
+        var expected = JacksonDefaults.mapper();
         var differences = new java.util.ArrayList<String>();
         for (var actual : new tools.jackson.databind.ObjectMapper[]{
                 SoapMappers.xmlMapper(), SoapMappers.yamlBuilder().build()}) {

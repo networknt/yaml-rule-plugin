@@ -1,6 +1,6 @@
 package com.networknt.rule.soap;
 
-import com.networknt.config.Jackson2Defaults;
+import com.networknt.jackson.JacksonDefaults;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.soap.transformer.TransformChain;
 import com.networknt.rule.soap.transformer.XmlTransformer;
@@ -18,7 +18,7 @@ public class Util {
     private static final Logger logger = LoggerFactory.getLogger(Util.class);
 
     public static String transformRest2Soap(String input, Collection<RuleActionValue> actionValues) throws IOException {
-        ObjectMapper mapper = Jackson2Defaults.mapper();
+        ObjectMapper mapper = JacksonDefaults.mapper();
         String returnString = input;
 
         try {
@@ -37,7 +37,7 @@ public class Util {
 
     public static String transformSoap2Rest(String input) throws JacksonException {
         XmlMapper xmlMapper = SoapMappers.xmlMapper();
-        ObjectMapper objectMapper = Jackson2Defaults.mapper();
+        ObjectMapper objectMapper = JacksonDefaults.mapper();
         String output;
         try {
             JsonNode jsonNode = xmlMapper.readTree(input);
