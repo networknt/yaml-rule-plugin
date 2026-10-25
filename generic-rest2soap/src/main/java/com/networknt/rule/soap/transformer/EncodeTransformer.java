@@ -1,11 +1,11 @@
 package com.networknt.rule.soap.transformer;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import tools.jackson.core.type.TypeReference;
 import com.networknt.rule.soap.Constants;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -89,7 +89,7 @@ public class EncodeTransformer extends Transformer {
     private Object getEncodedValue(String key, Object val) {
         try {
             return this.encodeInfo.get(key.toLowerCase()).applyEncode(val);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }
@@ -102,7 +102,7 @@ public class EncodeTransformer extends Transformer {
     public String getAsString() {
         try {
             return Transformer.JSON_MAPPER.writeValueAsString(this.endTransitionState);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }
@@ -150,26 +150,20 @@ public class EncodeTransformer extends Transformer {
             }
         }
 
-        private Object applyEncode(Object val) throws JsonProcessingException {
+        private Object applyEncode(Object val) throws JacksonException {
             Object returnObj;
             switch (this.dataFormat) {
                 case XML:
-                    Transformer.XML_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, false);
                     ObjectNode xmlNode = (ObjectNode) Transformer.XML_MAPPER.convertValue(val, JsonNode.class);
-                    returnObj = Transformer.XML_MAPPER.writeValueAsString(xmlNode);
-                    Transformer.XML_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
+                    returnObj = Transformer.XML_MAPPER.writer().without(SerializationFeature.INDENT_OUTPUT).writeValueAsString(xmlNode);
                     break;
                 case JSON:
-                    Transformer.JSON_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, false);
                     ObjectNode jsonNode = (ObjectNode) Transformer.JSON_MAPPER.convertValue(val, JsonNode.class);
-                    returnObj = Transformer.JSON_MAPPER.writeValueAsString(jsonNode);
-                    Transformer.JSON_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
+                    returnObj = Transformer.JSON_MAPPER.writer().without(SerializationFeature.INDENT_OUTPUT).writeValueAsString(jsonNode);
                     break;
                 case YAML:
-                    Transformer.YAML_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, false);
                     ObjectNode yamlNode = (ObjectNode) Transformer.YAML_MAPPER.convertValue(val, JsonNode.class);
-                    returnObj = Transformer.YAML_MAPPER.writeValueAsString(yamlNode);
-                    Transformer.YAML_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
+                    returnObj = Transformer.YAML_MAPPER.writer().without(SerializationFeature.INDENT_OUTPUT).writeValueAsString(yamlNode);
                     break;
                 case NONE:
                     Map<String, Object> noneNode = Transformer.JSON_MAPPER.convertValue(val, new TypeReference<Map<String, Object>>() {

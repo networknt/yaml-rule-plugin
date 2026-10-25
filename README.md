@@ -38,3 +38,11 @@ mvn versions:set -DnewVersion=1.1.10 -DgenerateBackupPoms=false
 ```
 mvn clean install deploy -DperformRelease
 ```
+
+## Jackson 3 source line
+
+This line requires Jackson 3.2.3, yaml-rule 4.0.0-SNAPSHOT and the Jackson 3 light-4j/http-client prerequisites. Build and install these sources in dependency order before building this reactor; Jackson 2 snapshot binaries are incompatible. Annotations retain com.fasterxml.jackson.annotation. Public SOAP serialization and transformer node types now use tools.jackson.
+
+JSON mappers use the shared Jackson2Defaults profile. SOAP XML/YAML builders inherit its common feature policy and stream constraints. Mappers are immutable; encoding selects compact ObjectWriters instead of changing shared settings. JacksonException is unchecked, and the existing transform fallback/error handling is preserved. JDK8 and Java time modules are built into Jackson 3. YAML uses YAML 1.2 scalars. Classic SnakeYAML cleanup is deferred to the stack-wide final phase.
+
+Local qualification covers the full offline reactor and sanitized SOAP/XML/JSON/YAML/token-request parity against the Jackson 2 baseline. Synthetic request-body tests do not contact an identity provider. No deployed integration or remote CI qualification is implied.

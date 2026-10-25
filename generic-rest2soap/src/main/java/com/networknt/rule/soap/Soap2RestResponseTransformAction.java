@@ -8,7 +8,7 @@ import com.networknt.server.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -59,7 +59,7 @@ public class Soap2RestResponseTransformAction implements ResponseTransformAction
             if (logger.isTraceEnabled())
                 logger.trace("transformed response body = " + output);
 
-        } catch (IOException ioe) {
+        } catch (JacksonException ioe) {
             logger.error("Transform exception:", ioe);
         }
 

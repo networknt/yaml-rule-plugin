@@ -1,6 +1,6 @@
 package com.networknt.rule.soap.transformer;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.networknt.rule.RuleActionValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

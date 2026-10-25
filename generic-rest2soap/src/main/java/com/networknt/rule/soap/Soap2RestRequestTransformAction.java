@@ -1,6 +1,6 @@
 package com.networknt.rule.soap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.networknt.rule.RequestTransformAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.soap.exception.InvalidSoapBodyException;
@@ -56,7 +56,7 @@ public class Soap2RestRequestTransformAction implements RequestTransformAction {
             output = Util.transformSoap2Rest(body);
             resultMap.put("requestBody", output);
             if (logger.isTraceEnabled()) logger.trace("transformed request body = " + output);
-        } catch (JsonProcessingException ioe) {
+        } catch (JacksonException ioe) {
             logger.error("Transform exception:", ioe);
         }
 

@@ -1,7 +1,7 @@
 package com.networknt.rule.generic.token;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
+import tools.jackson.core.type.TypeReference;
 import com.networknt.config.Config;
 import com.networknt.rule.generic.token.schema.TokenSchema;
 import org.apache.commons.lang3.NotImplementedException;
