@@ -1,6 +1,6 @@
 package com.networknt.rule.soap.transformer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import java.util.LinkedHashMap;
 
 public class JsonTransformer extends Transformer {
@@ -49,7 +49,7 @@ public class JsonTransformer extends Transformer {
         try {
             String returnString = Transformer.JSON_MAPPER.writeValueAsString(this.finalizedObject);
             return returnString.trim();
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }

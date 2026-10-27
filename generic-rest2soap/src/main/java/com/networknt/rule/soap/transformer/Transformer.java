@@ -1,16 +1,16 @@
 package com.networknt.rule.soap.transformer;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.networknt.jackson.JacksonDefaults;
 import com.networknt.rule.RuleActionValue;
-
 import java.util.LinkedHashMap;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.dataformat.xml.XmlMapper;
+import tools.jackson.dataformat.xml.XmlWriteFeature;
+import tools.jackson.dataformat.yaml.YAMLMapper;
 
 public abstract class Transformer {
 
@@ -21,21 +21,16 @@ public abstract class Transformer {
     protected JsonNode finalizedObject;
     protected boolean finalizedObjectRequired;
 
-    protected final static YAMLMapper YAML_MAPPER = new YAMLMapper();
-    static {
-        YAML_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
-    }
+    protected final static YAMLMapper YAML_MAPPER = com.networknt.rule.soap.SoapMappers.yamlBuilder()
+            .enable(SerializationFeature.INDENT_OUTPUT).build();
 
-    protected final static XmlMapper XML_MAPPER = new XmlMapper();
-    static {
-        XML_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
-        XML_MAPPER.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, false);
-        XML_MAPPER.configure(ToXmlGenerator.Feature.UNWRAP_ROOT_OBJECT_NODE, true);
-    }
-    protected final static ObjectMapper JSON_MAPPER = new ObjectMapper();
-    static {
-        JSON_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
-    }
+    protected final static XmlMapper XML_MAPPER = com.networknt.rule.soap.SoapMappers.xmlBuilder()
+            .enable(SerializationFeature.INDENT_OUTPUT)
+            .disable(XmlWriteFeature.WRITE_XML_DECLARATION)
+            .enable(XmlWriteFeature.UNWRAP_ROOT_OBJECT_NODE).build();
+
+    protected final static ObjectMapper JSON_MAPPER = JacksonDefaults.builder()
+            .enable(SerializationFeature.INDENT_OUTPUT).build();
 
     /**
      * Base constructor, all transformers require a base map.

@@ -1,12 +1,12 @@
 package com.networknt.rule.soap;
 
 import com.networknt.rule.soap.transformer.TransformerAttributeManager;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializable;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
-import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
-import java.io.IOException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.JacksonSerializable;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.jsontype.TypeSerializer;
+import tools.jackson.dataformat.xml.ser.ToXmlGenerator;
+import tools.jackson.core.JacksonException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -15,13 +15,13 @@ import java.util.Map;
  *
  * @author Kalev Gonvick
  */
-public class SoapSerializable implements JsonSerializable {
+public class SoapSerializable implements JacksonSerializable {
 
     private LinkedHashMap<String, Object> baseMap;
     private TransformerAttributeManager.AttributeInfo attributes;
 
     @Override
-    public void serialize(JsonGenerator gen, SerializerProvider serializers) throws IOException {
+    public void serialize(JsonGenerator gen, SerializationContext serializers) throws JacksonException {
         ToXmlGenerator toXmlGenerator = (ToXmlGenerator) gen;
         toXmlGenerator.writeStartObject();
         writeAttributes(toXmlGenerator);
@@ -34,15 +34,15 @@ public class SoapSerializable implements JsonSerializable {
      * Write attributes associated with the rootNode.
      *
      * @param toXmlGenerator - xmlgen
-     * @throws IOException -
+     * @throws JacksonException -
      */
-    private void writeAttributes(ToXmlGenerator toXmlGenerator) throws IOException {
+    private void writeAttributes(ToXmlGenerator toXmlGenerator) throws JacksonException {
         if (this.attributes != null) {
             for(TransformerAttributeManager.Attribute a : this.attributes.getAttributeList()) {
                 switch (a.getAttributeType()) {
                     case ATTRIBUTE:
                         toXmlGenerator.setNextIsAttribute(true);
-                        toXmlGenerator.writeFieldName(a.getKey());
+                        toXmlGenerator.writeName(a.getKey());
                         toXmlGenerator.writeString(a.getValue());
                         toXmlGenerator.setNextIsAttribute(false);
                         break;
@@ -61,16 +61,16 @@ public class SoapSerializable implements JsonSerializable {
      * Write the fields in our map.
      *
      * @param toXmlGenerator - xmlgen
-     * @throws IOException -
+     * @throws JacksonException -
      */
-    private void writeMap(ToXmlGenerator toXmlGenerator) throws IOException {
+    private void writeMap(ToXmlGenerator toXmlGenerator) throws JacksonException {
         for (Map.Entry<String, Object> e: this.baseMap.entrySet()) {
-            toXmlGenerator.writeObjectField(e.getKey(), e.getValue());
+            toXmlGenerator.writePOJOProperty(e.getKey(), e.getValue());
         }
     }
 
     @Override
-    public void serializeWithType(JsonGenerator gen, SerializerProvider serializers, TypeSerializer typeSer) throws IOException {
+    public void serializeWithType(JsonGenerator gen, SerializationContext serializers, TypeSerializer typeSer) throws JacksonException {
         serialize(gen, serializers);
     }
 

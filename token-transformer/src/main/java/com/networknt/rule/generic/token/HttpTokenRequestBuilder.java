@@ -1,6 +1,6 @@
 package com.networknt.rule.generic.token;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import com.networknt.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +76,7 @@ public class HttpTokenRequestBuilder {
                 try {
                     jsonBody = Config.getInstance().getMapper().writeValueAsString(parameters);
 
-                } catch (JsonProcessingException e) {
+                } catch (JacksonException e) {
                     throw new IllegalArgumentException("Provided body parameters contain invalid JSON properties.");
                 }
 

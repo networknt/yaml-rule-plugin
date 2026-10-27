@@ -2,8 +2,8 @@ package com.networknt.rule.soap.transformer;
 
 import com.networknt.rule.soap.Constants;
 import com.networknt.rule.soap.SoapSerializable;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.util.*;
 
@@ -77,7 +77,7 @@ public class XmlTransformer extends Transformer {
         try {
             String returnString = Transformer.XML_MAPPER.writeValueAsString(this.finalizedObject);
             return this.fixXmlFormat(returnString).trim();
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }

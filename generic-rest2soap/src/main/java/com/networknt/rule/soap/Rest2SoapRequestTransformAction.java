@@ -8,7 +8,6 @@ import com.networknt.server.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -48,17 +47,11 @@ public class Rest2SoapRequestTransformAction implements RequestTransformAction {
         if(logger.isDebugEnabled())
             logger.debug("original request body = {}", body);
 
-        String output = "";
-        try {
-            output = Util.transformRest2Soap(body, actionValues);
-            resultMap.put("requestBody", output);
+        String output = Util.transformRest2Soap(body, actionValues);
+        resultMap.put("requestBody", output);
 
-            if (logger.isDebugEnabled())
-                logger.debug("transformed request body = {}", output);
-
-        } catch (IOException ioe) {
-            logger.error("Transform exception:", ioe);
-        }
+        if (logger.isDebugEnabled())
+            logger.debug("transformed request body = {}", output);
 
         Map<String, String> headerMap = (Map<String, String>)objMap.get("requestHeaders");
         Optional<String> contentOptional = MapUtil.getValueIgnoreCase(headerMap, Constants.CONTENT_TYPE);
