@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -59,13 +58,7 @@ public class SoapTransformTest {
 				"    </DeliverExamOneContentResponse>\n" +
 				"  </soap:Body>\n" +
 				"</soap:Envelope>";
-    	String response = "";
-    	try {
-			response = Util.transformRest2Soap(example, actionValues);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		String response = Util.transformRest2Soap(example, actionValues);
     	Assertions.assertEquals(this.fixSystemIndents(expectedSoapResponse), this.fixSystemIndents(response));
     }
 
@@ -101,12 +94,7 @@ public class SoapTransformTest {
 				"    </ea:AddRequirementRequestBody>\n" +
 				"  </SOAP-ENV:Body>\n" +
 				"</SOAP-ENV:Envelope>";
-		String request = "";
-		try {
-			request = Util.transformRest2Soap(example, actionValues);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		String request = Util.transformRest2Soap(example, actionValues);
 
 		Assertions.assertEquals(expected, request);
 
@@ -137,12 +125,7 @@ public class SoapTransformTest {
 				"    </ea:Flower>\n" +
 				"  </SOAP-ENV:Body>\n" +
 				"</SOAP-ENV:Envelope>";
-		String request = "";
-		try {
-			request = Util.transformRest2Soap(example, actionValues);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		String request = Util.transformRest2Soap(example, actionValues);
 
 		Assertions.assertEquals(expected, request);
 

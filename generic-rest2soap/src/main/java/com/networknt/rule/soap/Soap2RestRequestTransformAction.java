@@ -1,6 +1,5 @@
 package com.networknt.rule.soap;
 
-import tools.jackson.core.JacksonException;
 import com.networknt.rule.RequestTransformAction;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.soap.exception.InvalidSoapBodyException;
@@ -51,14 +50,9 @@ public class Soap2RestRequestTransformAction implements RequestTransformAction {
         if (logger.isTraceEnabled())
             logger.trace("original request body = {}", body);
 
-        String output = "";
-        try {
-            output = Util.transformSoap2Rest(body);
-            resultMap.put("requestBody", output);
-            if (logger.isTraceEnabled()) logger.trace("transformed request body = " + output);
-        } catch (JacksonException ioe) {
-            logger.error("Transform exception:", ioe);
-        }
+        String output = Util.transformSoap2Rest(body);
+        resultMap.put("requestBody", output);
+        if (logger.isTraceEnabled()) logger.trace("transformed request body = " + output);
 
         // transform the content type header.
         Map<String, String> headerMap = (Map<String, String>) objMap.get("requestHeaders");

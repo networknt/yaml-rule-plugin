@@ -8,7 +8,6 @@ import com.networknt.server.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import tools.jackson.core.JacksonException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -52,16 +51,10 @@ public class Soap2RestResponseTransformAction implements ResponseTransformAction
         if (logger.isTraceEnabled())
             logger.trace("original response body = {}", body);
 
-        String output = "";
-        try {
-            output = Util.transformSoap2Rest(body);
-            resultMap.put("responseBody", output);
-            if (logger.isTraceEnabled())
-                logger.trace("transformed response body = " + output);
-
-        } catch (JacksonException ioe) {
-            logger.error("Transform exception:", ioe);
-        }
+        String output = Util.transformSoap2Rest(body);
+        resultMap.put("responseBody", output);
+        if (logger.isTraceEnabled())
+            logger.trace("transformed response body = " + output);
 
         // transform the content type header.
         Map<String, String> headerMap = (Map<String, String>) objMap.get("responseHeaders");

@@ -4,7 +4,6 @@ import com.networknt.jackson.JacksonDefaults;
 import com.networknt.rule.RuleActionValue;
 import com.networknt.rule.soap.transformer.TransformChain;
 import com.networknt.rule.soap.transformer.XmlTransformer;
-import java.io.*;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import org.slf4j.Logger;
@@ -17,7 +16,7 @@ import tools.jackson.dataformat.xml.XmlMapper;
 public class Util {
     private static final Logger logger = LoggerFactory.getLogger(Util.class);
 
-    public static String transformRest2Soap(String input, Collection<RuleActionValue> actionValues) throws IOException {
+    public static String transformRest2Soap(String input, Collection<RuleActionValue> actionValues) {
         ObjectMapper mapper = JacksonDefaults.mapper();
         String returnString = input;
 
@@ -35,7 +34,7 @@ public class Util {
         return returnString;
     }
 
-    public static String transformSoap2Rest(String input) throws JacksonException {
+    public static String transformSoap2Rest(String input) {
         XmlMapper xmlMapper = SoapMappers.xmlMapper();
         ObjectMapper objectMapper = JacksonDefaults.mapper();
         String output;

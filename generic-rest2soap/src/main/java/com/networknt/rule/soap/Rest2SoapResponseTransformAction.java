@@ -7,7 +7,6 @@ import com.networknt.server.ModuleRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -47,19 +46,11 @@ public class Rest2SoapResponseTransformAction implements ResponseTransformAction
         if(logger.isDebugEnabled())
             logger.debug("original response body = {}", body);
 
-        String output = "";
+        String output = Util.transformRest2Soap(body, actionValues);
 
-        try {
-            output = Util.transformRest2Soap(body, actionValues);
-
-            resultMap.put("responseBody", output);
-            if(logger.isDebugEnabled())
-                logger.debug("transformed response body = {}", output);
-
-
-        } catch (IOException ioe) {
-            logger.error("Transform exception:", ioe);
-        }
+        resultMap.put("responseBody", output);
+        if(logger.isDebugEnabled())
+            logger.debug("transformed response body = {}", output);
 
         // transform the content type header.
         Map<String, String> headerMap = (Map<String, String>)objMap.get("responseHeaders");
