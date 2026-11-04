@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.0](https://github.com/networknt/yaml-rule-plugin/tree/2.5.0) (2026-11-04)
+
+**Commits:**
+
+- upgrade to version 2.5.0 before release in 2.x branch ([14e91c0](https://github.com/networknt/yaml-rule-plugin/commit/14e91c09cf60257d110f11659dad2041f04b6f42)) (by Steve Hu)
+- upgrade to version 2.5.0-SNAPSHOT after release in 2.x branch ([7d5b221](https://github.com/networknt/yaml-rule-plugin/commit/7d5b221af118b40a728cca1344459c09e8df107b)) (by Steve Hu)
+- upgrade encoder to 1.6.0 from 1.5.0 ([09000ac](https://github.com/networknt/yaml-rule-plugin/commit/09000ac420e9541d3ce1e9682d3c750a5cef2136)) (by Steve Hu)
+- upgrade commons-codec to 1.23.0 from 1.22.1 ([8f62e74](https://github.com/networknt/yaml-rule-plugin/commit/8f62e74c45259224c4689e79567a6a35f31f9d47)) (by Steve Hu)
+- upgrade jackson to 2.22.4 from 2.22.3 ([e772029](https://github.com/networknt/yaml-rule-plugin/commit/e772029f071fc1c85332b543e5c8e669d6dcac55)) (by Steve Hu)
+- upgrade logback to 1.6.6 from 1.6.5 ([08983b6](https://github.com/networknt/yaml-rule-plugin/commit/08983b60f369534c120f0ef1a572741388aed458)) (by Steve Hu)
+- upgrade to version 2.4.2-SNAPSHOT after release in master branch ([6d31905](https://github.com/networknt/yaml-rule-plugin/commit/6d319057fb7366b804077603c91d13e105ff4cbb)) (by Steve Hu)
+
 ## [2.4.1](https://github.com/networknt/yaml-rule-plugin/tree/2.4.1) (2026-10-11)
 
 **Commits:**
