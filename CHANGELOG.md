@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.1](https://github.com/networknt/yaml-rule-plugin/tree/2.5.1) (2026-11-21)
+
+**Commits:**
+
+- upgrade to version 2.5.1 before release in 2.x branch ([1334f4b](https://github.com/networknt/yaml-rule-plugin/commit/1334f4b1f957fd95657ef19d2501a14bb01c7838)) (by Steve Hu)
+- upgrade logback to 1.6.8 from 1.6.7 ([4b9b372](https://github.com/networknt/yaml-rule-plugin/commit/4b9b372287d90057fecbdc0dc2c1e0a51396e451)) (by Steve Hu)
+- upgrade logback to 1.6.7 from 1.6.6 ([c0a379b](https://github.com/networknt/yaml-rule-plugin/commit/c0a379b989105b2caa16a7ecbb8041eb12f3098f)) (by Steve Hu)
+- upgrade maven-compiler to 3.16.0 from 3.8.1 ([069efe7](https://github.com/networknt/yaml-rule-plugin/commit/069efe774424e40a0f919a0e00fc5ffbf919f90d)) (by Steve Hu)
+- upgrade maven-surefire to 3.6.1 from 3.6.0 ([3fbd189](https://github.com/networknt/yaml-rule-plugin/commit/3fbd189be6a137a05f262edf70501a095ffba769)) (by Steve Hu)
+- upgrade to version 2.5.1-SNAPSHOT after release in 2.x branch ([c0b0734](https://github.com/networknt/yaml-rule-plugin/commit/c0b0734925cc900577e9d575295e351ae69887dc)) (by Steve Hu)
+
 ## [2.5.0](https://github.com/networknt/yaml-rule-plugin/tree/2.5.0) (2026-11-04)
 
 **Commits:**
